@@ -1,4 +1,5 @@
 var http = require('http');
+var initApi = require('./initapi');
 var socket_server = 0;
 
 // http://bcho.tistory.com/899 
@@ -21,6 +22,41 @@ function socket_communication()
             else if ("initiative_lists" == cmd) {
                 socket.emit('toclient', { msg: '[initiative_lists] New Contribution... Insert row Last !!' });
                 console.log('toclient :' + data.msg);
+
+                // Use Promise Object
+                initApi.get_InitiativeListP().then(function (data)
+                {
+                    console.log("Initiative List gathering ok - Promise");
+                    console.log(data);
+                    res.send('Initiative List gathering ok - Promise');
+                    socket.emit('initiative_lists', data);
+                }).catch(function (err)
+                {
+                    console.log("Initiative List gathering NG - Promise");
+                    console.log(err);
+                    res.send('Initiative List gathering NG - Promise');
+                });
+            }
+            else {
+            }
+            console.log('Message from client :' + data.msg);
+           });
+
+           socket.on('initiative_lists', function (data) {
+            var cmd = data.msg;
+            if ("all" == cmd) {
+                // Use Promise Object
+                initApi.get_InitiativeListP().then(function (data)
+                {
+                    console.log("******Initiative List gathering ok - Promise*******");
+                    console.log(JSON.stringify(data));
+                    console.log("******Send Initiative List to client*******");
+                    socket.emit('initiative_lists', data);
+                }).catch(function (err)
+                {
+                    console.log("Initiative List gathering NG - Promise");
+                    console.log(err);
+                });
             }
             else {
             }
@@ -33,4 +69,4 @@ function socket_communication()
     }
 }
 
-module.exports = socket_communication;
+module.exports = { socket_communication, };

@@ -21,13 +21,11 @@
         <div class="linkarea" style="top: 30px; left: 0px; width: 30px; height: 30px; cursor: pointer; position:absolute;" clicklink="http://www.naver.com">###</div>
         <div class="linkarea" style="top: 30px; left: 300px; width: 30px; height: 30px; cursor: pointer; position:absolute;" clicklink="http://www.naver.com">###</div>
       </div>
-      <div hidden id = 'hiddendata'></div>
-      <div id = 'summary region'>
-        <table id = 'static_summary_table'></table>
-      </div>
       <span id="msgs"></span>
-      <div id = "workflowstatus"></div>
+      <div id ="workflowstatus"></div>
+      <div id="initiative_org"></div>
       <div id="initiativelist"></div>
+      <div id="hiddendata"></div>
 </body>
 </html>
 
@@ -52,9 +50,8 @@
     $(document).ready(function() {
         //setDivLinks();
         open_socketcomm();
-        //getInitiativeStatus();
         initiative_organization(data);
-        display_initative();
+        socket.emit('initiative_lists',{ msg : "all" });
     });
 
     function open_socketcomm()
@@ -64,6 +61,7 @@
             console.log("open socket to communicate with server and install event handler....");
             //https://javafa.gitbooks.io/nodejs_server_basic/content/chapter10.html
             socket = io.connect('http://10.186.115.57:5555');
+            // send operation
             $("#msgbox").keyup(function(event) {
             if (event.which == 13) {
                 // send event with 'fromclientpublic' message ID 
@@ -79,9 +77,11 @@
             });
 
             socket.on('initiative_lists',function(data){
-                console.log(JSON.parse(data.msg));
+                var jsondata = JSON.stringify(data);
+                console.log("[****************************]");
+                console.log(JSON.stringify(data));
+                display_initiative(JSON.parse(jsondata));
             });
-
         }
         else
         {
@@ -103,17 +103,23 @@
         });
     }
 
-    function display_initative(data) {
-        socket.emit("get_initativelist", { param : "JSON" });
 
-        $("#rawdata").hide();
-        db = document.getElementById("hiddendata").innerHTML;
-        jsondata = JSON.parse(db);
+    function display_initiative(data) 
+    {
+        var header1 = ["No", "Type", "Key", "Summary", "Assignee", "DueDate", "Status"];
+        $("#hiddendata").hide();
+        document.getElementById("hiddendata").innerHTML = JSON.stringify(data);
+        jsondata = data;
 
-        $('#static_summary_table').empty(); // .remove()
+        table = $('#static_summary_table').empty(); // .remove()
+        $('#static_summary_table').append(table);				
+
+        var table = $('<table width=100% border=1 cellpadding=0 cellspacing=0 style="border-collapse:collapse"></table>');
+        table.attr('id', 'tb_initiative_list');
+        $('#initiativelist').append(table);				
 
         for (index in header1) {
-            $('#static_summary_table').append($('<th>').html(header1[index]))
+            table.append($('<th>').html(header1[index]))
         }
 
         for (i = 0; i < jsondata.total; i++) {
@@ -126,9 +132,8 @@
             assignee = assignee.substring(0, assignee.indexOf(' '));
             var due = jsondata["issues"][i]["fields"]["due"];
 
-            //var tr = document.createElement("TR");
             var tr = $('<tr>');
-            $('#static_summary_table').append(tr);
+            table.append(tr);
             $(tr).append($('<td>').html(no));
             $(tr).append($('<td>').html(type));
             $(tr).append($('<td>').html('<a href="http://hlm.lge.com/issue/browse/' + key + '" target="_blank">' + key + '</a>'));
@@ -142,7 +147,7 @@
     function initiative_organization(orgInfo)
     {
         var table = $('<table width=100% border=1 cellpadding=0 cellspacing=0 style="border-collapse:collapse"></table>');
-        table.attr('id', 'tb_initiative_status');;
+        table.attr('id', 'tb_initiative_status');
         $('#workflowstatus').append(table);				
         table.append($('<thead>')
                  .append($('<tr>')
@@ -170,8 +175,8 @@
     }
 
 
-	function makeInitiativeJiraIssueLink(group, status, issueCnt) {
-
+    function makeInitiativeJiraIssueLink(group, status, issueCnt) 
+    {
 		var filter = 'project = TVPLAT and issuetype = Initiative and fixVersion = "webOS TV 4.5 Initial"';
 		if(status != 'Total') {
 			filter += ' and status = "' + status + '"';
@@ -195,8 +200,7 @@
 			filter += ' and assignee in membersOf("' + group + '_' + groupLeader[group] + '")';			
 		}
 
-
-		var result = '<a href="http://hlm.lge.com/issue/issues/?jql=' + encodeURIComponent(filter) + '" target="_blank">' + issueCnt + '</a>';
+        var result = '<a href="http://hlm.lge.com/issue/issues/?jql=' + encodeURIComponent(filter) + '" target="_blank">' + issueCnt + '</a>';
 
 		return result;
 	}

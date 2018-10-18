@@ -1,9 +1,13 @@
 var express = require('express');
 var router = express.Router();
 
+// User Define module....
+var socketcomm = require('./socket_comm');
+var initapi = require('./initapi');
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  socket_communication();
+  socketcomm.socket_communication();
   res.render('index', { title: 'Express' });
 });
 
