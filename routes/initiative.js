@@ -35,7 +35,7 @@ router.get('/list', function(req, res, next) {
 router.get('/listP', function(req, res, next) {
   socketcomm.socket_communication();
   // Use Promise Object
-  initapi.get_InitiativeListP().then(function (data)
+  initapi.get_InitiativeListfromJira().then(function (data)
     {
       console.log("Initiative List gathering ok - Promise");
       console.log(data);
@@ -49,3 +49,4 @@ router.get('/listP', function(req, res, next) {
 });
 
 module.exports = router;
+

@@ -8,6 +8,10 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 //var chatRouter = require('./routes/chat');
 var initiativeRouter = require('./routes/initiative');
+var mysqlSaveRouter = require('./routes/mysqlsave');
+
+var tmr = require('./routes/mytimer');
+var initapi = require('./routes/initapi');
 
 var app = express();
 
@@ -25,6 +29,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 //app.use('/chat', chatRouter);
 app.use('/initiative', initiativeRouter);
+app.use('/mysqlsave', mysqlSaveRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -41,5 +46,25 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+function getInitiativeList(filterID)
+{
+  // Use Promise Object
+  initapi.get_InitiativeListfromJira(filterID).then(function (jsondata)
+  {
+    for (i = 0; i < jsondata.total; i++) {
+      initapi.jira_initiative_keylist.push(jsondata["issues"][i]["key"]);
+    }     
+    console.log("Initiative List gathering ok - Promise");
+    console.log(jsondata);
+    console.log(initapi.jira_initiative_keylist);
+  }).catch(function (err)
+  {
+    console.log("Initiative List gathering NG - Promise");
+    console.log(err);
+  });
+}  
+
+tmr.Timer_Setting(13, 17, 50, getInitiativeList, "42021");
 
 module.exports = app;
