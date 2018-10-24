@@ -47,24 +47,12 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-function getInitiativeList(filterID)
+function periodic_DBjobs()
 {
   // Use Promise Object
-  initapi.get_InitiativeListfromJira(filterID).then(function (jsondata)
-  {
-    for (i = 0; i < jsondata.total; i++) {
-      initapi.jira_initiative_keylist.push(jsondata["issues"][i]["key"]);
-    }     
-    console.log("Initiative List gathering ok - Promise");
-    console.log(jsondata);
-    console.log(initapi.jira_initiative_keylist);
-  }).catch(function (err)
-  {
-    console.log("Initiative List gathering NG - Promise");
-    console.log(err);
-  });
+  initapi.get_makeSnapshot_InitiativeInfofromJira(42101);
 }  
 
-tmr.Timer_Setting(13, 17, 50, getInitiativeList, "42021");
+tmr.Timer_Setting(16, 32, 10, periodic_DBjobs);
 
 module.exports = app;

@@ -33,12 +33,12 @@ function Timer_Setting(hour, min, sec, callback, arg)
     var diff = dtAlarm - dtNow;
 
 		if (diff > 0) {
-			console.log('[today] callback will be called after ", diff, " sec!');
+			console.log("[today] callback will be called after ", diff);
 		}
 		else {
 			dtAlarm.setDate(dtAlarm.getDate() + 1);
       diff = dtAlarm - dtNow;
-			console.log('[Next day] callback will be called after ", diff, " sec!');
+			console.log("[Next day] callback will be called after ", diff);
 		}
 
     console.log(diff);

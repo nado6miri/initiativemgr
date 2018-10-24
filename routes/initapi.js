@@ -5,8 +5,9 @@ var http = require('http');
 var url = require('url');
 var XMLHttpRequest = require('xmlhttprequest-ssl').XMLHttpRequest;
 
-var initiative50_list;
-var jira_initiative_keylist = [];
+var initiative_DB = [];
+var initiative_FilterResult;
+var initiative_keylist = [];
 
 var default_Sprint_Info = {
   'TVSP1_1' : '',  'TVSP1_2' : '',  'TVSP2_1' : '',  'TVSP2_2' : '',
@@ -81,7 +82,15 @@ function get_InitiativeListfromJira(filterID)
         {
           if (xhttp.status === 200)
           {
-            var resultJSON = initiative50_list = JSON.parse(xhttp.responseText);
+            var resultJSON = initiative_FilterResult = JSON.parse(xhttp.responseText);
+            var json = JSON.stringify(resultJSON);
+            fse.outputFileSync("./public/json/initiative_list", json, 'utf-8', function(e){
+              if(e){
+                console.log(e);
+              }else{
+                console.log("Download is done!");	
+              }
+            });
             resolve(resultJSON);
           }
           else
@@ -91,14 +100,17 @@ function get_InitiativeListfromJira(filterID)
       }
     }
 
-    filterID = "42101";
+    filterID = "filter="+filterID.toString();
+    //console.log("filterID = ", filterID);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
-    var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
-    //var param = '{ "jql" : "filter="+filterID : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
+    //var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
+    //var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };
+    var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
+    //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
     xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
     xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-    xhttp.send(param);  
+    xhttp.send(JSON.stringify(param));  
   });
 }
 
@@ -114,7 +126,7 @@ function get_InitiativeList(res, res, next)
         {
 			  	var resultJSON = JSON.parse(xhttp.responseText);
 			  	console.log(resultJSON.total, resultJSON);
-			  	var json = initiative50_list = JSON.stringify(resultJSON);
+			  	var json = JSON.stringify(resultJSON);
 			  	fse.outputFileSync("./public/json/initiative_list", json, 'utf-8', function(e){
 			  		if(e){
 			  			console.log(e);
@@ -165,10 +177,68 @@ function get_InitiativeList()
 } 
 */
 
+function get_makeSnapshot_InitiativeInfofromJira(filterID)
+{
+  // Use Promise Object
+  get_InitiativeListfromJira(filterID)
+  .then((filteredJsonData) => {
+    console.log("[Promise 1] get Initiative List and Iinitiative Key List from JIRA");
+    console.log(filteredJsonData);
+
+    return new Promise((resolve, reject) => {
+      for (i = 0; i < filteredJsonData.total; i++) {
+        initiative_keylist.push(filteredJsonData["issues"][i]["key"]);
+      }     
+      resolve(initiative_keylist);
+    });
+  })
+  .then((initkeylist) => {
+    console.log("[Proimse 2] Make a Epic List from Initiative Key List ");
+    //console.log(initkeylist);
+
+    /*
+      var key = jsondata["issues"][i]["key"];
+      var summary = jsondata["issues"][i]["fields"]["summary"];
+      var status = jsondata["issues"][i]["fields"]["status"]["name"];
+      var assignee = jsondata["issues"][i]["fields"]["assignee"]["displayName"];
+      assignee = assignee.substring(0, assignee.indexOf(' '));
+      var due = jsondata["issues"][i]["fields"]["due"];
+    */
+
+    return new Promise((resolve, reject) => {
+      for(var i = 0; i < initiative_FilterResult["issues"].length; i++){
+        var dissue = initiative_FilterResult['issues'][i];
+        console.log(dissue);
+      }
+      resolve(initkeylist[0]);
+    });
+  })
+  .then((initlist1) => {
+    console.log("Proimse 3rd then : initlist1 = ", initlist1);
+    return new Promise((resolve, reject) => {
+      resolve("need to get epic list from ", initlist1);
+    });
+  })
+  .then((epic) => {
+    console.log("Proimse 4th then : ", epic);
+    return new Promise((resolve, reject) => {
+      reject("can't find epic error from initiative");
+    });
+  })
+  .catch(function (err){
+    console.log("Proimse exception : Initiative List gathering NG - Promise");
+    console.log(err);
+  });
+}
+
+
+
 module.exports = { 
-  initiative50_list, 
-  jira_initiative_keylist,
+  initiative_DB,              // final DB
+  initiative_FilterResult,    // initiative JOSN Object from JIRA Filter
+  initiative_keylist,         // initiative Key List Only.
   // function
   get_InitiativeListfromJira,  // promise
   get_InitiativeList,          // callback
+  get_makeSnapshot_InitiativeInfofromJira,
  };
