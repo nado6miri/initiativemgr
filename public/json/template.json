@@ -1,0 +1,118 @@
+{
+    total : 2,
+    snapshotDate : '2018',
+
+    issue : 
+    [
+        {
+            'Initiative Key' : 'TVPLAT-1',
+            'Summary' : '',
+            'Assignee' : '',
+            'Status' : '',
+            'Release_SP' : '',
+            'CreatedDate' : '',
+            '관리대상' : '',
+            'Risk관리대상' : '',
+            'Initiative Order' : '',
+            'Status Color' : '',
+            'SE_Delivery' : '',
+            'SE_Quality' : '',
+            'ScopeOfChange' : '',
+            'RMS' : '',
+            'RescheduleCnt' : 0,
+            'STEOnSite' : '',
+            'AbnormalEpicSprint' : '',
+            "GovOrDeployment" : '',
+    
+            'DHistory' :  
+            [
+                { 'orginal' : 'TVSP7' }, 
+                { 'TVSP6' :'TVSP9'}, 
+                { 'TVSP9' :'TVSP12'}, 
+                { 'TVSP10' :'TVSP11'}, 
+            ],
+        
+            'EPIC' : 
+            {
+                'EpicTotalCnt': 0,
+                'EpicDevelCnt': 0,
+                'EpicGovOrDeploymentCnt': 0,
+                'EpicTotalResolutionCnt' : 0,
+                'EpicDevelResolutionCnt' : 0,
+                'EpicGovOrDeploymentResolutionCnt' : 0,
+                'EpicDelayedCnt' : 0,
+                issue : 
+                [ 
+                    {
+                        'Epic Key' : '',
+                        'Release_SP' : '',
+                        'Summary' : "",
+                        'Assignee' : '',
+                        'duedate' : '',
+                        'Status' : '',
+                        'CreatedDate' : '',
+                        'RescheduleCnt' : 0,
+                        'AbnormalEpicSprint' : '',
+                        "GovOrDeployment" : '',
+                        'DHistory' :  [
+                            { 'orginal' : 'TVSP7' }, 
+                            { 'TVSP6' :'TVSP9'}, 
+                            { 'TVSP9' :'TVSP12'}, 
+                            { 'TVSP10' :'TVSP11'}, 
+                            ],
+                        'Zephyr' : [
+                            {
+                                'target' : '7',
+                            },
+                        ],
+                    },
+                ],
+            },
+ 
+            'STORY' : 
+            {
+                'StoryTotalCnt': 0,
+                'StoryDevelCnt': 0,
+                'StoryGovOrDeploymentCnt': 0,
+                'StoryTotalResolutionCnt' : 0,
+                'StoryDevelResolutionCnt' : 0,
+                'StoryGovOrDeploymentResolutionCnt' : 0,
+                issue : 
+                [
+                    {
+                        'Story Key' : '',
+                        'Release_SP' : '',
+                        'Summary' : "",
+                        'Assignee' : '',
+                        'duedate' : '',
+                        'Status' : '',
+                        'CreatedDate' : '',
+                        'StoryZephyrCnt': 0,
+                        'StoryZephyrResolutionCnt' : 0,
+                        'RescheduleCnt' : 0,
+                        'AbnormalStorySprint' : '',
+                        "GovOrDeployment" : '',
+                        'Zephyr' : [],
+                    },
+                    {
+                        'Story Key' : '',
+                        'Release_SP' : '',
+                        'Summary' : "",
+                        'Assignee' : '',
+                        'duedate' : '',
+                        'Status' : '',
+                        'CreatedDate' : '',
+                        'StoryZephyrCnt': 0,
+                        'StoryZephyrResolutionCnt' : 0,
+                        'RescheduleCnt' : 0,
+                        'AbnormalStorySprint' : '',
+                        "GovOrDeployment" : '',
+                        'Zephyr' : [],
+                    },
+                ],
+            },
+        },
+    ],
+}
+
+

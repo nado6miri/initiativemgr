@@ -6,8 +6,17 @@ var url = require('url');
 var XMLHttpRequest = require('xmlhttprequest-ssl').XMLHttpRequest;
 
 var initiative_DB = [];
+// initiative filter result (json) - webOS45 webOS45MR, webOS5.0 
 var initiative_FilterResult;
 var initiative_keylist = [];
+
+// epic filter result (json) - epic list depend on intitative key
+var epic_FilterResult;
+var epic_keylist = [];
+
+// epic filter result (json) - story list depend on epic key
+var story_FilterResult;
+var story_keylist = [];
 
 var default_Sprint_Info = {
   'TVSP1_1' : '',  'TVSP1_2' : '',  'TVSP2_1' : '',  'TVSP2_2' : '',
@@ -70,6 +79,26 @@ var default_initiative_info = {
   "GovOrDeployment" : '',
       };
 
+
+  var default_story_info = 
+  {
+    'Story Key' : '',
+    'Release_SP' : '',
+    'Summary' : "",
+    'Assignee' : '',
+    'duedate' : '',
+    'Status' : '',
+    'CreatedDate' : '',
+    'TVSP' : default_Sprint_Info,
+    'StoryZephyrCnt': 0,
+    'StoryZephyrResolutionCnt' : 0,
+    'RescheduleCnt' : 0,
+    'Zephyr' : [],
+    'AbnormalStorySprint' : '',
+    "GovOrDeployment" : '',
+};
+  
+
 // Javascript 비동기 및 callback function.
 // https://joshua1988.github.io/web-development/javascript/javascript-asynchronous-operation/
 // Use Promise Object
@@ -104,8 +133,8 @@ function get_InitiativeListfromJira(filterID)
     //console.log("filterID = ", filterID);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
     //var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
-    //var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };
-    var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
+    //var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
+    var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks"] };
     //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
     xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
@@ -183,10 +212,10 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
   get_InitiativeListfromJira(filterID)
   .then((filteredJsonData) => {
     console.log("[Promise 1] get Initiative List and Iinitiative Key List from JIRA");
-    console.log(filteredJsonData);
+    //console.log(filteredJsonData);
 
     return new Promise((resolve, reject) => {
-      for (i = 0; i < filteredJsonData.total; i++) {
+      for (var i = 0; i < filteredJsonData.total; i++) {
         initiative_keylist.push(filteredJsonData["issues"][i]["key"]);
       }     
       resolve(initiative_keylist);
@@ -195,7 +224,6 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
   .then((initkeylist) => {
     console.log("[Proimse 2] Make a Epic List from Initiative Key List ");
     //console.log(initkeylist);
-
     /*
       var key = jsondata["issues"][i]["key"];
       var summary = jsondata["issues"][i]["fields"]["summary"];
@@ -203,24 +231,38 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
       var assignee = jsondata["issues"][i]["fields"]["assignee"]["displayName"];
       assignee = assignee.substring(0, assignee.indexOf(' '));
       var due = jsondata["issues"][i]["fields"]["due"];
-    */
-
-    return new Promise((resolve, reject) => {
       for(var i = 0; i < initiative_FilterResult["issues"].length; i++){
         var dissue = initiative_FilterResult['issues'][i];
-        console.log(dissue);
+        //console.log(dissue);
       }
-      resolve(initkeylist[0]);
-    });
+      */
+
+    initkeylist.forEach((value, index) => { 
+      console.log("index = ", index, "value =", value); 
+      default_initiative_info['Initiative Key'] = value;
+      getEpicListfromJira(value)
+      .then((epiclist) => {
+        console.log(epiclist);
+        epic_keylist = [];
+        for (var i = 0; i < epiclist.total; i++) {
+          epic_keylist.push(epiclist["issues"][i]["key"]);
+        }     
+        default_initiative_info['EPIC'] = epic_keylist;
+        console.log(default_initiative_info['EPIC']);
+        //initiative_DB['Initiative Key']['EPIC'] = epic_keylist;
+        //console.log(initiative_DB);
+      })
+      .catch((error) => { console.log(error); });
+    }); 
   })
   .then((initlist1) => {
-    console.log("Proimse 3rd then : initlist1 = ", initlist1);
+    console.log("[Proimse 3] then : initlist1 = ", initlist1);
     return new Promise((resolve, reject) => {
-      resolve("need to get epic list from ", initlist1);
+      resolve("---");
     });
   })
   .then((epic) => {
-    console.log("Proimse 4th then : ", epic);
+    console.log("[Proimse 4] then epic = : ", epic);
     return new Promise((resolve, reject) => {
       reject("can't find epic error from initiative");
     });
@@ -230,6 +272,54 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
     console.log(err);
   });
 }
+
+
+function getEpicListfromJira(initiativeKey)
+{
+  return new Promise(function (resolve, reject){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState === 4)
+      {
+        if (xhttp.status === 200)
+        {
+          var resultJSON = epic_FilterResult = JSON.parse(xhttp.responseText);
+          var json = JSON.stringify(resultJSON);
+          resolve(resultJSON);
+        }
+        else
+        {
+          reject(xhttp.status);
+        }        
+      }
+    }
+    let filterjql = "issue in linkedissues(" + initiativeKey + ")";
+    console.log("filterjql = ", filterjql);
+    var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
+    var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks"] };
+    //console.log("param=", JSON.stringify(param));
+    xhttp.open("POST", searchURL, true);
+    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+    xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+    xhttp.send(JSON.stringify(param));  
+  });    
+}  
+
+function getStoryListfromJira(epicKey)
+{
+
+}  
+
+function getEpicZephyerListfromJira(initiativeKey)
+{
+
+}  
+
+function getStoryZephyerListfromJira(epicKey)
+{
+
+}  
+
 
 
 

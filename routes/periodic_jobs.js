@@ -60,26 +60,5 @@ function getInitiativeList(filterID)
   });
 }  
 
-function getEpicList(initiativeKey)
-{
-
-}  
-
-function getStoryList(epicKey)
-{
-
-}  
-
-function getEpicZephyerList(initiativeKey)
-{
-
-}  
-
-function getStoryZephyerList(epicKey)
-{
-
-}  
-
-tmr.Timer_Setting(13, 07, 00, getInitiativeList, "42021");
 
 module.exports = { };

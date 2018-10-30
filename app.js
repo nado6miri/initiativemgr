@@ -50,9 +50,11 @@ app.use(function(err, req, res, next) {
 function periodic_DBjobs()
 {
   // Use Promise Object
-  initapi.get_makeSnapshot_InitiativeInfofromJira(42101);
+  //initapi.get_makeSnapshot_InitiativeInfofromJira(42101); // webOS4.5
+  initapi.get_makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
 }  
 
-tmr.Timer_Setting(16, 32, 10, periodic_DBjobs);
+//tmr.Timer_Setting(12, 20, 10, periodic_DBjobs);
+periodic_DBjobs();
 
 module.exports = app;
