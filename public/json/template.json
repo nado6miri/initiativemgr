@@ -1,7 +1,7 @@
 {
     total : 2,
     snapshotDate : '2018',
-
+    sprint : 'TVSP7', 
     issue : 
     [
         {
@@ -54,22 +54,57 @@
                         'RescheduleCnt' : 0,
                         'AbnormalEpicSprint' : '',
                         "GovOrDeployment" : '',
-                        'DHistory' :  [
+                        'DHistory' :  
+                        [
                             { 'orginal' : 'TVSP7' }, 
                             { 'TVSP6' :'TVSP9'}, 
                             { 'TVSP9' :'TVSP12'}, 
                             { 'TVSP10' :'TVSP11'}, 
-                            ],
-                        'Zephyr' : [
+                        ],
+                        'Zephyr' : 
+                        [
                             {
                                 'target' : '7',
+                            },
+                        ],      
+                        'STORY' : 
+                        [
+                            {
+                                'Story Key' : '',
+                                'Release_SP' : '',
+                                'Summary' : "",
+                                'Assignee' : '',
+                                'duedate' : '',
+                                'Status' : '',
+                                'CreatedDate' : '',
+                                'StoryZephyrCnt': 0,
+                                'StoryZephyrResolutionCnt' : 0,
+                                'RescheduleCnt' : 0,
+                                'AbnormalStorySprint' : '',
+                                "GovOrDeployment" : '',
+                                'Zephyr' : [],
+                            },
+                            {
+                                'Story Key' : '',
+                                'Release_SP' : '',
+                                'Summary' : "",
+                                'Assignee' : '',
+                                'duedate' : '',
+                                'Status' : '',
+                                'CreatedDate' : '',
+                                'StoryZephyrCnt': 0,
+                                'StoryZephyrResolutionCnt' : 0,
+                                'RescheduleCnt' : 0,
+                                'AbnormalStorySprint' : '',
+                                "GovOrDeployment" : '',
+                                'Zephyr' : [],
                             },
                         ],
                     },
                 ],
             },
  
-            'STORY' : 
+            'STORY_SUMMARY' : 
             {
                 'StoryTotalCnt': 0,
                 'StoryDevelCnt': 0,
@@ -77,40 +112,8 @@
                 'StoryTotalResolutionCnt' : 0,
                 'StoryDevelResolutionCnt' : 0,
                 'StoryGovOrDeploymentResolutionCnt' : 0,
-                issue : 
-                [
-                    {
-                        'Story Key' : '',
-                        'Release_SP' : '',
-                        'Summary' : "",
-                        'Assignee' : '',
-                        'duedate' : '',
-                        'Status' : '',
-                        'CreatedDate' : '',
-                        'StoryZephyrCnt': 0,
-                        'StoryZephyrResolutionCnt' : 0,
-                        'RescheduleCnt' : 0,
-                        'AbnormalStorySprint' : '',
-                        "GovOrDeployment" : '',
-                        'Zephyr' : [],
-                    },
-                    {
-                        'Story Key' : '',
-                        'Release_SP' : '',
-                        'Summary' : "",
-                        'Assignee' : '',
-                        'duedate' : '',
-                        'Status' : '',
-                        'CreatedDate' : '',
-                        'StoryZephyrCnt': 0,
-                        'StoryZephyrResolutionCnt' : 0,
-                        'RescheduleCnt' : 0,
-                        'AbnormalStorySprint' : '',
-                        "GovOrDeployment" : '',
-                        'Zephyr' : [],
-                    },
-                ],
             },
+
         },
     ],
 }
