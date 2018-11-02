@@ -119,3 +119,12 @@
 }
 
 
+// shell
+json file을 mongodb로 write
+mongoimport --jsonArray  -d testdb -c docs --file /filePath/filename.json
+mongoimport --jsonArray  -d testdb -c docs < /filePath/filename.json
+
+// shell or code
+use testdb                        # db name
+var o = JSON.parse(file);         # convert string to JSON
+db.forms.insert(o)                # collection name
