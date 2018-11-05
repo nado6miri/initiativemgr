@@ -1,0 +1,258 @@
+{
+    total : 2,
+    snapshotDate : '2018',
+    current_sprint : 'TVSP7', 
+    issue : 
+    [
+        {
+            'Initiative Key' : 'TVPLAT-1',
+            'Summary' : '',
+            'Assignee' : '',
+            '관리대상' : '',
+            'Risk관리대상' : '',
+            'Initiative Order' : '',
+            'Status Color' : '',
+            'SE_Delivery' : '',
+            'SE_Quality' : '',
+            'ScopeOfChange' : '',
+            'RMS' : '',
+            'RescheduleCnt' : 0,
+            'STEOnSite' : '',
+            'AbnormalEpicSprint' : '',
+            "GovOrDeployment" : '',
+            "StatusSummarymgrCnt" : '',
+
+            'Demo' : 
+            {
+                DemoCnt : 3,
+                'issue' : 
+                [
+                    {
+                        'key' : 'TVXX-0',
+                        'summary' : "통합데모 시연",
+                        '수상여부' : true,
+                    },
+                    {
+                        'key' : 'TVXX-1',
+                        'summary' : "통합데모 시연",
+                        '수상여부' : false,
+                    },
+                ],
+            },
+            'RelatedInitiative' : [ 'TVPLAT-XXXX', 'TVPLAT-0000', ], 
+            'StoryPoint' : 
+            {
+                'PlanSP' : 300,
+                'BurnedSP' : 200,
+                'RemainSP' : 100,
+            },
+
+            'workflow' :
+            {   
+                'CreatedDate' : '',
+                'Status' : '',
+                'history' :
+                [
+                    { "Draft" : '2019-01-01' , "Period" : "10" },                
+                    { "PO Review" : '2019-01-10' , "Period" : "10" },                
+                    { "ELTReview" : '2019-01-20' , "Period" : "10" },                
+                    { "Approved" : '2019-01-30' , "Period" : "10" },                
+                    { "Ready" : '2019-02-01' , "Period" : "10" },                
+                    { "InProgress" : '2019-02-03' , "Period" : "10" },                
+                    { "Delivered" : '2019-04-01' , "Period" : "10" },                
+                ],
+            },    
+            'MileStone' :
+            {   
+                'total' : '',
+                'rescheduleCnt' : '4',
+                'history' :
+                [
+                    { "Item1" : '2019-01-01' , "Schedule" : [ '2019-01-01', '2019-01-10', ] },                
+                ],
+            },    
+            'ReleaseSprint' :  
+            {
+                'CurRelease_SP' : 'TVSP11',
+                'history' :
+                [
+                    { 'orginal' : 'TVSP7' }, 
+                    { 'TVSP6' :'TVSP9'}, 
+                    { 'TVSP9' :'TVSP12'}, 
+                    { 'TVSP10' :'TVSP11'}, 
+                ],
+            },
+            'StakeHolders' :
+            {   
+                'OrgCnt' : 3,
+                'OrgLists' :
+                [
+                    { "OrgName1" : 'TV 화질' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
+                    { "OrgName1" : 'TV 음질' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
+                    { "OrgName1" : 'TV SystemCore' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
+                ],
+            },    
+
+            'STORY_SUMMARY' : 
+            {
+                'StoryTotalCnt': 0,
+                'StoryDevelCnt': 0,
+                'StoryGovOrDeploymentCnt': 0,
+                'StoryTotalResolutionCnt' : 0,
+                'StoryDevelResolutionCnt' : 0,
+                'StoryGovOrDeploymentResolutionCnt' : 0,
+            },
+
+            'EPIC' : 
+            {
+                'EpicTotalCnt': 0,
+                'EpicDevelCnt': 0,
+                'EpicGovOrDeploymentCnt': 0,
+                'EpicTotalResolutionCnt' : 0,
+                'EpicDevelResolutionCnt' : 0,
+                'EpicGovOrDeploymentResolutionCnt' : 0,
+                'EpicDelayedCnt' : 0,
+                issue : 
+                [ 
+                    {
+                        'Epic Key' : '',
+                        'Release_SP' : '',
+                        'Summary' : "",
+                        'Assignee' : '',
+                        'duedate' : '',
+                        'Status' : '',
+                        'CreatedDate' : '',
+                        'RescheduleCnt' : 0,
+                        'AbnormalEpicSprint' : '',
+                        "GovOrDeployment" : '',
+                        'StoryPoint' : 
+                        {
+                            'PlanSP' : 300,
+                            'BurnedSP' : 200,
+                            'RemainSP' : 100,
+                        },
+            
+                        'DHistory' :  
+                        [
+                            { 'orginal' : 'TVSP7' }, 
+                            { 'TVSP6' :'TVSP9'}, 
+                            { 'TVSP9' :'TVSP12'}, 
+                            { 'TVSP10' :'TVSP11'}, 
+                        ],
+
+                        'Zephyr' : 
+                        {
+                            'EpicZephyrCnt': 1,
+                            'EpicTC':
+                            [
+                                {
+                                    'issueId' : 964936,
+                                    'issueKey' : 'TVDEVTC-3088',
+                                    'summary' : '[SDET][TC] General Setting Test',
+                                    'assignee' : 'jira-user@lge.com',
+                                    'status' : 'Draft',
+                                    'label' : 'BASIC_TC, SETTINGS_GENERAL, TAS_MiniBAT',
+                                    'exeRecordsCnt' : 3,
+                                    'executions': 
+                                    [
+                                        {
+                                            'id': 143886,
+                                            'executionsStatus': '-1',
+                                            'cycleId': 7038,
+                                            'cycleName': 'MiniBAT_TAS_07_SETTINGS'
+                                        },
+                                        {
+                                            'id': 143885,
+                                            'executionStatus': '1',
+                                            'executionOn': '2018/11/01 16:19',
+                                            'executedBy': 'jira-user@lge.com',
+                                            'cycleId': -1,
+                                            'cycleName': 'Ad hoc'
+                                        },
+                                        {
+                                            'id': 143800,
+                                            'executionStatus': '1',
+                                            'executionOn': '2018/10/31 17:37',
+                                            'executedBy': 'jira-user@lge.com',
+                                            'cycleId': -1,
+                                            'cycleName': 'Ad hoc'
+                                        }
+                                    ]
+                                }
+                            ]                              
+                        },      
+                        
+                        'STORY' : 
+                        [
+                            {
+                                'Story Key' : '',
+                                'Release_SP' : '',
+                                'Summary' : "",
+                                'Assignee' : '',
+                                'duedate' : '',
+                                'Status' : '',
+                                'CreatedDate' : '',
+                                'StoryZephyrCnt': 0,
+                                'StoryZephyrResolutionCnt' : 0,
+                                'RescheduleCnt' : 0,
+                                'AbnormalStorySprint' : '',
+                                "GovOrDeployment" : '',
+
+                                'StoryPoint' : 
+                                {
+                                    'PlanSP' : 300,
+                                    'BurnedSP' : 200,
+                                    'RemainSP' : 100,
+                                },
+                    
+                                'Zephyr' :
+                                {
+                                    'SotryZephyrCnt': 1,
+                                    'StoryTC':
+                                    [
+                                        {
+                                            'issueId' : 964936,
+                                            'issueKey' : 'TVDEVTC-3088',
+                                            'summary' : '[SDET][TC] General Setting Test',
+                                            'assignee' : 'jira-user@lge.com',
+                                            'status' : 'Draft',
+                                            'label' : 'BASIC_TC, SETTINGS_GENERAL, TAS_MiniBAT',
+                                            'exeRecordsCnt' : 3,
+                                            'executions': 
+                                            [
+                                                {
+                                                    'id': 143886,
+                                                    'executionsStatus': '-1',
+                                                    'cycleId': 7038,
+                                                    'cycleName': 'MiniBAT_TAS_07_SETTINGS'
+                                                },
+                                                {
+                                                    'id': 143885,
+                                                    'executionStatus': '1',
+                                                    'executionOn': '2018/11/01 16:19',
+                                                    'executedBy': 'jira-user@lge.com',
+                                                    'cycleId': -1,
+                                                    'cycleName': 'Ad hoc'
+                                                },
+                                                {
+                                                    'id': 143800,
+                                                    'executionStatus': '1',
+                                                    'executionOn': '2018/10/31 17:37',
+                                                    'executedBy': 'jira-user@lge.com',
+                                                    'cycleId': -1,
+                                                    'cycleName': 'Ad hoc'
+                                                }
+                                            ]
+                                        }
+                                    ]                              
+                                },      
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+    ],
+}
+
+
