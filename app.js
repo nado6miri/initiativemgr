@@ -51,7 +51,8 @@ function periodic_DBjobs()
 {
   // Use Promise Object
   //initapi.get_makeSnapshot_InitiativeInfofromJira(42101); // webOS4.5
-  initapi.get_makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
+  //initapi.get_makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
+  initapi.get_makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
 }  
 
 //tmr.Timer_Setting(12, 20, 10, periodic_DBjobs);

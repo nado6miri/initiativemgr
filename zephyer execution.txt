@@ -1,0 +1,188 @@
+// 참고 자료
+참고.
+-	exeRecordsCnt: TC Executions에 등록된 Test Cycle(executions) 수
+-	executionStatus: “-1” UNEXECUTED, “1” PASS, “2” FAIL, “3” WIP, “4” BLOCKED”
+- UNEXECUTED: The test has not yet been executed.
+- PASS: Test was executed and passed successfully.
+- FAIL: Test was executed and failed.
+- WIP: Test execution is a work – in – progress.
+- BLOCKED: The test execution of this test was blocked for some reason.
+
+1. Epic / Story 하위 TC의 정보를 가져오기
+  - Test Case를 관리하는 Zephyr는 기본적으로 type이 “test”인 JIRA입니다.
+Story: type=test AND issueFunction in linkedIssuesOfRecursiveLimited("issueKey=TVPLAT-14628", 1)
+Epic: type=test AND issueFunction in linkedIssuesOfRecursiveLimited("issueKey=TVPLAT-10578", 1)
+Filter 참고: https://scriptrunner.adaptavist.com/latest/jira/jql-functions.html
+JIRA Issue Search(jira-python): https://jira.readthedocs.io/en/latest/examples.html#searching
+
+
+//======================================================================================================
+// Initiative 하위 Epic List 정보 얻어오기
+//======================================================================================================
+// Node JS
+var request = require("request");
+
+var options = { method: 'POST',
+  url: 'http://hlm.lge.com/issue/rest/api/2/search/',
+  headers:
+   { 'Postman-Token': '253a31dc-c2af-4805-916b-3f77fd4544b4',
+     'cache-control': 'no-cache',
+     'content-Type': 'application/json' },
+  body: '{\r\n\t "jql" : "type=EPIC AND issueFunction in linkedIssuesOfRecursiveLimited(\'issueKey= TVPLAT-16376\', 1)" \r\n\t,"maxResults" : 1000\r\n    , "startAt": 0\r\n    ,"fields" : ["summary", "key", "assignee", "due", "status", "labels"]\r\n};' };
+
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  console.log(body);
+});
+
+// Javascript Ajax
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://hlm.lge.com/issue/rest/api/2/search/",
+  "method": "POST",
+  "headers": {
+    "content-Type": "application/json",
+    "cache-control": "no-cache",
+    "Postman-Token": "6923f3d5-3430-4cdb-a2b4-fd509a7c7bb8"
+  },
+  "data": "{\r\n\t \"jql\" : \"type=EPIC AND issueFunction in linkedIssuesOfRecursiveLimited('issueKey= TVPLAT-16376', 1)\" \r\n\t,\"maxResults\" : 1000\r\n    , \"startAt\": 0\r\n    ,\"fields\" : [\"summary\", \"key\", \"assignee\", \"due\", \"status\", \"labels\"]\r\n};"
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+
+
+// 결과값
+{"expand":"schema,names","startAt":0,"maxResults":1000,"total":17,"issues":[{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"962757","self":"http://hlm.lge.com/issue/rest/api/2/issue/962757","key":"TVPLAT-20723","fields":{"summary":"WebApp Life Cycle Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=junseok.oh","name":"junseok.oh","key":"junseok.oh","emailAddress":"junseok.oh@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"오준석 junseok.oh","active":true,"timeZone":"ROK"},"labels":["SDET_서재교","개발EPIC"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10158","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Scoping","id":"10158","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"954792","self":"http://hlm.lge.com/issue/rest/api/2/issue/954792","key":"TVPLAT-20165","fields":{"summary":"App InstallD Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=junku.park","name":"junku.park","key":"junku.park","emailAddress":"junku.park@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"박준구 junku.park","active":true,"timeZone":"ROK"},"labels":["SDET_정구성","개발EPIC"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10158","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Scoping","id":"10158","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"954780","self":"http://hlm.lge.com/issue/rest/api/2/issue/954780","key":"TVPLAT-20163","fields":{"summary":"Preload Service Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=wonkyo.seo","name":"wonkyo.seo","key":"wonkyo.seo","emailAddress":"wonkyo.seo@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?ownerId=wonkyo.seo&avatarId=11922","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&ownerId=wonkyo.seo&avatarId=11922","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&ownerId=wonkyo.seo&avatarId=11922","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&ownerId=wonkyo.seo&avatarId=11922"},"displayName":"서원교 wonkyo.seo","active":true,"timeZone":"ROK"},"labels":["SDET_정구성","개발EPIC"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10158","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Scoping","id":"10158","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"953552","self":"http://hlm.lge.com/issue/rest/api/2/issue/953552","key":"TVPLAT-20078","fields":{"summary":"Dynamic Key Download Development for AirPlay","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=nhoon.kim","name":"nhoon.kim","key":"nhoon.kim","emailAddress":"nhoon.kim@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"김남훈 nhoon.kim","active":true,"timeZone":"ROK"},"labels":["SDET_서재교","개발EPIC"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10158","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Scoping","id":"10158","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"914305","self":"http://hlm.lge.com/issue/rest/api/2/issue/914305","key":"TVPLAT-17264","fields":{"summary":"AirPlay App Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=inmoon.kim","name":"inmoon.kim","key":"inmoon.kim","emailAddress":"inmoon.kim@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"김인문 inmoon.kim","active":true,"timeZone":"ROK"},"labels":["SDET_김용진"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10158","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Scoping","id":"10158","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"913808","self":"http://hlm.lge.com/issue/rest/api/2/issue/913808","key":"TVPLAT-17244","fields":{"summary":"HomeKit development on webOS TV","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=jinyoung76.choi","name":"jinyoung76.choi","key":"jinyoung76.choi","emailAddress":"jinyoung76.choi@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10113","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10113","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10113","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10113"},"displayName":"최진영 jinyoung76.choi","active":true,"timeZone":"ROK"},"labels":["AirPlay","SDET_정구성","tsc:wt:2018","tsc:wt:4.5","개발EPIC"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/3","description":"This issue is being actively worked on at the moment by the assignee.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/inprogress.png","name":"In Progress","id":"3","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"911420","self":"http://hlm.lge.com/issue/rest/api/2/issue/911420","key":"TVPLAT-17169","fields":{"summary":"MFi Key Provisioning","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=byounghyun.shin","name":"byounghyun.shin","key":"byounghyun.shin","emailAddress":"byounghyun.shin@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"신병현 byounghyun.shin","active":true,"timeZone":"ROK"},"labels":["AirPlay","SDET_조보영"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/3","description":"This issue is being actively worked on at the moment by the assignee.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/inprogress.png","name":"In Progress","id":"3","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"903638","self":"http://hlm.lge.com/issue/rest/api/2/issue/903638","key":"TVPLAT-16655","fields":{"summary":"Apple Security/Contract Verification","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=nathaniel.kim","name":"nathaniel.kim","key":"nathaniel.kim","emailAddress":"nathaniel.kim@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"김수환 nathaniel.kim","active":true,"timeZone":"ROK"},"labels":["SDET_CHECKED","SDET_서재교"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10158","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Scoping","id":"10158","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"902473","self":"http://hlm.lge.com/issue/rest/api/2/issue/902473","key":"TVPLAT-16571","fields":{"summary":"AirPlay Web Engine Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=jeongmin.kim","name":"jeongmin.kim","key":"jeongmin.kim","emailAddress":"jeongmin.kim@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?ownerId=jeongmin.kim&avatarId=16807","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&ownerId=jeongmin.kim&avatarId=16807","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&ownerId=jeongmin.kim&avatarId=16807","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&ownerId=jeongmin.kim&avatarId=16807"},"displayName":"김정민 jeongmin.kim","active":true,"timeZone":"ROK"},"labels":["SDET_김익주"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10060","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Review","id":"10060","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"861103","self":"http://hlm.lge.com/issue/rest/api/2/issue/861103","key":"TVPLAT-13187","fields":{"summary":"Factory MFi Key Download 및 Injection","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=chiho.shin","name":"chiho.shin","key":"chiho.shin","emailAddress":"chiho.shin@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"신치호 chiho.shin","active":true,"timeZone":"Etc/GMT"},"labels":["AirPlay","SDET_조보영"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/3","description":"This issue is being actively worked on at the moment by the assignee.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/inprogress.png","name":"In Progress","id":"3","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"840176","self":"http://hlm.lge.com/issue/rest/api/2/issue/840176","key":"TVPLAT-11463","fields":{"summary":"AirPlay SDK Integration","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=chiho.shin","name":"chiho.shin","key":"chiho.shin","emailAddress":"chiho.shin@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"신치호 chiho.shin","active":true,"timeZone":"Etc/GMT"},"labels":["AirPlay","SDET_조보영"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/3","description":"This issue is being actively worked on at the moment by the assignee.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/inprogress.png","name":"In Progress","id":"3","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"899907","self":"http://hlm.lge.com/issue/rest/api/2/issue/899907","key":"TMFTASK-15528","fields":{"summary":"HomeKit Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=jinyoung76.choi","name":"jinyoung76.choi","key":"jinyoung76.choi","emailAddress":"jinyoung76.choi@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10113","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10113","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10113","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10113"},"displayName":"최진영 jinyoung76.choi","active":true,"timeZone":"ROK"},"labels":["AirPlay","SDET_정구성"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"899903","self":"http://hlm.lge.com/issue/rest/api/2/issue/899903","key":"TMFTASK-15526","fields":{"summary":"Audio Streaming Protocol Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=taegyu74.kim","name":"taegyu74.kim","key":"taegyu74.kim","emailAddress":"taegyu74.kim@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?ownerId=taegyu74.kim&avatarId=14200","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&ownerId=taegyu74.kim&avatarId=14200","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&ownerId=taegyu74.kim&avatarId=14200","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&ownerId=taegyu74.kim&avatarId=14200"},"displayName":"김태규 taegyu74.kim","active":true,"timeZone":"ROK"},"labels":["AirPlay","SDET_김용진"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"899900","self":"http://hlm.lge.com/issue/rest/api/2/issue/899900","key":"TMFTASK-15525","fields":{"summary":"Audio Streaming and Mirroring Playback Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=hongsuk.jeong","name":"hongsuk.jeong","key":"hongsuk.jeong","emailAddress":"hongsuk.jeong@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"정홍석 hongsuk.jeong","active":true,"timeZone":"ROK"},"labels":["AirPlay","SDET_김용진","개발EPIC"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/3","description":"This issue is being actively worked on at the moment by the assignee.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/inprogress.png","name":"In Progress","id":"3","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"899897","self":"http://hlm.lge.com/issue/rest/api/2/issue/899897","key":"TMFTASK-15523","fields":{"summary":"AirPlay Key Injection Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=chiho.shin","name":"chiho.shin","key":"chiho.shin","emailAddress":"chiho.shin@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"신치호 chiho.shin","active":true,"timeZone":"Etc/GMT"},"labels":["AirPlay","SDET_조보영"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/3","description":"This issue is being actively worked on at the moment by the assignee.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/inprogress.png","name":"In Progress","id":"3","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"899895","self":"http://hlm.lge.com/issue/rest/api/2/issue/899895","key":"TMFTASK-15522","fields":{"summary":"AirPlay SDK Porting and Development","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=chiho.shin","name":"chiho.shin","key":"chiho.shin","emailAddress":"chiho.shin@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"신치호 chiho.shin","active":true,"timeZone":"Etc/GMT"},"labels":["AirPlay","SDET_조보영"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/1","description":"The issue is open and ready for the assignee to start work on it.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/open.png","name":"Open","id":"1","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/2","id":2,"key":"new","colorName":"blue-gray","name":"To Do"}}}},{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"899488","self":"http://hlm.lge.com/issue/rest/api/2/issue/899488","key":"TMFTASK-15505","fields":{"summary":"FairPlay DRM Development for AirPlay","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=chihyoung2.kim","name":"chihyoung2.kim","key":"chihyoung2.kim","emailAddress":"chihyoung2.kim@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10113","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10113","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10113","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10113"},"displayName":"김치형 chihyoung2.kim","active":true,"timeZone":"ROK"},"labels":["SDET_김용진"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/3","description":"This issue is being actively worked on at the moment by the assignee.","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/inprogress.png","name":"In Progress","id":"3","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}}]}
+
+
+//======================================================================================================
+// Epic 하위 TC List 정보 얻어오기
+//======================================================================================================
+// Node JS
+var request = require("request");
+
+var options = { method: 'POST',
+  url: 'http://hlm.lge.com/issue/rest/api/2/search/',
+  headers:
+   { 'Postman-Token': '15a5e5b2-472f-43d9-81ee-976e8e7329bb',
+     'cache-control': 'no-cache',
+     'content-Type': 'application/json' },
+  body: '{\r\n\t "jql" : "type=test AND issueFunction in linkedIssuesOfRecursiveLimited(\'issueKey=TVPLAT-14628\', 1)" \r\n\t,"maxResults" : 1000\r\n    , "startAt": 0\r\n    ,"fields" : ["summary", "key", "assignee", "due", "status", "labels"]\r\n};' };
+
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  console.log(body);
+});
+
+
+// Javascript Ajax
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://hlm.lge.com/issue/rest/api/2/search/",
+  "method": "POST",
+  "headers": {
+    "content-Type": "application/json",
+    "cache-control": "no-cache",
+    "Postman-Token": "43199218-cf9c-4f07-8a59-3f6159034fab"
+  },
+  "data": "{\r\n\t \"jql\" : \"type=test AND issueFunction in linkedIssuesOfRecursiveLimited('issueKey=TVPLAT-14628', 1)\" \r\n\t,\"maxResults\" : 1000\r\n    , \"startAt\": 0\r\n    ,\"fields\" : [\"summary\", \"key\", \"assignee\", \"due\", \"status\", \"labels\"]\r\n};"
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+
+// 실행결과
+{"expand":"names,schema","startAt":0,"maxResults":1000,"total":1,"issues":[{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"867833","self":"http://hlm.lge.com/issue/rest/api/2/issue/867833","key":"TVDEVTC-1847","fields":{"summary":"[TBC][Unified HDCP Key Split Tool 개발] Unified Split Tool TEST CASE","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=sangchul87.park","name":"sangchul87.park","key":"sangchul87.park","emailAddress":"sangchul87.park@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?avatarId=10122","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&avatarId=10122","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&avatarId=10122","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&avatarId=10122"},"displayName":"박상철 sangchul87.park","active":true,"timeZone":"ROK"},"labels":["TBC_VIDEO"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10368","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Active","id":"10368","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/4","id":4,"key":"indeterminate","colorName":"yellow","name":"In Progress"}}}}]}
+
+
+//======================================================================================================
+// Story 하위 TC List 정보 얻어오기
+//======================================================================================================
+// Node JS
+var request = require("request");
+
+var options = { method: 'POST',
+  url: 'http://hlm.lge.com/issue/rest/api/2/search/',
+  headers:
+   { 'Postman-Token': '92e2cfd8-82c6-4784-ae75-61806209ee35',
+     'cache-control': 'no-cache',
+     'content-Type': 'application/json' },
+  body: '{\r\n\t "jql" : "type=test AND issueFunction in linkedIssuesOfRecursiveLimited(\'issueKey=SSFREVIEW-1752\', 1)" \r\n\t,"maxResults" : 1000\r\n    , "startAt": 0\r\n    ,"fields" : ["summary", "key", "assignee", "due", "status", "labels"]\r\n};' };
+
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  console.log(body);
+});
+
+
+// Javascript Ajax
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://hlm.lge.com/issue/rest/api/2/search/",
+  "method": "POST",
+  "headers": {
+    "content-Type": "application/json",
+    "cache-control": "no-cache",
+    "Postman-Token": "5ff4f354-71c6-4cd1-9b5e-2024c9d96003"
+  },
+  "data": "{\r\n\t \"jql\" : \"type=test AND issueFunction in linkedIssuesOfRecursiveLimited('issueKey=SSFREVIEW-1752', 1)\" \r\n\t,\"maxResults\" : 1000\r\n    , \"startAt\": 0\r\n    ,\"fields\" : [\"summary\", \"key\", \"assignee\", \"due\", \"status\", \"labels\"]\r\n};"
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+
+// 실행결과
+{"expand":"names,schema","startAt":0,"maxResults":1000,"total":1,"issues":[{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"974583","self":"http://hlm.lge.com/issue/rest/api/2/issue/974583","key":"TVDEVTC-3138","fields":{"summary":"[TIS][STORY_TC] AirPlay - Apple 서버와 SDP 서버간 MFi key register 연동 구현 검증 Test Case","assignee":{"self":"http://hlm.lge.com/issue/rest/api/2/user?username=youngsuk.do","name":"youngsuk.do","key":"youngsuk.do","emailAddress":"youngsuk.do@lge.com","avatarUrls":{"48x48":"http://hlm.lge.com/issue/secure/useravatar?ownerId=youngsuk.do&avatarId=12213","24x24":"http://hlm.lge.com/issue/secure/useravatar?size=small&ownerId=youngsuk.do&avatarId=12213","16x16":"http://hlm.lge.com/issue/secure/useravatar?size=xsmall&ownerId=youngsuk.do&avatarId=12213","32x32":"http://hlm.lge.com/issue/secure/useravatar?size=medium&ownerId=youngsuk.do&avatarId=12213"},"displayName":"도영석 youngsuk.do","active":true,"timeZone":"ROK"},"labels":["STORY_TC"],"status":{"self":"http://hlm.lge.com/issue/rest/api/2/status/10367","description":"","iconUrl":"http://hlm.lge.com/issue/images/icons/statuses/generic.png","name":"Draft","id":"10367","statusCategory":{"self":"http://hlm.lge.com/issue/rest/api/2/statuscategory/2","id":2,"key":"new","colorName":"blue-gray","name":"To Do"}}}}]}
+
+
+
+//======================================================================================================
+// Zephyr Execution 정보 얻어오기
+//======================================================================================================
+// Node JS
+var request = require("request");
+
+var options = { method: 'GET',
+  url: 'http://hlm.lge.com/issue/rest/zapi/latest/execution',
+  qs: { issueKey: 'TVDEVTC-3088' },
+  headers:
+   { 'Postman-Token': '2ae807ba-9079-4698-b802-276dd8e8415e',
+     'cache-control': 'no-cache',
+     'content-Type': 'application/json' } };
+
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  console.log(body);
+});
+
+
+// Javascript Ajax
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://hlm.lge.com/issue/rest/zapi/latest/execution?issueKey=TVDEVTC-3088",
+  "method": "GET",
+  "headers": {
+    "content-Type": "application/json",
+    "cache-control": "no-cache",
+    "Postman-Token": "8ef2490a-5982-4279-a443-ea10288d4c60"
+  }
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+
+// Execution 정보 결과값
+{"status":{"1":{"id":1,"color":"#75B000","description":"Test was executed and passed successfully.","name":"PASS"},"2":{"id":2,"color":"#CC3300","description":"Test was executed and failed.","name":"FAIL"},"3":{"id":3,"color":"#F2B000","description":"Test execution is a work-in-progress.","name":"WIP"},"4":{"id":4,"color":"#6693B0","description":"The test execution of this test was blocked for some reason.","name":"BLOCKED"},"-1":{"id":-1,"color":"#A0A0A0","description":"The test has not yet been executed.","name":"UNEXECUTED"}},"executions":[],"currentlySelectedExecutionId":""}

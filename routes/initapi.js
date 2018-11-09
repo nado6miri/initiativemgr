@@ -5,7 +5,14 @@ var http = require('http');
 var url = require('url');
 var XMLHttpRequest = require('xmlhttprequest-ssl').XMLHttpRequest;
 
-var initiative_DB = [];
+var initiative_DB = {
+  total : 0,
+  snapshotDate : '2018',
+  current_sprint : 'TVSP7', 
+  issue :  // initiative issue list
+  [],
+};
+
 // initiative filter result (json) - webOS45 webOS45MR, webOS5.0 
 var initiative_FilterResult;
 var initiative_keylist = [];
@@ -28,76 +35,191 @@ var default_Sprint_Info = {
   'TVSP13_1' : '',  'TVSP13_2' : '',  'TVSP14_1' : '',  'TVSP14_2' : '',
   'TVSP15_1' : '',  'TVSP15_2' : '',  'TVSP16_1' : '',  'TVSP16_2' : '',
   'TVSP17_1' : '',  'TVSP17_2' : '',  'TVSP18_1' : '',  'TVSP18_2' : '',
-  }
-
-var default_epic_info = {
-      'Epic Key' : '',
-      'Release_SP' : '',
-      'Summary' : "",
-      'Assignee' : '',
-      'duedate' : '',
-      'Status' : '',
-      'CreatedDate' : '',
-      'TVSP' : default_Sprint_Info,
-      'StoryCnt': 0,
-      'StoryResolutionCnt' : 0,
-      'RescheduleCnt' : 0,
-      'STORY' : [],
-      'AbnormalEpicSprint' : '',
-      "GovOrDeployment" : '',
   };
 
-var default_initiative_info = {
-  'Initiative Key' : '',
-  'Summary' : '',
-  'Assignee' : '',
-  'Status' : '',
-  'Release_SP' : '',
-  'CreatedDate' : '',
-  '관리대상' : '',
-  'Risk 관리 대상' : '',
-  'Initiative Order' : '',
-  'EPIC' : [],
-  'DEMO' : [],
-  'CCC' : [],
-  'TestCase' : [],
-  'Dev_Verification' : [],
-  'TVSP' : default_Sprint_Info,
-  'Status Color' : '',
-  'SE_Delivery' : '',
-  'SE_Quality' : '',
-  'ScopeOfChange' : '',
-  'EpicCnt' : '',
-  'EpicResolutionCnt' : '',
-  'StoryCnt' : 0,
-  'StoryResolutionCnt' : 0,
-  'RMS' : '',
-  'RescheduleCnt' : 0,
-  'EpicDelayedCnt' : 0,
-  'STEOnSite' : '',
-  'AbnormalEpicSprint' : '',
-  "GovOrDeployment" : '',
-      };
+var current_demo_info = {
+  'key' : '',
+  'summary' : '',
+  'praize' : false,
+};
 
-
-  var default_story_info = 
-  {
-    'Story Key' : '',
+var story_point = 
+{
+  'PlanSP' : 0,
+  'BurnedSP' : 0,
+  'RemainSP' : 0,
+};
+  
+var current_epic_info =  
+{
+    'Epic Key' : '',
     'Release_SP' : '',
-    'Summary' : "",
+    'Summary' : '',
     'Assignee' : '',
     'duedate' : '',
     'Status' : '',
     'CreatedDate' : '',
-    'TVSP' : default_Sprint_Info,
-    'StoryZephyrCnt': 0,
-    'StoryZephyrResolutionCnt' : 0,
     'RescheduleCnt' : 0,
-    'Zephyr' : [],
-    'AbnormalStorySprint' : '',
+    'AbnormalEpicSprint' : '',
     "GovOrDeployment" : '',
+    'StoryPoint' : story_point,
+
+    'DHistory' :  
+    [
+        { 'orginal' : 'TVSP1' }, 
+    ],
+
+    'Zephyr' : {},
+    'STORY' : [],
 };
-  
+
+var current_initiative_info = 
+{
+  'Initiative Key' : '',
+  'Summary' : '',
+  'Assignee' : '',
+  '관리대상' : '',
+  'Risk관리대상' : '',
+  'Initiative Order' : '',
+  'Status Color' : '',
+  'SE_Delivery' : '',
+  'SE_Quality' : '',
+  'ScopeOfChange' : '',
+  'RMS' : '',
+  'RescheduleCnt' : 0,
+  'STESDET_OnSite' : '',
+  'AbnormalEpicSprint' : '',
+  "GovOrDeployment" : '',
+  'StatusSummarymgrCnt' : '',
+  'Demo' : [],
+  'RelatedInitiative' : [ 'TVPLAT-XXXX', 'TVPLAT-0000', ], 
+  'StoryPoint' : story_point,
+  'Workflow' :
+  {   
+      'CreatedDate' : '',
+      'Status' : '',
+      'History' :
+      [
+          { "Draft" : '2019-01-01' , "Period" : "10" },                
+          { "PO Review" : '2019-01-10' , "Period" : "10" },                
+          { "ELTReview" : '2019-01-20' , "Period" : "10" },                
+          { "Approved" : '2019-01-30' , "Period" : "10" },                
+          { "Ready" : '2019-02-01' , "Period" : "10" },                
+          { "InProgress" : '2019-02-03' , "Period" : "10" },                
+          { "Delivered" : '2019-04-01' , "Period" : "10" },                
+      ],
+  },    
+  'MileStone' :
+  {   
+      'total' : '',
+      'rescheduleCnt' : '4',
+      'history' :
+      [
+          { "Item1" : '2019-01-01' , "Schedule" : [ '2019-01-01', '2019-01-10', ] },                
+      ],
+  },    
+  'ReleaseSprint' :  
+  {
+      'CurRelease_SP' : 'TVSP11',
+      'History' :
+      [
+          { 'orginal' : 'TVSP7' }, 
+          { 'TVSP6' :'TVSP9'}, 
+          { 'TVSP9' :'TVSP12'}, 
+          { 'TVSP10' :'TVSP11'}, 
+      ],
+  },
+  'StakeHolders' : 
+  [
+    { "OrgName1" : 'TV 화질' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
+    { "OrgName1" : 'TV 음질' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
+    { "OrgName1" : 'TV SystemCore' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
+  ],
+
+  'STORY_SUMMARY' : 
+  {
+      'StoryTotalCnt': 0,
+      'StoryDevelCnt': 0,
+      'StoryGovOrDeploymentCnt': 0,
+      'StoryTotalResolutionCnt' : 0,
+      'StoryDevelResolutionCnt' : 0,
+      'StoryGovOrDeploymentResolutionCnt' : 0,
+  },
+
+  'EPIC' : 
+  {
+    'EpicTotalCnt': 0,
+    'EpicDevelCnt': 0,
+    'EpicGovOrDeploymentCnt': 0,
+    'EpicTotalResolutionCnt' : 0,
+    'EpicDevelResolutionCnt' : 0,
+    'EpicGovOrDeploymentResolutionCnt' : 0,
+    'EpicDelayedCnt' : 0,
+    issue : [],    
+  },
+};
+
+
+var story_info = 
+{
+  'Story Key' : '',
+  'Release_SP' : '',
+  'Summary' : "",
+  'Assignee' : '',
+  'duedate' : '',
+  'Status' : '',
+  'CreatedDate' : '',
+  'StoryZephyrCnt': 0,
+  'StoryZephyrResolutionCnt' : 0,
+  'RescheduleCnt' : 0,
+  'AbnormalStorySprint' : '',
+  "GovOrDeployment" : '',
+  'StoryPoint' : story_point,
+  'Zephyr' : {},
+};
+
+var zephyr_info = 
+{
+  'ZephyrCnt': 1,
+  'ZepyhrTC':
+  [
+      {
+          'issueId' : 964936,
+          'issueKey' : 'TVDEVTC-3088',
+          'summary' : '[SDET][TC] General Setting Test',
+          'assignee' : 'jira-user@lge.com',
+          'status' : 'Draft',
+          'label' : 'BASIC_TC, SETTINGS_GENERAL, TAS_MiniBAT',
+          'exeRecordsCnt' : 3,
+          'executions': 
+          [
+              {
+                  'id': 143886,
+                  'executionsStatus': '-1',
+                  'cycleId': 7038,
+                  'cycleName': 'MiniBAT_TAS_07_SETTINGS'
+              },
+              {
+                  'id': 143885,
+                  'executionStatus': '1',
+                  'executionOn': '2018/11/01 16:19',
+                  'executedBy': 'jira-user@lge.com',
+                  'cycleId': -1,
+                  'cycleName': 'Ad hoc'
+              },
+              {
+                  'id': 143800,
+                  'executionStatus': '1',
+                  'executionOn': '2018/10/31 17:37',
+                  'executedBy': 'jira-user@lge.com',
+                  'cycleId': -1,
+                  'cycleName': 'Ad hoc'
+              }
+          ]
+      },
+  ]                              
+}     
+
 
 // Javascript 비동기 및 callback function.
 // https://joshua1988.github.io/web-development/javascript/javascript-asynchronous-operation/
@@ -210,53 +332,77 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
 {
   // Use Promise Object
   get_InitiativeListfromJira(filterID)
-  .then((filteredJsonData) => {
-    console.log("[Promise 1] get Initiative List and Iinitiative Key List from JIRA");
-    //console.log(filteredJsonData);
+  .then((initiativelist) => {
+    // input : initiative filter id --> the search result of initiative (JSON Object)
+    // output : epic list and update of basic epic info depend on initiative 
+    console.log("[Promise 1] Get Initiative List / Update Basic Info and Iinitiative Key List from JIRA");
+    console.log(initiativelist);
 
     return new Promise((resolve, reject) => {
-      for (var i = 0; i < filteredJsonData.total; i++) {
-        initiative_keylist.push(filteredJsonData["issues"][i]["key"]);
+      for (var i = 0; i < initiativelist.total; i++) {
+        initiative_keylist.push(initiativelist["issues"][i]["key"]);
+        // need to be update initiative info
+        current_initiative_info['Initiative Key'] = initiativelist["issues"][i]["key"];        
+        current_initiative_info['Summary'] = initiativelist["issues"][i]["Summary"];        
+        current_initiative_info['Assignee'] = initiativelist["issues"][i]["Assignee"];        
+        current_initiative_info['관리대상'] = false;     
+        current_initiative_info['Risk관리대상'] = false;        
+        current_initiative_info['Initiative Order'] = 0;        
+        current_initiative_info['Status Color'] = 0;        
+        current_initiative_info['SE_Delivery'] = 0;        
+        current_initiative_info['SE_Quality'] = 0;        
+        current_initiative_info['ScopeOfChange'] = 'local';        
+        current_initiative_info['RMS'] = true;        
+        current_initiative_info['RescheduleCnt'] = 0;        
+        current_initiative_info['STESDET_OnSite'] = true;        
+        current_initiative_info['AbnormalEpicSprint'] = false;        
+        current_initiative_info['GovOrDeployment'] = false;        
+        current_initiative_info['StatusSummarymgrCnt'] = 0;        
       }     
       resolve(initiative_keylist);
     });
   })
   .then((initkeylist) => {
-    console.log("[Proimse 2] Make a Epic List from Initiative Key List ");
-    //console.log(initkeylist);
-    /*
-      var key = jsondata["issues"][i]["key"];
-      var summary = jsondata["issues"][i]["fields"]["summary"];
-      var status = jsondata["issues"][i]["fields"]["status"]["name"];
-      var assignee = jsondata["issues"][i]["fields"]["assignee"]["displayName"];
-      assignee = assignee.substring(0, assignee.indexOf(' '));
-      var due = jsondata["issues"][i]["fields"]["due"];
-      for(var i = 0; i < initiative_FilterResult["issues"].length; i++){
-        var dissue = initiative_FilterResult['issues'][i];
-        //console.log(dissue);
-      }
-      */
+    // input : initiative key list = [ 'TVPLAT-XXXX', 'TVPLAT-XXXX', .... ]
+    // output : epic list and update of basic epic info depend on initiative 
+    console.log("[Proimse 2] Get Epic List / Update Epic Basic Info");
+    console.log(initkeylist);
 
-    initkeylist.forEach((value, index) => { 
-      console.log("index = ", index, "value =", value); 
-      default_initiative_info['Initiative Key'] = value;
-      getEpicListfromJira(value)
-      .then((epiclist) => {
-        console.log(epiclist);
-        epic_keylist = [];
-        for (var i = 0; i < epiclist.total; i++) {
-          epic_keylist.push(epiclist["issues"][i]["key"]);
-        }     
-        default_initiative_info['EPIC'] = epic_keylist;
-        console.log(default_initiative_info['EPIC']);
-        //initiative_DB['Initiative Key']['EPIC'] = epic_keylist;
-        //console.log(initiative_DB);
+    // Epic List Update.....
+    return new Promise((resolve, reject) => {
+      initkeylist.forEach((value, index) => { 
+        //console.log("index = ", index, "initiative key value =", value); 
+        getEpicListfromJira(initkeylist)
+        .then((epiclist) => {
+          //console.log(epiclist);
+          epic_keylist = [];
+          for (var i = 0; i < epiclist.total; i++) 
+          {
+            epic_keylist.push(epiclist["issues"][i]["key"]);
+            // need to be update initiative info
+            current_epic_info['Epic Key'] = epiclist["issues"][i]["key"];
+            current_epic_info['Release_SP'] = 'TVSP21';        
+            current_epic_info['Summary'] = epiclist["issues"][i]["Summary"];        
+            current_epic_info['Assignee'] = epiclist["issues"][i]["Assignee"];        
+            current_epic_info['duedate'] = epiclist["issues"][i]["DueDate"];        
+            current_epic_info['Status'] = epiclist["issues"][i]["Status"];        
+            current_epic_info['CreatedDate'] = epiclist["issues"][i]["CreatedDate"];        
+            current_epic_info['AbnormalEpicSprint'] = 0;        
+            current_epic_info['GovOrDeployment'] = false;        
+            current_epic_info['StoryPoint'] = story_point;        
+            current_epic_info['DHistory'] = [];        
+            current_epic_info['Zephyr'] = zephyr_info;        
+            current_epic_info['STORY'] = story_info,
+            console.log(current_epic_info);
+          } 
+          resolve(epic_keylist);
+        })
+        .catch((error) => { console.log(error); });
       })
-      .catch((error) => { console.log(error); });
-    }); 
+    });
   })
-  .then((initlist1) => {
-    console.log("[Proimse 3] then : initlist1 = ", initlist1);
+  .then((epickeylist) => {
+    console.log("[Proimse 3] then : epickeylist = ", epickeylist);
     return new Promise((resolve, reject) => {
       resolve("---");
     });
@@ -293,10 +439,19 @@ function getEpicListfromJira(initiativeKey)
         }        
       }
     }
+
+    // "jql" : "type=EPIC AND issueFunction in linkedIssuesOfRecursiveLimited('issueKey= TVPLAT-16376', 1)" 
     let filterjql = "issue in linkedissues(" + initiativeKey + ")";
-    console.log("filterjql = ", filterjql);
+    //console.log("filterjql = ", filterjql);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
+    /*
+    var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,
+                  "fields" : [ "summary", "key", "assignee", "due", "status", "labels", "issuelinks", "updated", "created", "customfield_10105", "timespent" 
+                              , "components", "progress", "resolution", "workratio", "description", "customfield_16034", "customfield_16033", "duedate", "lastViewed"] };
+    */
+    //var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
     var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks"] };
+
     //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
     xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
@@ -332,3 +487,18 @@ module.exports = {
   get_InitiativeList,          // callback
   get_makeSnapshot_InitiativeInfofromJira,
  };
+
+
+
+     /*
+      var key = jsondata["issues"][i]["key"];
+      var summary = jsondata["issues"][i]["fields"]["summary"];
+      var status = jsondata["issues"][i]["fields"]["status"]["name"];
+      var assignee = jsondata["issues"][i]["fields"]["assignee"]["displayName"];
+      assignee = assignee.substring(0, assignee.indexOf(' '));
+      var due = jsondata["issues"][i]["fields"]["due"];
+      for(var i = 0; i < initiative_FilterResult["issues"].length; i++){
+        var dissue = initiative_FilterResult['issues'][i];
+        //console.log(dissue);
+      }
+      */
