@@ -431,6 +431,16 @@ function getEpicListfromJira(initiativeKey)
         {
           var resultJSON = epic_FilterResult = JSON.parse(xhttp.responseText);
           var json = JSON.stringify(resultJSON);
+          fse.outputFileSync("./public/json/epic_list", json, 'utf-8', function(e){
+            if(e)
+            {
+              console.log(e);
+            }
+            else
+            {
+              console.log("Download is done!");	
+            }
+          });
           resolve(resultJSON);
         }
         else
