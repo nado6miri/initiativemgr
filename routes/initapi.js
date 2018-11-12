@@ -5,14 +5,6 @@ var http = require('http');
 var url = require('url');
 var XMLHttpRequest = require('xmlhttprequest-ssl').XMLHttpRequest;
 
-var initiative_DB = {
-  total : 0,
-  snapshotDate : '2018',
-  current_sprint : 'TVSP7', 
-  issue :  // initiative issue list
-  [],
-};
-
 // initiative filter result (json) - webOS45 webOS45MR, webOS5.0 
 var initiative_FilterResult;
 var initiative_keylist = [];
@@ -37,6 +29,14 @@ var default_Sprint_Info = {
   'TVSP17_1' : '',  'TVSP17_2' : '',  'TVSP18_1' : '',  'TVSP18_2' : '',
   };
 
+var initiative_DB = {
+  total : 0,
+  snapshotDate : '2018',
+  current_sprint : 'TVSP7', 
+  issues :  // initiative issue list
+  [],
+};  
+
 var current_demo_info = {
   'key' : '',
   'summary' : '',
@@ -50,7 +50,10 @@ var story_point =
   'RemainSP' : 0,
 };
   
-var current_epic_info =  
+
+var current_epic_info = {};
+
+var epic_info =  
 {
     'Epic Key' : '',
     'Release_SP' : '',
@@ -73,7 +76,8 @@ var current_epic_info =
     'STORY' : [],
 };
 
-var current_initiative_info = 
+var current_initiative_info = { };
+var initiative_info =
 {
   'Initiative Key' : '',
   'Summary' : '',
@@ -155,7 +159,7 @@ var current_initiative_info =
     'EpicDevelResolutionCnt' : 0,
     'EpicGovOrDeploymentResolutionCnt' : 0,
     'EpicDelayedCnt' : 0,
-    issue : [],    
+    issues : [],    
   },
 };
 
@@ -338,13 +342,15 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
     console.log("[Promise 1] Get Initiative List / Update Basic Info and Iinitiative Key List from JIRA");
     console.log(initiativelist);
 
+    initiative_DB['total'] = initiativelist.total;
     return new Promise((resolve, reject) => {
       for (var i = 0; i < initiativelist.total; i++) {
-        initiative_keylist.push(initiativelist["issues"][i]["key"]);
+        initiative_keylist.push(initiativelist['issues'][i]['key']);
         // need to be update initiative info
-        current_initiative_info['Initiative Key'] = initiativelist["issues"][i]["key"];        
-        current_initiative_info['Summary'] = initiativelist["issues"][i]["Summary"];        
-        current_initiative_info['Assignee'] = initiativelist["issues"][i]["Assignee"];        
+        current_initiative_info = Object.assign({}, initiative_info); // initialize...
+        current_initiative_info['Initiative Key'] = initiativelist['issues'][i]['key'];        
+        current_initiative_info['Summary'] = initiativelist['issues'][i]['fields']['summary'];        
+        current_initiative_info['Assignee'] = initiativelist['issues'][i]['fields']['assignee']['name'];        
         current_initiative_info['관리대상'] = false;     
         current_initiative_info['Risk관리대상'] = false;        
         current_initiative_info['Initiative Order'] = 0;        
@@ -357,7 +363,14 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
         current_initiative_info['STESDET_OnSite'] = true;        
         current_initiative_info['AbnormalEpicSprint'] = false;        
         current_initiative_info['GovOrDeployment'] = false;        
-        current_initiative_info['StatusSummarymgrCnt'] = 0;        
+        current_initiative_info['StatusSummarymgrCnt'] = 0;    
+        console.log("^^^^", initiativelist['issues'][i]['key']);
+        console.log(current_initiative_info);
+        //initiative_DB['issues'][i] = Object.assign({}, current_initiative_info); 
+        //initiative_DB['issues'].push(Object.assign({}, current_initiative_info)); 
+        initiative_DB['issues'].push(current_initiative_info); 
+        console.log("^^^^", current_initiative_info['Initiative Key']);
+        console.log("i = ", i, "\n", initiative_DB['issues'][i]);
       }     
       resolve(initiative_keylist);
     });
@@ -367,46 +380,65 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
     // output : epic list and update of basic epic info depend on initiative 
     console.log("[Proimse 2] Get Epic List / Update Epic Basic Info");
     console.log(initkeylist);
-
     // Epic List Update.....
     return new Promise((resolve, reject) => {
-      initkeylist.forEach((value, index) => { 
-        //console.log("index = ", index, "initiative key value =", value); 
-        getEpicListfromJira(initkeylist)
+      var saved = 0;
+      initkeylist.forEach((init_keyvalue, index) => { 
+        console.log("index = ", index, "initiative key init_keyvalue =", init_keyvalue); 
+        getEpicListfromJira(init_keyvalue)
         .then((epiclist) => {
           //console.log(epiclist);
           epic_keylist = [];
           for (var i = 0; i < epiclist.total; i++) 
           {
-            epic_keylist.push(epiclist["issues"][i]["key"]);
+            epic_keylist.push(epiclist['issues'][i]['key']);
+            current_epic_info = Object.assign({}, epic_info);
             // need to be update initiative info
-            current_epic_info['Epic Key'] = epiclist["issues"][i]["key"];
+            current_epic_info['Epic Key'] = epiclist['issues'][i]['key'];
             current_epic_info['Release_SP'] = 'TVSP21';        
-            current_epic_info['Summary'] = epiclist["issues"][i]["Summary"];        
-            current_epic_info['Assignee'] = epiclist["issues"][i]["Assignee"];        
-            current_epic_info['duedate'] = epiclist["issues"][i]["DueDate"];        
-            current_epic_info['Status'] = epiclist["issues"][i]["Status"];        
-            current_epic_info['CreatedDate'] = epiclist["issues"][i]["CreatedDate"];        
+            current_epic_info['Summary'] = epiclist['issues'][i]['fields']['summary'];        
+            current_epic_info['Assignee'] = epiclist['issues'][i]['fields']['assignee']['name'];        
+            current_epic_info['duedate'] = epiclist['issues'][i]["duedate"];        
+            current_epic_info['Status'] = epiclist['issues'][i]['fields']['status']['name'];        
+            current_epic_info['CreatedDate'] = epiclist['issues'][i]["createddate"];        
             current_epic_info['AbnormalEpicSprint'] = 0;        
             current_epic_info['GovOrDeployment'] = false;        
             current_epic_info['StoryPoint'] = story_point;        
             current_epic_info['DHistory'] = [];        
             current_epic_info['Zephyr'] = zephyr_info;        
-            current_epic_info['STORY'] = story_info,
-            console.log(current_epic_info);
+            current_epic_info['STORY'] = story_info;
+            //console.log(current_epic_info);
+            //find index
+            for(var a = 0; a < initiative_DB['total']; a++)
+            {
+              if(init_keyvalue == initiative_DB['issues'][a]['Initiative Key'])
+              {
+                initiative_DB['issues'][a]['EPIC']['issues'].push(current_epic_info);        
+              } 
+            }
           } 
-          resolve(epic_keylist);
+          //console.log("index = ", index);
+          //console.log(epic_keylist);
+          //console.log(initiative_DB);
+          //resolve(epic_keylist);
+          saveInitDB(initiative_DB);
+          resolve(epic_keylist); 
         })
-        .catch((error) => { console.log(error); });
-      })
+        .catch((error) => { console.log("nsb err===", error); 
+        });
+      });
     });
   })
   .then((epickeylist) => {
-    console.log("[Proimse 3] then : epickeylist = ", epickeylist);
+    console.log("[Proimse 3] then : =================");
+    console.log(epickeylist);
+    /*
     return new Promise((resolve, reject) => {
       resolve("---");
     });
+    */
   })
+  /*
   .then((epic) => {
     console.log("[Proimse 4] then epic = : ", epic);
     return new Promise((resolve, reject) => {
@@ -417,6 +449,7 @@ function get_makeSnapshot_InitiativeInfofromJira(filterID)
     console.log("Proimse exception : Initiative List gathering NG - Promise");
     console.log(err);
   });
+  */
 }
 
 
@@ -452,7 +485,7 @@ function getEpicListfromJira(initiativeKey)
 
     // "jql" : "type=EPIC AND issueFunction in linkedIssuesOfRecursiveLimited('issueKey= TVPLAT-16376', 1)" 
     let filterjql = "issue in linkedissues(" + initiativeKey + ")";
-    //console.log("filterjql = ", filterjql);
+    console.log("filterjql = ", filterjql);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
     /*
     var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,
@@ -486,6 +519,17 @@ function getStoryZephyerListfromJira(epicKey)
 }  
 
 
+function saveInitDB(jsonObject)
+{
+  var json = JSON.stringify(jsonObject);
+  fse.outputFileSync("./public/json/initiative_DB", json, 'utf-8', function(e){
+    if(e){
+      console.log(e);
+    }else{
+      console.log("Download is done!");	
+    }
+  });
+}
 
 
 module.exports = { 
