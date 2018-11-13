@@ -30,11 +30,10 @@ var default_Sprint_Info = {
   };
 
 var initiative_DB = {
-  total : 0,
-  snapshotDate : '2018',
-  current_sprint : 'TVSP7', 
-  issues :  // initiative issue list
-  [],
+  'total' : 0,
+  'snapshotDate' : '2018',
+  'current_sprint' : 'TVSP7', 
+  'issues' : [], // initiative issue list
 };  
 
 var current_demo_info = {
@@ -50,9 +49,7 @@ var story_point =
   'RemainSP' : 0,
 };
   
-
 var current_epic_info = {};
-
 var epic_info =  
 {
     'Epic Key' : '',
@@ -159,7 +156,7 @@ var initiative_info =
     'EpicDevelResolutionCnt' : 0,
     'EpicGovOrDeploymentResolutionCnt' : 0,
     'EpicDelayedCnt' : 0,
-    issues : [],    
+    'issues' : [],    
   },
 };
 
@@ -270,189 +267,6 @@ function get_InitiativeListfromJira(filterID)
 }
 
 
-function get_InitiativeList(res, res, next)
-{
-	var xhttp = new XMLHttpRequest();
-	  xhttp.onreadystatechange = function()
-    {
-      if (xhttp.readyState === 4)
-      {
-        if (xhttp.status === 200)
-        {
-			  	var resultJSON = JSON.parse(xhttp.responseText);
-			  	console.log(resultJSON.total, resultJSON);
-			  	var json = JSON.stringify(resultJSON);
-			  	fse.outputFileSync("./public/json/initiative_list", json, 'utf-8', function(e){
-			  		if(e){
-			  			console.log(e);
-			  		}else{
-			  			console.log("Download is done!");	
-			  		}
-			  	});
-          console.log("Initiative List gathering ok");
-          res.send('Initiative List gathering ok');
-        }
-        else
-        {
-          console.log("AJAX Error...............");
-        }
-      }
-    };
-
-  var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
-  var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
-  xhttp.open("POST", searchURL, true);
-  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
-  xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-  xhttp.send(param);
-} 
-
-
- /*   
-function get_InitiativeList()
-{
-    var request = require("request");
-
-    var options = { 
-        method: 'POST',
-        url: 'http://hlm.lge.com/issue/rest/api/2/search/',
-        headers: { 
-          'Postman-Token': '326c78f4-af52-40f1-8671-3c19a1bd3a3f',
-          'Cache-Control': 'no-cache',
-          'Authorization': 'Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=',
-          'content-Type': 'application/json' 
-        },
-        body: '{\r\n\t "jql" : "filter=Initiative_webOS4.5_Initial_Dev" \r\n\t,"maxResults" : 1000\r\n    , "startAt": 0\r\n    ,"fields" : ["summary", "key", "assignee", "due", "status", "labels"]\r\n};' 
-    };
- 
-    request(options, function (error, response, body) {
-      if (error) throw new Error(error);
-      console.log(body);
-    });
-} 
-*/
-
-function get_makeSnapshot_InitiativeInfofromJira(filterID)
-{
-  // Use Promise Object
-  get_InitiativeListfromJira(filterID)
-  .then((initiativelist) => {
-    // input : initiative filter id --> the search result of initiative (JSON Object)
-    // output : epic list and update of basic epic info depend on initiative 
-    console.log("[Promise 1] Get Initiative List / Update Basic Info and Iinitiative Key List from JIRA");
-    console.log(initiativelist);
-
-    initiative_DB['total'] = initiativelist.total;
-    return new Promise((resolve, reject) => {
-      for (var i = 0; i < initiativelist.total; i++) {
-        initiative_keylist.push(initiativelist['issues'][i]['key']);
-        // need to be update initiative info
-        current_initiative_info = Object.assign({}, initiative_info); // initialize...
-        current_initiative_info['Initiative Key'] = initiativelist['issues'][i]['key'];        
-        current_initiative_info['Summary'] = initiativelist['issues'][i]['fields']['summary'];        
-        current_initiative_info['Assignee'] = initiativelist['issues'][i]['fields']['assignee']['name'];        
-        current_initiative_info['관리대상'] = false;     
-        current_initiative_info['Risk관리대상'] = false;        
-        current_initiative_info['Initiative Order'] = 0;        
-        current_initiative_info['Status Color'] = 0;        
-        current_initiative_info['SE_Delivery'] = 0;        
-        current_initiative_info['SE_Quality'] = 0;        
-        current_initiative_info['ScopeOfChange'] = 'local';        
-        current_initiative_info['RMS'] = true;        
-        current_initiative_info['RescheduleCnt'] = 0;        
-        current_initiative_info['STESDET_OnSite'] = true;        
-        current_initiative_info['AbnormalEpicSprint'] = false;        
-        current_initiative_info['GovOrDeployment'] = false;        
-        current_initiative_info['StatusSummarymgrCnt'] = 0;    
-        console.log("^^^^", initiativelist['issues'][i]['key']);
-        console.log(current_initiative_info);
-        //initiative_DB['issues'][i] = Object.assign({}, current_initiative_info); 
-        //initiative_DB['issues'].push(Object.assign({}, current_initiative_info)); 
-        initiative_DB['issues'].push(current_initiative_info); 
-        console.log("^^^^", current_initiative_info['Initiative Key']);
-        console.log("i = ", i, "\n", initiative_DB['issues'][i]);
-      }     
-      resolve(initiative_keylist);
-    });
-  })
-  .then((initkeylist) => {
-    // input : initiative key list = [ 'TVPLAT-XXXX', 'TVPLAT-XXXX', .... ]
-    // output : epic list and update of basic epic info depend on initiative 
-    console.log("[Proimse 2] Get Epic List / Update Epic Basic Info");
-    console.log(initkeylist);
-    // Epic List Update.....
-    return new Promise((resolve, reject) => {
-      var saved = 0;
-      initkeylist.forEach((init_keyvalue, index) => { 
-        console.log("index = ", index, "initiative key init_keyvalue =", init_keyvalue); 
-        getEpicListfromJira(init_keyvalue)
-        .then((epiclist) => {
-          //console.log(epiclist);
-          epic_keylist = [];
-          for (var i = 0; i < epiclist.total; i++) 
-          {
-            epic_keylist.push(epiclist['issues'][i]['key']);
-            current_epic_info = Object.assign({}, epic_info);
-            // need to be update initiative info
-            current_epic_info['Epic Key'] = epiclist['issues'][i]['key'];
-            current_epic_info['Release_SP'] = 'TVSP21';        
-            current_epic_info['Summary'] = epiclist['issues'][i]['fields']['summary'];        
-            current_epic_info['Assignee'] = epiclist['issues'][i]['fields']['assignee']['name'];        
-            current_epic_info['duedate'] = epiclist['issues'][i]["duedate"];        
-            current_epic_info['Status'] = epiclist['issues'][i]['fields']['status']['name'];        
-            current_epic_info['CreatedDate'] = epiclist['issues'][i]["createddate"];        
-            current_epic_info['AbnormalEpicSprint'] = 0;        
-            current_epic_info['GovOrDeployment'] = false;        
-            current_epic_info['StoryPoint'] = story_point;        
-            current_epic_info['DHistory'] = [];        
-            current_epic_info['Zephyr'] = zephyr_info;        
-            current_epic_info['STORY'] = story_info;
-            //console.log(current_epic_info);
-            //find index
-            for(var a = 0; a < initiative_DB['total']; a++)
-            {
-              if(init_keyvalue == initiative_DB['issues'][a]['Initiative Key'])
-              {
-                initiative_DB['issues'][a]['EPIC']['issues'].push(current_epic_info);        
-              } 
-            }
-          } 
-          //console.log("index = ", index);
-          //console.log(epic_keylist);
-          //console.log(initiative_DB);
-          //resolve(epic_keylist);
-          saveInitDB(initiative_DB);
-          resolve(epic_keylist); 
-        })
-        .catch((error) => { console.log("nsb err===", error); 
-        });
-      });
-    });
-  })
-  .then((epickeylist) => {
-    console.log("[Proimse 3] then : =================");
-    console.log(epickeylist);
-    /*
-    return new Promise((resolve, reject) => {
-      resolve("---");
-    });
-    */
-  })
-  /*
-  .then((epic) => {
-    console.log("[Proimse 4] then epic = : ", epic);
-    return new Promise((resolve, reject) => {
-      reject("can't find epic error from initiative");
-    });
-  })
-  .catch(function (err){
-    console.log("Proimse exception : Initiative List gathering NG - Promise");
-    console.log(err);
-  });
-  */
-}
-
-
 function getEpicListfromJira(initiativeKey)
 {
   return new Promise(function (resolve, reject){
@@ -532,6 +346,291 @@ function saveInitDB(jsonObject)
 }
 
 
+function get_InitiativeList(res, res, next)
+{
+	var xhttp = new XMLHttpRequest();
+	  xhttp.onreadystatechange = function()
+    {
+      if (xhttp.readyState === 4)
+      {
+        if (xhttp.status === 200)
+        {
+			  	var resultJSON = JSON.parse(xhttp.responseText);
+			  	console.log(resultJSON.total, resultJSON);
+			  	var json = JSON.stringify(resultJSON);
+			  	fse.outputFileSync("./public/json/initiative_list", json, 'utf-8', function(e){
+			  		if(e){
+			  			console.log(e);
+			  		}else{
+			  			console.log("Download is done!");	
+			  		}
+			  	});
+          console.log("Initiative List gathering ok");
+          res.send('Initiative List gathering ok');
+        }
+        else
+        {
+          console.log("AJAX Error...............");
+        }
+      }
+    };
+
+  var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
+  var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
+  xhttp.open("POST", searchURL, true);
+  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+  xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+  xhttp.send(param);
+} 
+
+
+ /*   
+function get_InitiativeList()
+{
+    var request = require("request");
+
+    var options = { 
+        method: 'POST',
+        url: 'http://hlm.lge.com/issue/rest/api/2/search/',
+        headers: { 
+          'Postman-Token': '326c78f4-af52-40f1-8671-3c19a1bd3a3f',
+          'Cache-Control': 'no-cache',
+          'Authorization': 'Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=',
+          'content-Type': 'application/json' 
+        },
+        body: '{\r\n\t "jql" : "filter=Initiative_webOS4.5_Initial_Dev" \r\n\t,"maxResults" : 1000\r\n    , "startAt": 0\r\n    ,"fields" : ["summary", "key", "assignee", "due", "status", "labels"]\r\n};' 
+    };
+ 
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+      console.log(body);
+    });
+} 
+*/
+/*
+function get_makeSnapshot_InitiativeInfofromJira(filterID)
+{
+  // Use Promise Object
+  get_InitiativeListfromJira(filterID)
+  .then((initiativelist) => {
+    // input : initiative filter id --> the search result of initiative (JSON Object)
+    // output : epic list and update of basic epic info depend on initiative 
+    console.log("[Promise 1] Get Initiative List / Update Basic Info and Iinitiative Key List from JIRA");
+    console.log(initiativelist);
+
+    initiative_DB['total'] = initiativelist.total;
+    return new Promise((resolve, reject) => {
+      for (var i = 0; i < initiativelist.total; i++) {
+        initiative_keylist.push(initiativelist['issues'][i]['key']);
+        // need to be update initiative info
+        current_initiative_info = Object.assign({}, initiative_info); // initialize...
+        current_initiative_info['Initiative Key'] = initiativelist['issues'][i]['key'];        
+        current_initiative_info['Summary'] = initiativelist['issues'][i]['fields']['summary'];        
+        current_initiative_info['Assignee'] = initiativelist['issues'][i]['fields']['assignee']['name'];        
+        current_initiative_info['관리대상'] = false;     
+        current_initiative_info['Risk관리대상'] = false;        
+        current_initiative_info['Initiative Order'] = 0;        
+        current_initiative_info['Status Color'] = 0;        
+        current_initiative_info['SE_Delivery'] = 0;        
+        current_initiative_info['SE_Quality'] = 0;        
+        current_initiative_info['ScopeOfChange'] = 'local';        
+        current_initiative_info['RMS'] = true;        
+        current_initiative_info['RescheduleCnt'] = 0;        
+        current_initiative_info['STESDET_OnSite'] = true;        
+        current_initiative_info['AbnormalEpicSprint'] = false;        
+        current_initiative_info['GovOrDeployment'] = false;        
+        current_initiative_info['StatusSummarymgrCnt'] = 0;    
+        console.log("^^^^", initiativelist['issues'][i]['key']);
+        console.log(current_initiative_info);
+        //initiative_DB['issues'][i] = Object.assign({}, current_initiative_info); 
+        //initiative_DB['issues'].push(Object.assign({}, current_initiative_info)); 
+        initiative_DB['issues'].push(current_initiative_info); 
+        console.log("^^^^", current_initiative_info['Initiative Key']);
+        console.log("i = ", i, "\n", initiative_DB['issues'][i]);
+      }     
+      resolve(initiative_keylist);
+    });
+  })
+  .then((initkeylist) => {
+    // input : initiative key list = [ 'TVPLAT-XXXX', 'TVPLAT-XXXX', .... ]
+    // output : epic list and update of basic epic info depend on initiative 
+    console.log("[Proimse 2] Get Epic List / Update Epic Basic Info");
+    console.log(initkeylist);
+    // Epic List Update.....
+    return new Promise((resolve, reject) => {
+      //initkeylist.forEach((init_keyvalue, index) => { 
+      //for(var index = 0; index < initiative_DB['total']; index++) {
+      for(var index = 0; index < 1; index++) 
+      {
+        init_keyvalue = initiative_DB['issues'][index]['Initiative Key'];
+        console.log("index = ", index, "initiative key init_keyvalue =", init_keyvalue); 
+        getEpicListfromJira(init_keyvalue)
+        .then((epiclist) => {
+          //console.log(epiclist);
+          epic_keylist = [];
+          for (var i = 0; i < epiclist.total; i++) 
+          {
+            epic_keylist.push(epiclist['issues'][i]['key']);
+            current_epic_info = Object.assign({}, epic_info);
+            // need to be update initiative info
+            current_epic_info['Epic Key'] = epiclist['issues'][i]['key'];
+            current_epic_info['Release_SP'] = 'TVSP21';        
+            current_epic_info['Summary'] = epiclist['issues'][i]['fields']['summary'];        
+            current_epic_info['Assignee'] = epiclist['issues'][i]['fields']['assignee']['name'];        
+            current_epic_info['duedate'] = epiclist['issues'][i]["duedate"];        
+            current_epic_info['Status'] = epiclist['issues'][i]['fields']['status']['name'];        
+            current_epic_info['CreatedDate'] = epiclist['issues'][i]["createddate"];        
+            current_epic_info['AbnormalEpicSprint'] = 0;        
+            current_epic_info['GovOrDeployment'] = false;        
+            current_epic_info['StoryPoint'] = story_point;        
+            current_epic_info['DHistory'] = [];        
+            current_epic_info['Zephyr'] = zephyr_info;        
+            current_epic_info['STORY'] = story_info;
+            //console.log(current_epic_info);
+            //find index
+            for(var a = 0; a < initiative_DB['total']; a++)
+            {
+              if(init_keyvalue == initiative_DB['issues'][a]['Initiative Key'])
+              {
+                console.log("===========&&&&&&");
+                initiative_DB['issues'][a]['EPIC']['issues'].push(current_epic_info);        
+              } 
+            }
+          } 
+          //console.log("index = ", index);
+          //console.log(epic_keylist);
+          //console.log(initiative_DB);
+          //resolve(epic_keylist);
+          saveInitDB(initiative_DB);
+          resolve(epic_keylist); 
+        })
+        .catch((error) => { console.log("nsb err===", error); 
+        });
+      }
+    });
+  })
+  .then((epickeylist) => {
+    console.log("[Proimse 3] then : =================");
+    console.log(epickeylist);
+    return new Promise((resolve, reject) => {
+      resolve("---");
+    });
+  })
+  .then((epic) => {
+    console.log("[Proimse 4] then epic = : ", epic);
+    return new Promise((resolve, reject) => {
+      reject("can't find epic error from initiative");
+    });
+  })
+  .catch(function (err){
+    console.log("Proimse exception : Initiative List gathering NG - Promise");
+    console.log(err);
+  });
+}
+*/
+
+
+async function makeSnapshot_InitiativeInfofromJira(filterID)
+{
+  // Use Promise Object
+  await get_InitiativeListfromJira(filterID)
+  .then((initiativelist) => {
+    // input : initiative filter id --> the search result of initiative (JSON Object)
+    // output : epic list and update of basic epic info depend on initiative 
+    console.log("[Promise 1] Get Initiative List / Update Basic Info and Iinitiative Key List from JIRA");
+    console.log(initiativelist);
+
+    initiative_DB['total'] = initiativelist.total;
+    for (var i = 0; i < initiativelist.total; i++) {
+      initiative_keylist.push(initiativelist['issues'][i]['key']);
+      // need to be update initiative info
+      current_initiative_info = JSON.parse(JSON.stringify(initiative_info)); // initialize...
+      current_initiative_info['Initiative Key'] = initiativelist['issues'][i]['key'];        
+      current_initiative_info['Summary'] = initiativelist['issues'][i]['fields']['summary'];        
+      current_initiative_info['Assignee'] = initiativelist['issues'][i]['fields']['assignee']['name'];        
+      current_initiative_info['관리대상'] = false;     
+      current_initiative_info['Risk관리대상'] = false;        
+      current_initiative_info['Initiative Order'] = 0;        
+      current_initiative_info['Status Color'] = 0;        
+      current_initiative_info['SE_Delivery'] = 0;        
+      current_initiative_info['SE_Quality'] = 0;        
+      current_initiative_info['ScopeOfChange'] = 'local';        
+      current_initiative_info['RMS'] = true;        
+      current_initiative_info['RescheduleCnt'] = 0;        
+      current_initiative_info['STESDET_OnSite'] = true;        
+      current_initiative_info['AbnormalEpicSprint'] = false;        
+      current_initiative_info['GovOrDeployment'] = false;        
+      current_initiative_info['StatusSummarymgrCnt'] = 0;    
+      //console.log("^^^^", initiativelist['issues'][i]['key']);
+      //console.log(current_initiative_info);
+      
+      // JSON방식으로 deep copy를 수행했을때 Date형식의 데이터가 제대로 deep copy되지 않는 현상을 발견하였다. 따라서 Object.assign() 사용하나 arraylist deep copy는 안됨.
+      //initiative_DB['issues'][i] = Object.assign({}, current_initiative_info); 
+
+      // error case : [].push는 object copy시 shallow copy임. 주의 필요함.
+      //initiative_DB['issues'].push(current_initiative_info); // error case --> push = object shallow copy, reference copy 
+
+      initiative_DB['issues'][i] = JSON.parse(JSON.stringify(current_initiative_info)) // object copy --> need deep copy
+      //console.log("^^^^", current_initiative_info['Initiative Key']);
+      //console.log("i = ", i, "\n", initiative_DB['issues'][i]);
+    }     
+  });
+  //saveInitDB(initiative_DB);
+
+  await makeSnapshot_EpicInfofromJira(initiative_keylist);
+}
+
+
+async function makeSnapshot_EpicInfofromJira(initkeylist)
+{
+  // input : initiative key list = [ 'TVPLAT-XXXX', 'TVPLAT-XXXX', .... ]
+  // output : epic list and update of basic epic info depend on initiative 
+  console.log("[Proimse 2] Get Epic List / Update Epic Basic Info");
+  console.log(initkeylist);
+
+  // Epic List Update.....
+  for(var index = 0; index < initiative_DB['total']; index++) 
+  //for(var index = 0; index < 1; index++) 
+  {
+    var init_keyvalue = initkeylist[index];
+    console.log("index = ", index, "initiative key init_keyvalue =", init_keyvalue); 
+    await getEpicListfromJira(init_keyvalue)
+    .then((epiclist) => {
+      //console.log(epiclist);
+      console.log("getEpicListfromJira.then start--------------", index, "epic total=", epiclist.total);
+      epic_keylist = new Array();
+      for (var i = 0; i < epiclist.total; i++) 
+      {
+        epic_keylist.push(epiclist['issues'][i]['key']);
+        current_epic_info = JSON.parse(JSON.stringify(epic_info));
+        // need to be update initiative info
+        current_epic_info['Epic Key'] = epiclist['issues'][i]['key'];
+        current_epic_info['Release_SP'] = 'TVSP21';        
+        current_epic_info['Summary'] = epiclist['issues'][i]['fields']['summary'];        
+        current_epic_info['Assignee'] = epiclist['issues'][i]['fields']['assignee']['name'];        
+        current_epic_info['duedate'] = epiclist['issues'][i]["duedate"];        
+        current_epic_info['Status'] = epiclist['issues'][i]['fields']['status']['name'];        
+        current_epic_info['CreatedDate'] = epiclist['issues'][i]["createddate"];        
+        current_epic_info['AbnormalEpicSprint'] = 0;        
+        current_epic_info['GovOrDeployment'] = false;        
+        current_epic_info['StoryPoint'] = story_point;        
+        current_epic_info['DHistory'] = [];        
+        current_epic_info['Zephyr'] = zephyr_info;        
+        current_epic_info['STORY'] = story_info;
+        //initiative_DB['issues'][0]['EPIC']['issues'][i] = new Object();
+        initiative_DB['issues'][index]['EPIC']['issues'][i] = JSON.parse(JSON.stringify(current_epic_info));        
+      }
+      console.log("Save file = initiative_DB", index)
+      saveInitDB(initiative_DB);
+      console.log("getEpicListfromJira.then end--------------", index);
+      console.log(JSON.stringify(initiative_DB));
+  })
+    console.log("loop end = ", index)
+  }
+}
+
+
+
 module.exports = { 
   initiative_DB,              // final DB
   initiative_FilterResult,    // initiative JOSN Object from JIRA Filter
@@ -539,7 +638,7 @@ module.exports = {
   // function
   get_InitiativeListfromJira,  // promise
   get_InitiativeList,          // callback
-  get_makeSnapshot_InitiativeInfofromJira,
+  makeSnapshot_InitiativeInfofromJira,
  };
 
 
