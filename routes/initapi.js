@@ -160,7 +160,7 @@ var initiative_info =
   },
 };
 
-
+var current_story_info;
 var story_info = 
 {
   'Story Key' : '',
@@ -319,7 +319,52 @@ function getEpicListfromJira(initiativeKey)
 
 function getStoryListfromJira(epicKey)
 {
+  return new Promise(function (resolve, reject){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState === 4)
+      {
+        if (xhttp.status === 200)
+        {
+          var resultJSON = epic_FilterResult = JSON.parse(xhttp.responseText);
+          var json = JSON.stringify(resultJSON);
+          fse.outputFileSync("./public/json/epic_list", json, 'utf-8', function(e){
+            if(e)
+            {
+              console.log(e);
+            }
+            else
+            {
+              console.log("Download is done!");	
+            }
+          });
+          resolve(resultJSON);
+        }
+        else
+        {
+          reject(xhttp.status);
+        }        
+      }
+    }
 
+    // "jql" : "type=EPIC AND issueFunction in linkedIssuesOfRecursiveLimited('issueKey= TVPLAT-16376', 1)" 
+    let filterjql = "issue in linkedissues(" + epicKey + ")";
+    console.log("filterjql = ", filterjql);
+    var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
+    /*
+    var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,
+                  "fields" : [ "summary", "key", "assignee", "due", "status", "labels", "issuelinks", "updated", "created", "customfield_10105", "timespent" 
+                              , "components", "progress", "resolution", "workratio", "description", "customfield_16034", "customfield_16033", "duedate", "lastViewed"] };
+    */
+    //var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
+    var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks"] };
+
+    //console.log("param=", JSON.stringify(param));
+    xhttp.open("POST", searchURL, true);
+    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+    xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+    xhttp.send(JSON.stringify(param));  
+  });    
 }  
 
 function getEpicZephyerListfromJira(initiativeKey)
@@ -561,18 +606,16 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
       current_initiative_info['AbnormalEpicSprint'] = false;        
       current_initiative_info['GovOrDeployment'] = false;        
       current_initiative_info['StatusSummarymgrCnt'] = 0;    
-      //console.log("^^^^", initiativelist['issues'][i]['key']);
+      console.log("^^^^Initiative Key = ", initiativelist['issues'][i]['key']);
       //console.log(current_initiative_info);
       
+      // reference site --- http://hong.adfeel.info/frontend/javascript-%EA%B0%9D%EC%B2%B4-deep-copy/
       // JSON방식으로 deep copy를 수행했을때 Date형식의 데이터가 제대로 deep copy되지 않는 현상을 발견하였다. 따라서 Object.assign() 사용하나 arraylist deep copy는 안됨.
       //initiative_DB['issues'][i] = Object.assign({}, current_initiative_info); 
-
       // error case : [].push는 object copy시 shallow copy임. 주의 필요함.
       //initiative_DB['issues'].push(current_initiative_info); // error case --> push = object shallow copy, reference copy 
-
       initiative_DB['issues'][i] = JSON.parse(JSON.stringify(current_initiative_info)) // object copy --> need deep copy
-      //console.log("^^^^", current_initiative_info['Initiative Key']);
-      //console.log("i = ", i, "\n", initiative_DB['issues'][i]);
+      console.log("i = ", i, "\n", initiative_DB['issues'][i]);
     }     
   });
   //saveInitDB(initiative_DB);
@@ -590,14 +633,13 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
 
   // Epic List Update.....
   for(var index = 0; index < initiative_DB['total']; index++) 
-  //for(var index = 0; index < 1; index++) 
   {
     var init_keyvalue = initkeylist[index];
-    console.log("index = ", index, "initiative key init_keyvalue =", init_keyvalue); 
+    console.log("getEpicListfromJira.then start--------------");
     await getEpicListfromJira(init_keyvalue)
     .then((epiclist) => {
       //console.log(epiclist);
-      console.log("getEpicListfromJira.then start--------------", index, "epic total=", epiclist.total);
+      console.log("epic loop Start : Initiative index = ", index, "initiative key init_keyvalue =", init_keyvalue); 
       epic_keylist = new Array();
       for (var i = 0; i < epiclist.total; i++) 
       {
@@ -616,16 +658,64 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
         current_epic_info['StoryPoint'] = story_point;        
         current_epic_info['DHistory'] = [];        
         current_epic_info['Zephyr'] = zephyr_info;        
-        current_epic_info['STORY'] = story_info;
+        //current_epic_info['STORY'] = story_info;
         //initiative_DB['issues'][0]['EPIC']['issues'][i] = new Object();
-        initiative_DB['issues'][index]['EPIC']['issues'][i] = JSON.parse(JSON.stringify(current_epic_info));        
+        initiative_DB['issues'][index]['EPIC']['issues'][i] = JSON.parse(JSON.stringify(current_epic_info));
       }
-      console.log("Save file = initiative_DB", index)
-      saveInitDB(initiative_DB);
-      console.log("getEpicListfromJira.then end--------------", index);
-      console.log(JSON.stringify(initiative_DB));
-  })
-    console.log("loop end = ", index)
+      console.log("Save file = initiative_DB", index);
+      //saveInitDB(initiative_DB);
+      console.log("epic loop end : init index = ", index)
+      //console.log(JSON.stringify(initiative_DB));
+    })
+    console.log("getEpicListfromJira.then end--------------", index);
+    await makeSnapshot_StoryInfofromJira(index, epic_keylist); // initiative index, epick keylist        
+    console.log("[final] Save file = initiative_DB");
+    saveInitDB(initiative_DB);
+  }
+}
+
+
+async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
+{
+  // input : initiative key list = [ 'TVPLAT-XXXX', 'TVPLAT-XXXX', .... ]
+  // output : epic list and update of basic epic info depend on initiative 
+  console.log("[Proimse 3] Init Index = ", init_index, " Get Epic-Story List / Update Story Basic Info");
+ 
+  var init_keyvalue = initiative_keylist[init_index];
+  
+  for(var i = 0; i < epickeylist.length; i++)
+  {
+    var epic_keyvalue = epickeylist[i];
+    console.log("getStoryListfromJira.then start--------------");
+    await getStoryListfromJira(epic_keyvalue)
+    .then((storylist) => {
+      //console.log(storylist);
+      story_keylist = new Array();
+      console.log("Story loop Start : init_index = ", init_index, "epic_keyvalue =", epic_keyvalue, "story_length = ", storylist.total);
+      for (var j = 0; j < storylist.total; j++) 
+      {
+        story_keylist.push(storylist['issues'][j]['key']);
+        current_story_info = JSON.parse(JSON.stringify(story_info));
+        // need to be update initiative info
+        current_story_info['Story Key'] = storylist['issues'][j]['key'];
+        current_story_info['Release_SP'] = 'TVSP21';        
+        current_story_info['Summary'] = storylist['issues'][j]['fields']['summary'];        
+        current_story_info['Assignee'] = storylist['issues'][j]['fields']['assignee']['name'];        
+        current_story_info['duedate'] = storylist['issues'][j]["duedate"];        
+        current_story_info['Status'] = storylist['issues'][j]['fields']['status']['name'];        
+        current_story_info['CreatedDate'] = storylist['issues'][j]["createddate"];        
+        current_story_info['AbnormalEpicSprint'] = 0;        
+        current_story_info['GovOrDeployment'] = false;        
+        current_story_info['StoryPoint'] = story_point;        
+        current_story_info['Zephyr'] = zephyr_info;        
+        initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY'][j] = JSON.parse(JSON.stringify(current_story_info));        
+      }
+      console.log("Save file = initiative_DB", "init index = ", init_index, "epic index = ", i);
+      //saveInitDB(initiative_DB);
+      console.log("story loop end : epic index = ", i)
+      //console.log(JSON.stringify(initiative_DB));
+    })
+    console.log("getStoryListfromJira.then end--------------");
   }
 }
 
