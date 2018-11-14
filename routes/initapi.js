@@ -63,13 +63,15 @@ var epic_info =
     'AbnormalEpicSprint' : '',
     "GovOrDeployment" : '',
     'StoryPoint' : story_point,
-
     'DHistory' :  
     [
         { 'orginal' : 'TVSP1' }, 
     ],
-
-    'Zephyr' : {},
+    'Zephyr' : 
+    {
+      'ZephyrCnt': 0,
+      "ZephyrTC": [],       
+    },
     'STORY' : [],
 };
 
@@ -93,8 +95,8 @@ var initiative_info =
   "GovOrDeployment" : '',
   'StatusSummarymgrCnt' : '',
   'Demo' : [],
-  'RelatedInitiative' : [ 'TVPLAT-XXXX', 'TVPLAT-0000', ], 
-  'StoryPoint' : story_point,
+  'RelatedInitiative' : [], 
+  'StoryPoint' : { },
   'Workflow' :
   {   
       'CreatedDate' : '',
@@ -112,8 +114,8 @@ var initiative_info =
   },    
   'MileStone' :
   {   
-      'total' : '',
-      'rescheduleCnt' : '4',
+      'total' : 0,
+      'rescheduleCnt' : 0,
       'history' :
       [
           { "Item1" : '2019-01-01' , "Schedule" : [ '2019-01-01', '2019-01-10', ] },                
@@ -175,52 +177,37 @@ var story_info =
   'RescheduleCnt' : 0,
   'AbnormalStorySprint' : '',
   "GovOrDeployment" : '',
-  'StoryPoint' : story_point,
-  'Zephyr' : {},
+  'StoryPoint' : {} ,
+  'Zephyr' : 
+  {
+    'ZephyrCnt': 0,
+    'ZephyrTC': [],      
+  },
 };
 
+var current_zephyr_info = {};
 var zephyr_info = 
 {
-  'ZephyrCnt': 1,
-  'ZepyhrTC':
-  [
-      {
-          'issueId' : 964936,
-          'issueKey' : 'TVDEVTC-3088',
-          'summary' : '[SDET][TC] General Setting Test',
-          'assignee' : 'jira-user@lge.com',
-          'status' : 'Draft',
-          'label' : 'BASIC_TC, SETTINGS_GENERAL, TAS_MiniBAT',
-          'exeRecordsCnt' : 3,
-          'executions': 
-          [
-              {
-                  'id': 143886,
-                  'executionsStatus': '-1',
-                  'cycleId': 7038,
-                  'cycleName': 'MiniBAT_TAS_07_SETTINGS'
-              },
-              {
-                  'id': 143885,
-                  'executionStatus': '1',
-                  'executionOn': '2018/11/01 16:19',
-                  'executedBy': 'jira-user@lge.com',
-                  'cycleId': -1,
-                  'cycleName': 'Ad hoc'
-              },
-              {
-                  'id': 143800,
-                  'executionStatus': '1',
-                  'executionOn': '2018/10/31 17:37',
-                  'executedBy': 'jira-user@lge.com',
-                  'cycleId': -1,
-                  'cycleName': 'Ad hoc'
-              }
-          ]
-      },
-  ]                              
+  'IssueID' : 0,
+  'Zephyr Key' : '',
+  'Summary' : '',
+  'Assignee' : '',
+  'Status' : '',
+  'Label' : '',
+  'ExeRecordsCnt' : 0,
+  'Executions': [],
 }     
 
+var current_zephyr_exeinfo = {};
+var zephyr_exeinfo = 
+{
+  'id': 0,
+  'executionStatus': '',
+  'executionOn': '',
+  'executedBy': '',
+  'cycleId': 0,
+  'cycleName': ''
+}
 
 // Javascript 비동기 및 callback function.
 // https://joshua1988.github.io/web-development/javascript/javascript-asynchronous-operation/
@@ -367,14 +354,80 @@ function getStoryListfromJira(epicKey)
   });    
 }  
 
-function getEpicZephyerListfromJira(initiativeKey)
-{
 
+function getZephyerListfromJira(KeyID)
+{
+  return new Promise(function (resolve, reject){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState === 4)
+      {
+        if (xhttp.status === 200)
+        {
+          var resultJSON = epic_FilterResult = JSON.parse(xhttp.responseText);
+          var json = JSON.stringify(resultJSON);
+          fse.outputFileSync("./public/json/epic_list", json, 'utf-8', function(e){
+            if(e)
+            {
+              console.log(e);
+            }
+            else
+            {
+              console.log("Download is done!");	
+            }
+          });
+          resolve(resultJSON);
+        }
+        else
+        {
+          reject(xhttp.status);
+        }        
+      }
+    }
+
+  
+  let filterjql = "type = test AND issueFunction in linkedIssuesOfRecursiveLimited(" + "\'issueKey = " + KeyID + "\', 1)";
+
+  console.log("Zephyr filterjql = ", filterjql);
+  var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
+  var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks"] };
+
+  xhttp.open("POST", searchURL, true);
+  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+  xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(param));  
+  });    
 }  
 
-function getStoryZephyerListfromJira(epicKey)
-{
 
+function getZephyerExecutionfromJira(IssueID)
+{
+  return new Promise(function (resolve, reject){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState === 4)
+      {
+        if (xhttp.status === 200)
+        {
+          var resultJSON = epic_FilterResult = JSON.parse(xhttp.responseText);
+          var json = JSON.stringify(resultJSON);
+          //console.log("Executions", json);
+          resolve(resultJSON);
+        }
+        else
+        {
+          reject(xhttp.status);
+        }        
+      }
+    }
+
+  var searchURL = 'http://hlm.lge.com/issue/rest/zapi/latest/execution?issueId=' + IssueID;
+  var param = { 'issueId' : IssueID };
+  xhttp.open("GET", searchURL);
+  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+  xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+  xhttp.send(null);  
+  });    
 }  
 
 
@@ -401,7 +454,6 @@ function get_InitiativeList(res, res, next)
         if (xhttp.status === 200)
         {
 			  	var resultJSON = JSON.parse(xhttp.responseText);
-			  	console.log(resultJSON.total, resultJSON);
 			  	var json = JSON.stringify(resultJSON);
 			  	fse.outputFileSync("./public/json/initiative_list", json, 'utf-8', function(e){
 			  		if(e){
@@ -657,7 +709,7 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
         current_epic_info['GovOrDeployment'] = false;        
         current_epic_info['StoryPoint'] = story_point;        
         current_epic_info['DHistory'] = [];        
-        current_epic_info['Zephyr'] = zephyr_info;        
+        //current_epic_info['Zephyr'] = zephyr_info;        
         //current_epic_info['STORY'] = story_info;
         //initiative_DB['issues'][0]['EPIC']['issues'][i] = new Object();
         initiative_DB['issues'][index]['EPIC']['issues'][i] = JSON.parse(JSON.stringify(current_epic_info));
@@ -668,9 +720,52 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
       //console.log(JSON.stringify(initiative_DB));
     })
     console.log("getEpicListfromJira.then end--------------", index);
+    await makeSnapshot_EpicZephyrInfofromJira(index, epic_keylist); // initiative index, epick keylist        
     await makeSnapshot_StoryInfofromJira(index, epic_keylist); // initiative index, epick keylist        
     console.log("[final] Save file = initiative_DB");
     saveInitDB(initiative_DB);
+  }
+}
+
+
+async function makeSnapshot_EpicZephyrInfofromJira(init_index, epickeylist)
+{
+  // input : initiative key list = [ 'TVPLAT-XXXX', 'TVPLAT-XXXX', .... ]
+  // output : epic list and update of basic epic info depend on initiative 
+  console.log("[Proimse] Init Index = ", init_index, " Get Epic-Zephyr List / Update Zephyr Basic Info");
+ 
+  var init_keyvalue = initiative_keylist[init_index];
+  
+  for(var i = 0; i < epickeylist.length; i++)
+  {
+    var epic_keyvalue = epickeylist[i];
+    console.log("getEpicZephyrListfromJira.then start--------------");
+    await getZephyerListfromJira(epic_keyvalue)
+    .then((zephyrlist) => {
+      //console.log(zephyrlist);
+      console.log("Zephyr loop Start : init_index = ", init_index, "epic_keyvalue =", epic_keyvalue, "zephyrlist_length = ", zephyrlist.total);
+      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['Zephyr']['ZephyrCnt'] = zephyrlist.total; 
+      for (var j = 0; j < zephyrlist.total; j++) 
+      {
+        current_zephyr_info = JSON.parse(JSON.stringify(zephyr_info));
+        // need to be update initiative info
+        current_zephyr_info['IssueID'] = zephyrlist['issues'][j]['id'];
+        current_zephyr_info['Zephyr Key'] = zephyrlist['issues'][j]['key'];        
+        current_zephyr_info['Summary'] = zephyrlist['issues'][j]['fields']['summary'];        
+        current_zephyr_info['Assignee'] = zephyrlist['issues'][j]['fields']['assignee']['name'];        
+        current_zephyr_info['Status'] = zephyrlist['issues'][j]['fields']['status']['name'];        
+        current_zephyr_info['Labels'] = zephyrlist['issues'][j]["fields"]['labels'];        
+        console.log("^^^^add zephyr^^^^^");       
+        initiative_DB['issues'][init_index]['EPIC']['issues'][i]['Zephyr']['ZephyrTC'][j] = JSON.parse(JSON.stringify(current_zephyr_info)); 
+        makeSnapshot_ZephyrExecutionInfofromJira(init_index, i, j, 964936);
+        //makeSnapshot_ZephyrExecutionInfofromJira(init_index, i, j, current_zephyr_info['IssueID']); 
+      }
+      console.log("Save file = initiative_DB", "init index = ", init_index, "epic index = ", i);
+      //saveInitDB(initiative_DB);
+      console.log("Zephyr loop end : epic index = ", i)
+      //console.log(JSON.stringify(initiative_DB));
+    })
+    console.log("getEpicZephyrListfromJira.then end--------------");
   }
 }
 
@@ -720,6 +815,41 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
 }
 
 
+
+async function makeSnapshot_ZephyrExecutionInfofromJira(init_index, epic_index, zephyr_index, zephyrkeyID)
+{
+  // input : initiative key list = [ 'TVPLAT-XXXX', 'TVPLAT-XXXX', .... ]
+  // output : epic list and update of basic epic info depend on initiative 
+  console.log("[Proimse] Get Zephyr Execution Info");
+  console.log("[Zephyr Execution] getZephyerExecutionfromJira.then start--------------");
+  await getZephyerExecutionfromJira(zephyrkeyID)
+  .then((zephyrExecution) => {
+    //console.log(zephyrlist);
+    console.log("Zephyr Execution loop Start : Zephyrkey = ", zephyrkeyID);
+    for (var i = 0; i < zephyrExecution['executions'].length; i++) 
+    {
+      current_zephyr_exeinfo = JSON.parse(JSON.stringify(zephyr_exeinfo));
+      console.log(zephyrExecution['executions'][i]);
+      initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['Zephyr']['ZephyrTC'][zephyr_index]['Executions'][i] = JSON.parse(JSON.stringify(current_zephyr_exeinfo)); 
+      // need to be update initiative info
+      /*
+      current_zephyr_exeinfo['IssueID'] = zephyrExecution['issues'][j]['id'];
+      current_zephyr_exeinfo['Zephyr Key'] = zephyrExecution['issues'][j]['key'];        
+      current_zephyr_exeinfo['Summary'] = zephyrExecution['issues'][j]['fields']['summary'];        
+      current_zephyr_exeinfo['Assignee'] = zephyrExecution['issues'][j]['fields']['assignee']['name'];        
+      current_zephyr_exeinfo['Status'] = zephyrExecution['issues'][j]['fields']['status']['name'];        
+      current_zephyr_exeinfo['Labels'] = zephyrExecution['issues'][j]["fields"]['labels'];        
+      console.log("^^^^add zephyr Execution^^^^^");       
+      initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['Zephyr']['ZephyrTC'][zephyr_index]['executions'] = JSON.parse(JSON.stringify(current_zephyr_exeinfo)); 
+      */
+    }
+    console.log("Save file = initiative_DB", "init index = ", init_index, "epic index = ", epic_index, "ZephyrkeyID = ", zephyrkeyID);
+    //saveInitDB(initiative_DB);
+    console.log("Zephyr Execution loop end : epic index = ", epic_index)
+    //console.log(JSON.stringify(initiative_DB));
+  })
+  console.log("[Zephyr Execution] getZephyerExecutionfromJira.then end--------------");
+}
 
 module.exports = { 
   initiative_DB,              // final DB
