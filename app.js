@@ -53,8 +53,20 @@ function periodic_DBjobs()
   // Use Promise Object
   //initapi.makeSnapshot_InitiativeInfofromJira(42101); // webOS4.5
   //initapi.makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
-  //initapi.makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
-  lgldap.getLDAP_Info('boyoung.cho');
+  initapi.makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
+  //lgldap.getLDAP_Info('boyoung.cho');
+  /*
+  var date = new Date();
+  var time = date.getHours().toString();
+  var min = date.getMinutes().toString();
+  var snapshot = date.toISOString().substring(0, 10);
+  snapshot = snapshot + "T" + time + min;
+  console.log(snapshot);
+  var json = { 'snapshotDate' : 0 };
+  json['snapshotDate'] = snapshot; 
+  console.log(json['snapshotDate']);
+  console.log(snapshot);
+  */
 }  
 
 //tmr.Timer_Setting(12, 20, 10, periodic_DBjobs);
