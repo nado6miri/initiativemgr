@@ -12,6 +12,7 @@ var mysqlSaveRouter = require('./routes/mysqlsave');
 
 var tmr = require('./routes/mytimer');
 var initapi = require('./routes/initapi');
+var lgldap = require('./routes/lgeldap');
 
 var app = express();
 
@@ -52,7 +53,8 @@ function periodic_DBjobs()
   // Use Promise Object
   //initapi.makeSnapshot_InitiativeInfofromJira(42101); // webOS4.5
   //initapi.makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
-  initapi.makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
+  //initapi.makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
+  lgldap.getLDAP_Info('boyoung.cho');
 }  
 
 //tmr.Timer_Setting(12, 20, 10, periodic_DBjobs);
