@@ -46,7 +46,7 @@ function getLDAP_Info(username)
   });
 
   try {
-    client.bind('addhost', '1qaz2wsx', function (error) {
+    client.bind('id', 'pass', function (error) {
         if(error){
             console.log(error.message);
             client.unbind(function(error) {if(error){console.log(error.message);} else{console.log('client disconnected1');}});
