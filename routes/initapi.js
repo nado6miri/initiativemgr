@@ -246,7 +246,13 @@ function get_InitiativeListfromJira(filterID)
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
     //var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
     //var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
-    var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks"] };
+    var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,
+                  "fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks", "resolution", "components", "issuetype", "customfield_15926",
+                              "customfield_15710", "customfield_15711", "customfield_16988", "customfield_16984", "customfield_16983", "customfield_15228", 
+                              "customfield_16986", "created", "updated", "duedate", "resolutiondate", "labels", "description", "fixVersions", "customfield_15104", 
+                              "reporter", "assignee", "customfield_10105", "customfield_16985",
+                             ] };
+
     //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
     xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
@@ -486,13 +492,15 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
   snapshot = snapshot + "T" + time + ":" + min;
   initiative_DB['snapshotDate'] = snapshot;
 
+  var initparse = require('./parsejirafields');
+
   // Use Promise Object
   await get_InitiativeListfromJira(filterID)
   .then((initiativelist) => {
     // input : initiative filter id --> the search result of initiative (JSON Object)
     // output : epic list and update of basic epic info depend on initiative 
     console.log("[Promise 1] Get Initiative List / Update Basic Info and Iinitiative Key List from JIRA");
-    //console.log(initiativelist);
+    //console.log(JSON.stringify(initiativelist));
 
     initiative_DB['total'] = initiativelist.total;
     for (var i = 0; i < initiativelist.total; i++) {
@@ -515,6 +523,41 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
       current_initiative_info['AbnormalEpicSprint'] = false;        
       current_initiative_info['GovOrDeployment'] = false;        
       current_initiative_info['StatusSummarymgrCnt'] = 0;    
+
+      initparse.getKey(initiativelist['issues'][i]);
+      initparse.getSummary(initiativelist['issues'][i]);
+      initparse.getStatus(initiativelist['issues'][i]);
+      initparse.getIssuetype(initiativelist['issues'][i]);
+      initparse.getResolution(initiativelist['issues'][i]);
+      initparse.getComponents(initiativelist['issues'][i]);
+      initparse.checkGovDeployComponents(initiativelist['issues'][i]);
+      initparse.getReleaseSprint(initiativelist['issues'][i]);
+      //initparse.conversionDateToDatetime(initiativelist['issues'][i]);
+      //initparse.conversionDuedateToSprint(initiativelist['issues'][i]);
+      //initparse.conversionReleaseSprintToSprint(initiativelist['issues'][i]);
+      initparse.getStatusSummary(initiativelist['issues'][i]);
+      initparse.getStatusColor(initiativelist['issues'][i]);
+      initparse.getSE_Delivery(initiativelist['issues'][i]);
+      initparse.getSE_Quality(initiativelist['issues'][i]);
+      initparse.getD_Comment(initiativelist['issues'][i]);
+      initparse.getQ_Comment(initiativelist['issues'][i]);
+      initparse.getSTEList(initiativelist['issues'][i]);
+      initparse.getInitiativeOrder(initiativelist['issues'][i]);
+      initparse.getInitiativeScore(initiativelist['issues'][i]);
+      initparse.getCreatedDate(initiativelist['issues'][i]);
+      initparse.getUpdatedDate(initiativelist['issues'][i]);
+      initparse.getDueDate(initiativelist['issues'][i]);
+      initparse.getResolutionDate(initiativelist['issues'][i]);
+      initparse.getLabels(initiativelist['issues'][i]);
+      initparse.getDescription(initiativelist['issues'][i]);
+      initparse.getFixVersions(initiativelist['issues'][i]);
+      initparse.getScopeOfChange(initiativelist['issues'][i]);
+      initparse.getIssueLinks(initiativelist['issues'][i]);
+      initparse.getReporter(initiativelist['issues'][i]);
+      initparse.getAssignee(initiativelist['issues'][i]);
+      initparse.getWatchers(initiativelist['issues'][i]);
+      initparse.checkLabels(initiativelist['issues'][i], 'SPE_M');
+
       //console.log("^^^^Initiative Key = ", initiativelist['issues'][i]['key']);
       //console.log(current_initiative_info);
       
@@ -528,7 +571,7 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
     }     
   });
 
-  await makeSnapshot_EpicInfofromJira(initiative_keylist);
+  //await makeSnapshot_EpicInfofromJira(initiative_keylist);
   console.log("[final] Save file = initiative_DB");
   saveInitDB(initiative_DB);
   console.log("[final] Save end : initiative_DB");
