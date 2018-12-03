@@ -84,12 +84,12 @@ var initiative_info =
   '관리대상' : '',
   'Risk관리대상' : '',
   'Initiative Order' : '',
+  'Initiative Score' : '', 
   'Status Color' : '',
   'SE_Delivery' : '',
   'SE_Quality' : '',
   'ScopeOfChange' : '',
   'RMS' : '',
-  'RescheduleCnt' : 0,
   'STESDET_OnSite' : '',
   'AbnormalEpicSprint' : '',
   "GovOrDeployment" : '',
@@ -97,6 +97,7 @@ var initiative_info =
   'Demo' : [],
   'RelatedInitiative' : [], 
   'StoryPoint' : { },
+  'FixVersion' : [ ],
   'Workflow' :
   {   
       'CreatedDate' : '',
@@ -124,6 +125,7 @@ var initiative_info =
   'ReleaseSprint' :  
   {
       'CurRelease_SP' : 'TVSP11',
+      'RescheduleCnt' : 0,
       'History' :
       [
           { 'orginal' : 'TVSP7' }, 
@@ -346,15 +348,9 @@ function getStoryListfromJira(epicKey)
       }
     }
 
-    // "jql" : "type=EPIC AND issueFunction in linkedIssuesOfRecursiveLimited('issueKey= TVPLAT-16376', 1)" 
     let filterjql = "issue in linkedissues(" + epicKey + ")";
     //console.log("filterjql = ", filterjql);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
-    /*
-    var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,
-                  "fields" : [ "summary", "key", "assignee", "due", "status", "labels", "issuelinks", "updated", "created", "customfield_10105", "timespent" 
-                              , "components", "progress", "resolution", "workratio", "description", "customfield_16034", "customfield_16033", "duedate", "lastViewed"] };
-    */
     //var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
     var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks"] };
 
@@ -503,27 +499,33 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
     //console.log(JSON.stringify(initiativelist));
 
     initiative_DB['total'] = initiativelist.total;
+    var issue = 0;
     for (var i = 0; i < initiativelist.total; i++) {
       initiative_keylist.push(initiativelist['issues'][i]['key']);
+      issue = initiativelist['issues'][i];
       // need to be update initiative info
       current_initiative_info = JSON.parse(JSON.stringify(initiative_info)); // initialize...
-      current_initiative_info['Initiative Key'] = initiativelist['issues'][i]['key'];        
-      current_initiative_info['Summary'] = initiativelist['issues'][i]['fields']['summary'];        
-      current_initiative_info['Assignee'] = initiativelist['issues'][i]['fields']['assignee']['name'];        
-      current_initiative_info['관리대상'] = false;     
-      current_initiative_info['Risk관리대상'] = false;        
-      current_initiative_info['Initiative Order'] = 0;        
-      current_initiative_info['Status Color'] = 0;        
-      current_initiative_info['SE_Delivery'] = 0;        
-      current_initiative_info['SE_Quality'] = 0;        
-      current_initiative_info['ScopeOfChange'] = 'local';        
-      current_initiative_info['RMS'] = true;        
-      current_initiative_info['RescheduleCnt'] = 0;        
-      current_initiative_info['STESDET_OnSite'] = true;        
-      current_initiative_info['AbnormalEpicSprint'] = false;        
-      current_initiative_info['GovOrDeployment'] = false;        
-      current_initiative_info['StatusSummarymgrCnt'] = 0;    
+      current_initiative_info['Initiative Key'] = initparse.getKey(issue);        
+      current_initiative_info['Summary'] = initparse.getSummary(issue);        
+      current_initiative_info['Assignee'] = initparse.getAssignee(issue);        
+      current_initiative_info['관리대상'] = initparse.checkLabels(issue, 'SPE_M');
+      current_initiative_info['Risk관리대상'] = initparse.checkLabels(issue, 'SPE_R');        
+      current_initiative_info['Initiative Score'] = initparse.getInitiativeScore(issue);        
+      current_initiative_info['Initiative Order'] = initparse.getInitiativeOrder(issue);        
+      current_initiative_info['Status Color'] = initparse.getStatusColor(issue);        
+      current_initiative_info['SE_Delivery'] = initparse.getSE_Delivery(issue);        
+      current_initiative_info['SE_Quality'] = initparse.getSE_Quality(issue);       
+      current_initiative_info['ScopeOfChange'] = initparse.getScopeOfChange(issue);        
+      current_initiative_info['RMS'] = initparse.checkRMSInitiative(issue);       
+      current_initiative_info['STESDET_OnSite'] = initparse.getSTESDET_Support(issue);        
+      current_initiative_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);    
+      current_initiative_info['AbnormalEpicSprint'] = false; // need to update     
+      current_initiative_info['StatusSummarymgrCnt'] = 0;  // need to update    
+      current_initiative_info['Demo'] = 0; // need to update    
+      current_initiative_info['RelatedInitiative'] = []; // need to update    
+      current_initiative_info['StoryPoint'] = []; // need to update    
 
+      /*
       initparse.getKey(initiativelist['issues'][i]);
       initparse.getSummary(initiativelist['issues'][i]);
       initparse.getStatus(initiativelist['issues'][i]);
@@ -531,36 +533,29 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
       initparse.getResolution(initiativelist['issues'][i]);
       initparse.getComponents(initiativelist['issues'][i]);
       initparse.checkGovDeployComponents(initiativelist['issues'][i]);
-      initparse.getReleaseSprint(initiativelist['issues'][i]);
-      //initparse.conversionDateToDatetime(initiativelist['issues'][i]);
-      //initparse.conversionDuedateToSprint(initiativelist['issues'][i]);
-      //initparse.conversionReleaseSprintToSprint(initiativelist['issues'][i]);
+      var releaseSP = initparse.getReleaseSprint(initiativelist['issues'][i]);
       initparse.getStatusSummary(initiativelist['issues'][i]);
-      initparse.getStatusColor(initiativelist['issues'][i]);
-      initparse.getSE_Delivery(initiativelist['issues'][i]);
-      initparse.getSE_Quality(initiativelist['issues'][i]);
       initparse.getD_Comment(initiativelist['issues'][i]);
       initparse.getQ_Comment(initiativelist['issues'][i]);
-      initparse.getSTEList(initiativelist['issues'][i]);
-      initparse.getInitiativeOrder(initiativelist['issues'][i]);
       initparse.getInitiativeScore(initiativelist['issues'][i]);
       initparse.getCreatedDate(initiativelist['issues'][i]);
       initparse.getUpdatedDate(initiativelist['issues'][i]);
-      initparse.getDueDate(initiativelist['issues'][i]);
+      var due_date = initparse.getDueDate(initiativelist['issues'][i]);
       initparse.getResolutionDate(initiativelist['issues'][i]);
       initparse.getLabels(initiativelist['issues'][i]);
       initparse.getDescription(initiativelist['issues'][i]);
       initparse.getFixVersions(initiativelist['issues'][i]);
-      initparse.getScopeOfChange(initiativelist['issues'][i]);
       initparse.getIssueLinks(initiativelist['issues'][i]);
       initparse.getReporter(initiativelist['issues'][i]);
       initparse.getAssignee(initiativelist['issues'][i]);
       initparse.getWatchers(initiativelist['issues'][i]);
-      initparse.checkLabels(initiativelist['issues'][i], 'SPE_M');
+      var due_sprint = initparse.conversionDuedateToSprint(due_date);
+      releaseSP = initparse.conversionReleaseSprintToSprint(releaseSP);
+      console.log("Duedate = ", due_date, " Due_Sprint = ", due_sprint, " Release SP= ", releaseSP)
+      */
 
       //console.log("^^^^Initiative Key = ", initiativelist['issues'][i]['key']);
       //console.log(current_initiative_info);
-      
       // reference site --- http://hong.adfeel.info/frontend/javascript-%EA%B0%9D%EC%B2%B4-deep-copy/
       // JSON방식으로 deep copy를 수행했을때 Date형식의 데이터가 제대로 deep copy되지 않는 현상을 발견하였다. 따라서 Object.assign() 사용하나 arraylist deep copy는 안됨.
       //initiative_DB['issues'][i] = Object.assign({}, current_initiative_info); 

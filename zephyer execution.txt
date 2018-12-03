@@ -184,5 +184,24 @@ $.ajax(settings).done(function (response) {
   console.log(response);
 });
 
-// Execution 정보 결과값
+
+// Execution 정보 결과
 {"status":{"1":{"id":1,"color":"#75B000","description":"Test was executed and passed successfully.","name":"PASS"},"2":{"id":2,"color":"#CC3300","description":"Test was executed and failed.","name":"FAIL"},"3":{"id":3,"color":"#F2B000","description":"Test execution is a work-in-progress.","name":"WIP"},"4":{"id":4,"color":"#6693B0","description":"The test execution of this test was blocked for some reason.","name":"BLOCKED"},"-1":{"id":-1,"color":"#A0A0A0","description":"The test has not yet been executed.","name":"UNEXECUTED"}},"executions":[],"currentlySelectedExecutionId":""}
+
+OK - 0. initiative snapshot date 기록 (파일로 date정보를 filename에 기록하여 저장)
+OK - 1. initiative basic info update (summary / assignee / order / status color / se delivery & quality, scopeofchange, RM and so on....)
+OK - 2. date(1번) 기준으로 sprint로 변환하는 함수 정의 (date object를 string으로 전달시 SPRINT 변환)
+3. Epic 기본정보 Update (total count, devel count, deploycnt, total resolution cnt, resolutioncnt, delayed cnt, due date null cnt, abnormal epic cnt....)
+4. Story 기본정보 Update (total count, devel count, deploycnt, total resolution cnt, resolutioncnt, delayed cnt, due date null cnt, abnormal epic cnt....)
+5. Release Sprint (Current / History) - 변경 날짜를 기록할 것인지? 변경된 SPRINT로 기록할 건지? 날짜가 좀 더 정확함.
+6. ok - Stake Holder 구성 (매우 중요)
+  - LADP를 이용한 조직 얻어오기... [ok] - 별도 DB구성 핅요...
+ing... - 7. Zephyr 상세 info update (executions 포함)
+
+8. Mile Stone ?? - 우선순위 낮춤...
+9. Demo JIRA 구성 (Epic / Story처럼)
+10. workflow 구성방안 
+11. relative initiative mapping...? (우선순위 낮춤)
+
+
+'addhost', '1qaz2wsx'

@@ -195,7 +195,7 @@ function getSummary(jiraIssue) {
 //===========================================================================
 // Get Status of jira
 // [param] jiraIssue : json object of jira
-// [return] str
+// [return]checkLabels str
 //===========================================================================
 function getStatus(jiraIssue) {
     let value = jiraIssue['fields']['status']['name'];
@@ -306,18 +306,18 @@ function getReleaseSprint(jiraIssue) {
 function conversionDateToDatetime(datedata) {
     // "2018-05-04"
     // "2018-05-04T14:03:49.000+0900"
-    let datedata = str(datedata);
+    datedata = String(datedata);
     let result = datedata.split(' ');
     result = result[0]; // take yyyy-mm-dd area
     result = result.split('-');
 
-    if(len(result) >= 3) {
+    if(result.length >= 3) {
         let yyyy = result[0];
         let mm = result[1];
         let dd = result[2];
         dd = dd.split('T');
         dd = dd[0];
-        return datetime(int(yyyy), int(mm), int(dd));
+        return new Date(Number(yyyy), Number(mm), Number(dd));
     }
     else {
         return null;
@@ -356,7 +356,7 @@ function conversionDuedateToSprint(covdate) {
 //===========================================================================
 function conversionReleaseSprintToSprint(ReleaseSprint) {
     let bypass = false;
-    let sprint = ReleaseSprint;
+    let sprint = String(ReleaseSprint);
     let b = 0;
 
     // webOS5.0 Sprint
@@ -518,6 +518,17 @@ function getSTEList(jiraIssue) {
     }
     console.log("getSTEList[] = null");
     return null;
+}
+
+
+//===========================================================================
+// Get STE manage item or Not..
+// [param] jiraIssue : json object of jira
+// [return] true or false
+//===========================================================================
+function getSTESDET_Support(jiraIssue) {
+    if(getSTEList(jiraIssue) != null) { return true; }
+    return false;
 }
 
 
@@ -731,6 +742,30 @@ function checkLabels(jiraIssue, labelname) {
 }
 
 
+
+//===========================================================================
+// Check Initiative base on RMS
+// [param] dissue : jira issue
+// [return] true or false
+//===========================================================================
+function checkRMSInitiative(jiraIssue) {
+    let labels = getLabels(jiraIssue);
+    if(labels.includes('RMS요구사항') == true)
+    {
+        console.log("checkLabels = RMS요구사항 --> TRUE");
+        return true;
+    }
+    let summary = getSummary(jiraIssue);
+    if(summary.includes('RMS') == true)
+    {
+        console.log("summary includes RMS :..--> TRUE");
+        return true;
+    }
+    console.log("checkRMSInitiative = --> FALSE");
+    return false;
+}
+
+
 module.exports = { 
     // var
     Y2019_SP_Schedule,
@@ -753,6 +788,7 @@ module.exports = {
     getD_Comment,
     getQ_Comment,
     getSTEList,
+    getSTESDET_Support,
     getInitiativeOrder,
     getInitiativeScore,
     getCreatedDate,
@@ -767,7 +803,8 @@ module.exports = {
     getReporter,
     getAssignee,
     getWatchers,
-    checkLabels
+    checkLabels,
+    checkRMSInitiative,
    };
   
   
