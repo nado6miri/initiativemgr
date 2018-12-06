@@ -766,6 +766,95 @@ function checkRMSInitiative(jiraIssue) {
 }
 
 
+
+//===========================================================================
+// Get Exeinfo ID of zephyr
+// [param] jiraIssue : json object of jira
+// [return] str (ID)
+//===========================================================================
+function getZephyrExeinfo_ID(ZephyrIssue) {
+    if(ZephyrIssue['id'] != null) 
+    {
+        return ZephyrIssue['id'];
+    }
+    return null;    
+}
+
+
+//===========================================================================
+// Get Exeinfo Status of zephyr
+// [param] jiraIssue : json object of jira
+// [return] str (Status) - “-1” UNEXECUTED, “1” PASS, “2” FAIL, “3” WIP, “4” BLOCKED”
+// UNEXECUTED: The test has not yet been executed.
+// PASS: Test was executed and passed successfully.
+// FAIL: Test was executed and failed.
+// WIP: Test execution is a work – in – progress.
+// BLOCKED: The test execution of this test was blocked for some reason.
+//===========================================================================
+function getZephyrExeinfo_Status(ZephyrIssue) {
+    if(ZephyrIssue['executionStatus'] != null) 
+    {
+        return ZephyrIssue['executionStatus'];
+    }
+    return null;
+}
+
+//===========================================================================
+// Get Exeinfo executionOn of zephyr
+// [param] jiraIssue : json object of jira
+// [return] str (executionOn - Date Info)
+//===========================================================================
+function getZephyrExeinfo_Date(ZephyrIssue) {
+    if(ZephyrIssue['executionOn'] != null) 
+    {
+        return ZephyrIssue['executionOn'];
+    }
+    return null;
+}
+
+
+//===========================================================================
+// Get Exeinfo executionBy of zephyr
+// [param] jiraIssue : json object of jira
+// [return] str (executionBy)
+//===========================================================================
+function getZephyrExeinfo_Tester(ZephyrIssue) {
+    if(ZephyrIssue['executedBy'] != null) 
+    {
+        return ZephyrIssue['executedBy'];
+    }
+    return null;
+}
+
+
+//===========================================================================
+// Get Exeinfo cycle ID of zephyr
+// [param] jiraIssue : json object of jira
+// [return] str (cycle ID)
+//===========================================================================
+function getZephyrExeinfo_cycleId(ZephyrIssue) {
+    if(ZephyrIssue['cycleId'] != null) 
+    {
+        return ZephyrIssue['cycleId'];
+    }
+    return null;
+}
+
+
+//===========================================================================
+// Get Exeinfo cycle Name of zephyr
+// [param] jiraIssue : json object of jira
+// [return] str (cycle Name)
+//===========================================================================
+function getZephyrExeinfo_cycleName(ZephyrIssue) {
+    if(ZephyrIssue['cycleName'] != null) 
+    {
+        return ZephyrIssue['cycleName'];
+    }    
+    return null;
+}
+
+
 module.exports = { 
     // var
     Y2019_SP_Schedule,
@@ -805,6 +894,12 @@ module.exports = {
     getWatchers,
     checkLabels,
     checkRMSInitiative,
+    getZephyrExeinfo_ID,
+    getZephyrExeinfo_Status,
+    getZephyrExeinfo_Date,
+    getZephyrExeinfo_Tester,
+    getZephyrExeinfo_cycleId,
+    getZephyrExeinfo_cycleName,
    };
   
   
