@@ -349,6 +349,7 @@ function conversionDuedateToSprint(covdate) {
     return "SP_UNDEF";
 }
 
+
 //===========================================================================
 // convert ReleaseSprint to ShortSprint
 // [param] duedate : "2019_IR1SP01(3/XX~5/10)"
@@ -855,6 +856,30 @@ function getZephyrExeinfo_cycleName(ZephyrIssue) {
 }
 
 
+//===========================================================================
+// checkAbnormalSP : compare init vs epic/story Release SP
+// [param] initiative Release SP, epic/story Release SP
+// [param] epic Release SP, story Release SP
+// [return] init >= epicstory (false) else true
+//===========================================================================
+function checkAbnormalSP(initSP, epicstory_duedate)
+{
+    var epic_story_SP = conversionReleaseSprintToSprint(epicstory_duedate);
+    var init_SP = conversionReleaseSprintToSprint(initSP);
+    
+    for(var i = 0; i < Y2019_SP_Schedule.length; i++)
+    {
+        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == init_SP) { init_SP = i; }
+        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == epic_story_SP) { epic_story_SP = i; }
+    }
+
+    if(i >= Y2019_SP_Schedule.length) { return false; }
+    else
+    {
+        if(init_SP >= epic_story_SP) {return false; } else { return true; }
+    }
+}
+
 module.exports = { 
     // var
     Y2019_SP_Schedule,
@@ -900,6 +925,7 @@ module.exports = {
     getZephyrExeinfo_Tester,
     getZephyrExeinfo_cycleId,
     getZephyrExeinfo_cycleName,
+    checkAbnormalSP,
    };
   
   

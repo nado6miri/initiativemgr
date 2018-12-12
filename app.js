@@ -8,7 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 //var chatRouter = require('./routes/chat');
 var initiativeRouter = require('./routes/initiative');
-var mysqlSaveRouter = require('./routes/mysqlsave');
+//var mysqlSaveRouter = require('./routes/mysqlsave');
 
 var tmr = require('./routes/mytimer');
 var initapi = require('./routes/initapi');
@@ -30,7 +30,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 //app.use('/chat', chatRouter);
 app.use('/initiative', initiativeRouter);
-app.use('/mysqlsave', mysqlSaveRouter);
+//app.use('/mysqlsave', mysqlSaveRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -52,9 +52,14 @@ function periodic_DBjobs()
 {
   // Use Promise Object
   //initapi.makeSnapshot_InitiativeInfofromJira(42101); // webOS4.5
-  initapi.makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
-  //initapi.makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
-  //lgldap.getLDAP_Info('boyoung.cho');
+  //initapi.makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
+  initapi.makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
+
+  /*
+  lgldap.get_UserInfofromLDAP('boyoung.cho');  
+  lgldap.get_UserInfofromLDAP('sungbin.na');
+  */
+ 
   /*
   var date = new Date();
   var time = date.getHours().toString();
