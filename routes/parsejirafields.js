@@ -862,23 +862,67 @@ function getZephyrExeinfo_cycleName(ZephyrIssue) {
 // [param] epic Release SP, story Release SP
 // [return] init >= epicstory (false) else true
 //===========================================================================
-function checkAbnormalSP(initSP, epicstory_duedate)
+function checkAbnormalSP(initSP, initStatus, epicstorySP, epicstoryStatus)
 {
-    var epic_story_SP = conversionReleaseSprintToSprint(epicstory_duedate);
+    var epic_story_SP = epicstorySP;
     var init_SP = conversionReleaseSprintToSprint(initSP);
-    
+    var init_index = 0, epic_story_index = 0;
+
+    if(initSP == "UNDEF_SP" || epicstorySP == "UNDEF_SP") 
+    { 
+        if(checkIsDelivered(epicstoryStatus) == true) { return false } else { return true; } 
+    }
+
     for(var i = 0; i < Y2019_SP_Schedule.length; i++)
     {
-        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == init_SP) { init_SP = i; }
-        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == epic_story_SP) { epic_story_SP = i; }
+        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == init_SP) { init_index = i; }
+        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == epic_story_SP) { epic_story_index = i; }
     }
 
     if(i >= Y2019_SP_Schedule.length) { return false; }
     else
     {
-        if(init_SP >= epic_story_SP) {return false; } else { return true; }
+        if(init_index >= epic_story_index) {return false; } 
+        else 
+        {
+            if(checkIsDelivered(epicstoryStatus) == true) { return false } else { return true; } 
+        }
     }
 }
+
+
+
+//===========================================================================
+// checkIsDelivered : check developing or not (resolved, closed, deferred, withdrawn)
+// [param] Status
+// [return] under development (false), delivered (resolved/closed/resolved/withdrawn) : true
+//===========================================================================
+function checkIsDelivered(Status)
+{
+    if(Status == 'Resolved' || Status == 'Closed' || Status == 'delivered' || Status == 'Deferred' || Status == "Withdrwan" || Status == 'Verify')
+    { 
+        return true; 
+    }
+    return false;  
+}
+
+
+//===========================================================================
+// checkIsDelayed : check delayed or not
+// [param] duedate
+// [return] delayed : true, not delayed : false
+//===========================================================================
+function checkIsDelayed(DueDate)
+{
+    if(DueDate != null)
+    {
+        var duedate = new Date(DueDate);
+        var today = new Date();
+        if(duedate < today) { return true; }
+    }
+    return false;
+}
+
 
 module.exports = { 
     // var
@@ -926,6 +970,8 @@ module.exports = {
     getZephyrExeinfo_cycleId,
     getZephyrExeinfo_cycleName,
     checkAbnormalSP,
+    checkIsDelivered,
+    checkIsDelayed,
    };
   
   

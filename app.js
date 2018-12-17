@@ -53,7 +53,8 @@ function periodic_DBjobs()
   // Use Promise Object
   //initapi.makeSnapshot_InitiativeInfofromJira(42101); // webOS4.5
   //initapi.makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
-  initapi.makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
+  //initapi.makeSnapshot_InitiativeInfofromJira(46022);   // webOS4.5 MR Pilot
+  initapi.makeSnapshot_InitiativeInfofromJira(46093);   // webOS4.5 MR minor
 
   /*
   lgldap.get_UserInfofromLDAP('boyoung.cho');  
