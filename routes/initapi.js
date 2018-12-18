@@ -7,6 +7,8 @@ var XMLHttpRequest = require('xmlhttprequest-ssl').XMLHttpRequest;
 var initparse = require('./parsejirafields');
 var ldap = require('./lgeldap.js')
 
+var async_mode = true;
+
 // initiative filter result (json) - webOS45 webOS45MR, webOS5.0 
 var initiative_FilterResult;
 var initiative_keylist = [];
@@ -61,7 +63,7 @@ var epic_info =
     'Status' : '',
     'CreatedDate' : '',
     'RescheduleCnt' : 0,
-    'AbnormalSprint' : '',
+    'AbnormalSprint' : false,
     "GovOrDeployment" : '',
     'Organization' :'', 
     'StoryPoint' : story_point,
@@ -118,7 +120,7 @@ var initiative_info =
   'ScopeOfChange' : '',
   'RMS' : '',
   'STESDET_OnSite' : '',
-  'AbnormalSprint' : '',
+  'AbnormalSprint' : false,
   "GovOrDeployment" : '',
   'StatusSummarymgrCnt' : '',
   'Demo' : [],
@@ -333,8 +335,8 @@ function getEpicListfromJira(initiativeKey)
       }
     }
 
-    // "jql" : "type=EPIC AND issueFunction in linkedIssuesOfRecursiveLimited('issueKey= TVPLAT-16376', 1)" 
-    let filterjql = "(type = epic or type = arch) AND issue in linkedissues(" + initiativeKey + ")";
+    let filterjql = '(issuetype = epic) AND issuefunction in linkedissuesOf(\"key=' + initiativeKey + '\"' + ')';
+    //let filterjql = "(issuetype = epic) AND issue in linkedissues(" + initiativeKey + ")";
     // console.log("filterjql = ", filterjql);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
 
@@ -388,8 +390,8 @@ function getStoryListfromJira(epicKey)
       }
     }
 
-    let filterjql = "issue in linkedissues(" + epicKey + ")";
-    //console.log("filterjql = ", filterjql);
+    let filterjql = '(issuetype = story) AND issuefunction in linkedissuesOf(\"key=' + epicKey + '\"' + ')';
+    console.log("filterjql = ", filterjql);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
     //var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
     var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,
@@ -637,30 +639,31 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
   //console.log(initkeylist);
 
   // Epic List Update.....
-  for(var index = 0; index < initiative_DB['total']; index++) 
+  for(var i = 0; i < initiative_DB['total']; i++) 
   {
-    var init_keyvalue = initkeylist[index];
+    var init_keyvalue = initkeylist[i];
     await getEpicListfromJira(init_keyvalue)
     .then((epiclist) => {
       //console.log(epiclist);
-      console.log("getEpicListfromJira ==== [I-index]:", index, "[I-Key]:", init_keyvalue);
+      console.log("getEpicListfromJira ==== [I-index]:", i, "[I-Key]:", init_keyvalue);
       epic_keylist = new Array();
       let issue = 0;
-      initiative_DB['issues'][index]['EPIC']['EpicTotalCnt'] = epiclist.total;
-      initiative_DB['issues'][index]['EPIC']['EpicDevelCnt'] = epiclist.total;
-      initiative_DB['issues'][index]['EPIC']['GovOrDeploymentCnt'] = 0;
-      initiative_DB['issues'][index]['EPIC']['EpicTotalResolutionCnt'] = 0;
-      initiative_DB['issues'][index]['EPIC']['EpicDevelResolutionCnt'] = 0;
-      initiative_DB['issues'][index]['EPIC']['EpicGovOrDeploymentResolutionCnt'] = 0;
-      initiative_DB['issues'][index]['EPIC']['EpicDelayedCnt'] = 0;
+      let epic = initiative_DB['issues'][i]['EPIC'];
+      epic['EpicTotalCnt'] = epiclist.total;
+      epic['EpicDevelCnt'] = epiclist.total;
+      epic['GovOrDeploymentCnt'] = 0;
+      epic['EpicTotalResolutionCnt'] = 0;
+      epic['EpicDevelResolutionCnt'] = 0;
+      epic['EpicGovOrDeploymentResolutionCnt'] = 0;
+      epic['EpicDelayedCnt'] = 0;
 
-      for (var i = 0; i < epiclist.total; i++) 
+      for (var j = 0; j < epiclist.total; j++) 
       {
-        var init_ReleaseSP = initiative_DB['issues'][index]['ReleaseSprint']['CurRelease_SP'];
+        var init_ReleaseSP = initiative_DB['issues'][i]['ReleaseSprint']['CurRelease_SP'];
         var epic_ReleaseSP = 0;
-        var init_Status = initiative_DB['issues'][index]['Workflow']['Status'];
+        var init_Status = initiative_DB['issues'][i]['Workflow']['Status'];
         var epic_Status = 0;
-        issue = epiclist['issues'][i];
+        issue = epiclist['issues'][j];
         epic_keylist.push(issue['key']);
         current_epic_info = JSON.parse(JSON.stringify(epic_info));
         // need to be update initiative info
@@ -673,44 +676,43 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
         current_epic_info['CreatedDate'] = initparse.getCreatedDate(issue);         
         current_epic_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);        
         current_epic_info['AbnormalSprint'] = initparse.checkAbnormalSP(init_ReleaseSP, init_Status, epic_ReleaseSP, epic_Status);   
-        if(current_epic_info['GovOrDeployment'] == true) { govcnt ++; }     
         // Gathering organization infomation
         //ldap.get_UserInfofromLDAP(current_epic_info['Assignee']);
-        //initiative_DB['issues'][index]['Organization'] = 
+        //initiative_DB['issues'][i]['Organization'] = 
         /*
         current_epic_info['Organization'] = 0;  // need to be updated        
         current_epic_info['StoryPoint'] = story_point;  // need to be updated      
         current_epic_info['DHistory'] = [];        
         */
-        initiative_DB['issues'][index]['EPIC']['issues'][i] = JSON.parse(JSON.stringify(current_epic_info));
-        initiative_DB['issues'][index]['AbnormalSprint'] = current_epic_info['AbnormalSprint'];
+        epic['issues'][j] = JSON.parse(JSON.stringify(current_epic_info));
+        initiative_DB['issues'][i]['AbnormalSprint'] = current_epic_info['AbnormalSprint'];
 
-        if(initparse.checkIsDelayed(current_epic_info['duedate']) == true) { initiative_DB['issues'][index]['EPIC']['EpicDelayedCnt']++; }
+        if(initparse.checkIsDelayed(current_epic_info['duedate']) == true) { epic['EpicDelayedCnt']++; }
         if(current_epic_info['GovOrDeployment'] == true) 
         {
-          initiative_DB['issues'][index]['EPIC']['EpicDevelCnt']--;
-          initiative_DB['issues'][index]['EPIC']['GovOrDeploymentCnt']++;
+          epic['EpicDevelCnt']--;
+          epic['GovOrDeploymentCnt']++;
           if(initparse.checkIsDelivered(epic_Status) == true)
           {
-            initiative_DB['issues'][index]['EPIC']['EpicTotalResolutionCnt']++;
-            initiative_DB['issues'][index]['EPIC']['EpicGovOrDeploymentResolutionCnt']++;
+            epic['EpicTotalResolutionCnt']++;
+            epic['EpicGovOrDeploymentResolutionCnt']++;
           }
         }
         else
         {
           if(initparse.checkIsDelivered(epic_Status) == true)
           {
-            initiative_DB['issues'][index]['EPIC']['EpicTotalResolutionCnt']++;
-            initiative_DB['issues'][index]['EPIC']['EpicDevelResolutionCnt']++;
+            epic['EpicTotalResolutionCnt']++;
+            epic['EpicDevelResolutionCnt']++;
           }
         }
       }
     }).catch(error => {
-      console.log("[Catch] getEpicListfromJira ==== [I-index]:", index, "[I-Key]:", init_keyvalue, " - exception error = ", error);
+      console.log("[Catch] getEpicListfromJira ==== [I-index]:", i, "[I-Key]:", init_keyvalue, " - exception error = ", error);
       get_errors['epiclist'].push(init_keyvalue);
     });
-    await makeSnapshot_EpicZephyrInfofromJira(index, epic_keylist); // initiative index, epick keylist        
-    await makeSnapshot_StoryInfofromJira(index, epic_keylist); // initiative index, epick keylist        
+    await makeSnapshot_EpicZephyrInfofromJira(i, epic_keylist); // initiative index, epick keylist        
+    await makeSnapshot_StoryInfofromJira(i, epic_keylist); // initiative index, epick keylist        
   }
 }
 
@@ -727,8 +729,9 @@ async function makeSnapshot_EpicZephyrInfofromJira(init_index, epickeylist)
     await getZephyerListfromJira(epic_keyvalue)
     .then((zephyrlist) => {
       //console.log(zephyrlist);
+      let epiczephyr = initiative_DB['issues'][init_index]['EPIC']['issues'][i]['Zephyr'];
       console.log("getZephyerListfromJira ==== [I-index]:", init_index, "[I-Key]:", init_keyvalue, "[E-index]:", i, "[E-Key]:", epic_keyvalue, "[Z-Total]:",zephyrlist.total);
-      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['Zephyr']['ZephyrCnt'] = zephyrlist.total; 
+      epiczephyr['ZephyrCnt'] = zephyrlist.total; 
       zephyr_issueIdlist = [];
       let issue = 0;
       for (var j = 0; j < zephyrlist.total; j++) 
@@ -744,9 +747,9 @@ async function makeSnapshot_EpicZephyrInfofromJira(init_index, epickeylist)
         current_zephyr_info['Status'] = initparse.getStatus(issue);        
         current_zephyr_info['Labels'] = initparse.getLabels(issue);        
         //console.log("^^^^add zephyr^^^^^");       
-        initiative_DB['issues'][init_index]['EPIC']['issues'][i]['Zephyr']['ZephyrTC'][j] = JSON.parse(JSON.stringify(current_zephyr_info)); 
+        epiczephyr['ZephyrTC'][j] = JSON.parse(JSON.stringify(current_zephyr_info)); 
         // async
-        //makeSnapshot_EpicZephyrExecutionInfofromJira(init_index, i, j, current_zephyr_info['IssueID']); 
+        if(async_mode == true) { makeSnapshot_EpicZephyrExecutionInfofromJira(init_index, i, j, current_zephyr_info['IssueID']); }
       }
     }).catch(error => {
       console.log("[Catch] getZephyerListfromJira ==== [I-index]:", init_index, "[I-Key]:", init_keyvalue, "[E-index]:", i, "[E-Key]:", 
@@ -757,7 +760,7 @@ async function makeSnapshot_EpicZephyrInfofromJira(init_index, epickeylist)
       get_errors['e_zephyrlist'].push(error_info);
     });
     //sync
-    //await makeSnapshot_EpicZephyrExecutionInfofromJira(init_index, i, zephyr_issueIdlist) //j, 964936);
+    if(async_mode == false) { await makeSnapshot_EpicZephyrExecutionInfofromJira(init_index, i, zephyr_issueIdlist); }
   }
 }
 
@@ -776,7 +779,8 @@ async function makeSnapshot_StoryZephyrInfofromJira(init_index, epic_index, stro
     .then((zephyrlist) => {
       console.log("getZephyerListfromJira ==== [I-index]:", init_index, "[I-Key]:", init_keyvalue, "[E-index]:", epic_index, "[S-Key]:", story_keyvalue, "[Z-Total]:", zephyrlist.total);
       //console.log(zephyrlist);
-      initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['issues'][i]['Zephyr']['ZephyrCnt'] = zephyrlist.total; 
+      let storyzephyr = initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['issues'][i]['Zephyr'];
+      storyzephyr['ZephyrCnt'] = zephyrlist.total; 
       zephyr_issueIdlist = [];
       let issue = 0;
       for (var j = 0; j < zephyrlist.total; j++) 
@@ -792,9 +796,9 @@ async function makeSnapshot_StoryZephyrInfofromJira(init_index, epic_index, stro
         current_zephyr_info['Status'] = initparse.getStatus(issue);        
         current_zephyr_info['Labels'] = initparse.getLabels(issue);        
         //console.log("^^^^add zephyr^^^^^");       
-        initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['issues'][i]['Zephyr']['ZephyrTC'][j] = JSON.parse(JSON.stringify(current_zephyr_info)); 
+        storyzephyr['ZephyrTC'][j] = JSON.parse(JSON.stringify(current_zephyr_info)); 
         // async mode....
-        //makeSnapshot_StoryZephyrExecutionInfofromJira(init_index, epic_index, i, j, current_zephyr_info['IssueID']); 
+        if(async_mode == true) { makeSnapshot_StoryZephyrExecutionInfofromJira(init_index, epic_index, i, j, current_zephyr_info['IssueID']); }
       }
     }).catch(error => {
       console.log("[Catch] getZephyerListfromJira ==== [I-index]:", init_index, "[I-Key]:", init_keyvalue, "[E-index]:", epic_index, "[S-Key]:", 
@@ -807,7 +811,7 @@ async function makeSnapshot_StoryZephyrInfofromJira(init_index, epic_index, stro
     });
 
     // sync mode....
-    //await makeSnapshot_SyncStoryZephyrExecutionInfofromJira(init_index, epic_index, i, zephyr_issueIdlist);
+    if(async_mode == false) { await makeSnapshot_SyncStoryZephyrExecutionInfofromJira(init_index, epic_index, i, zephyr_issueIdlist); }
   }
 }
 
@@ -816,13 +820,14 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
   console.log("[Proimse 4] makeSnapshot_StoryInfofromJira ---- Get Epic-Story List / Update Story Basic Info");
   var init_keyvalue = initiative_keylist[init_index];
   let issue = 0;
-  initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryTotalCnt'] = 0;
-  initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryDevelCnt'] = 0;
-  initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryGovOrDeploymentCnt'] = 0;
-  initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryTotalResolutionCnt'] = 0;
-  initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryDevelResolutionCnt'] = 0;
-  initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryGovOrDeploymentResolutionCnt'] = 0;
-  initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryDelayedCnt'] = 0;
+  let initstorysummary = initiative_DB['issues'][init_index]['STORY_SUMMARY'];
+  initstorysummary['StoryTotalCnt'] = 0;
+  initstorysummary['StoryDevelCnt'] = 0;
+  initstorysummary['StoryGovOrDeploymentCnt'] = 0;
+  initstorysummary['StoryTotalResolutionCnt'] = 0;
+  initstorysummary['StoryDevelResolutionCnt'] = 0;
+  initstorysummary['StoryGovOrDeploymentResolutionCnt'] = 0;
+  initstorysummary['StoryDelayedCnt'] = 0;
 
   for(var i = 0; i < epickeylist.length; i++)
   {
@@ -833,13 +838,14 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
       //console.log(storylist);
       story_keylist = new Array();
       let issue = 0;
-      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryTotalCnt'] = storylist.total;
-      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDevelCnt'] = storylist.total;
-      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryGovOrDeploymentCnt'] = 0;
-      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryTotalResolutionCnt'] = 0;
-      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDevelResolutionCnt'] = 0;
-      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryGovOrDeploymentResolutionCnt'] = 0;
-      initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDelayedCnt'] = 0;
+      let epicstorysummary = initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY'];
+      epicstorysummary['StoryTotalCnt'] = storylist.total;
+      epicstorysummary['StoryDevelCnt'] = storylist.total;
+      epicstorysummary['StoryGovOrDeploymentCnt'] = 0;
+      epicstorysummary['StoryTotalResolutionCnt'] = 0;
+      epicstorysummary['StoryDevelResolutionCnt'] = 0;
+      epicstorysummary['StoryGovOrDeploymentResolutionCnt'] = 0;
+      epicstorysummary['StoryDelayedCnt'] = 0;
 
       for (var j = 0; j < storylist.total; j++) 
       {
@@ -851,7 +857,6 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
         issue = storylist['issues'][j];
         story_keylist.push(storylist['issues'][j]['key']);
         current_story_info = JSON.parse(JSON.stringify(story_info));
-        // need to be update initiative info
         current_story_info['Story Key'] = initparse.getKey(issue); 
         current_story_info['duedate'] = initparse.getDueDate(issue);        
         current_story_info['Release_SP'] = story_ReleaseSP = initparse.conversionDuedateToSprint(current_story_info['duedate']);         
@@ -861,7 +866,6 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
         current_story_info['CreatedDate'] = initparse.getCreatedDate(issue);        
         current_story_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);        
         current_story_info['AbnormalSprint'] = initparse.checkAbnormalSP(epic_ReleaseSP,epic_Status, story_ReleaseSP, story_Status); 
-
         current_story_info['Organization'] = 0; // need to be updated 
         current_story_info['StoryPoint'] = 0; // need to be updated     
         /*  
@@ -869,34 +873,36 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
         */
         initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['issues'][j] = JSON.parse(JSON.stringify(current_story_info));   
         initiative_DB['issues'][init_index]['EPIC']['issues'][i]['AbnormalSprint'] = current_story_info['AbnormalSprint'];
-      }
 
-      if(initparse.checkIsDelayed(current_story_info['duedate']) == true) {initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDelayedCnt']++; }
-      if(current_story_info['GovOrDeployment'] == true) 
-      {
-        initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDevelCnt']--;
-        initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryGovOrDeploymentCnt']++;
-        if(initparse.checkIsDelivered(story_Status) == true)
+        if(initparse.checkIsDelayed(current_story_info['duedate']) == true) { epicstorysummary['StoryDelayedCnt']++; }
+        if(current_story_info['GovOrDeployment'] == true) 
         {
-          initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryTotalResolutionCnt']++;
-          initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryGovOrDeploymentResolutionCnt']++;
+          epicstorysummary['StoryDevelCnt']--;
+          epicstorysummary['StoryGovOrDeploymentCnt']++;
+          if(initparse.checkIsDelivered(story_Status) == true)
+          {
+            epicstorysummary['StoryTotalResolutionCnt']++;
+            epicstorysummary['StoryGovOrDeploymentResolutionCnt']++;
+          }
         }
+        else
+        {
+          if(initparse.checkIsDelivered(story_Status) == true)
+          {
+            epicstorysummary['StoryTotalResolutionCnt']++;
+            epicstorysummary['StoryDevelResolutionCnt']++;
+          }
+        }             
       }
-      else
-      {
-        if(initparse.checkIsDelivered(story_Status) == true)
-        {
-          initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryTotalResolutionCnt']++;
-          initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDevelResolutionCnt']++;
-        }
-      }      
-      initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryTotalCnt'] += initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryTotalCnt'];
-      initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryDevelCnt'] += initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDevelCnt'];
-      initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryGovOrDeploymentCnt'] += initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryGovOrDeploymentCnt'];
-      initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryTotalResolutionCnt'] += initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryTotalResolutionCnt'];
-      initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryDevelResolutionCnt'] += initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDevelResolutionCnt'];
-      initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryGovOrDeploymentResolutionCnt'] += initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryGovOrDeploymentResolutionCnt'];
-      initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryDelayedCnt'] += initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['STORY_SUMMARY']['StoryDelayedCnt'];
+ 
+      //let initstorysummary = initiative_DB['issues'][init_index]['STORY_SUMMARY'];
+      initstorysummary['StoryTotalCnt'] += epicstorysummary['StoryTotalCnt'];
+      initstorysummary['StoryDevelCnt'] += epicstorysummary['StoryDevelCnt'];
+      initstorysummary['StoryGovOrDeploymentCnt'] += epicstorysummary['StoryGovOrDeploymentCnt'];
+      initstorysummary['StoryTotalResolutionCnt'] += epicstorysummary['StoryTotalResolutionCnt'];
+      initstorysummary['StoryDevelResolutionCnt'] += epicstorysummary['StoryDevelResolutionCnt'];
+      initstorysummary['StoryGovOrDeploymentResolutionCnt'] += epicstorysummary['StoryGovOrDeploymentResolutionCnt'];
+      initstorysummary['StoryDelayedCnt'] += epicstorysummary['StoryDelayedCnt'];
     }).catch(error => {
       console.log("[Catch] getStoryListfromJira ==== [I-index]:", init_index, "[E-Key]:", epic_keyvalue, " - exception error = ", error);
       let error_info = { 'IK' : '', 'EK' : '' };

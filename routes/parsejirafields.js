@@ -868,7 +868,7 @@ function checkAbnormalSP(initSP, initStatus, epicstorySP, epicstoryStatus)
     var init_SP = conversionReleaseSprintToSprint(initSP);
     var init_index = 0, epic_story_index = 0;
 
-    if(initSP == "UNDEF_SP" || epicstorySP == "UNDEF_SP") 
+    if(initSP == "SP_UNDEF" || epicstorySP == "SP_UNDEF") 
     { 
         if(checkIsDelivered(epicstoryStatus) == true) { return false } else { return true; } 
     }
