@@ -324,7 +324,7 @@ var workflow =
 // Javascript 비동기 및 callback function.
 // https://joshua1988.github.io/web-development/javascript/javascript-asynchronous-operation/
 // Use Promise Object
-function get_InitiativeListfromJira(filterID)
+function get_InitiativeListfromJira(querymode, jql)
 {
     return new Promise(function (resolve, reject){
       var xhttp = new XMLHttpRequest();
@@ -351,7 +351,15 @@ function get_InitiativeListfromJira(filterID)
       }
     }
 
-    filterID = "filter="+filterID.toString();
+    if(querymode == "filterID")
+    { // search by filterID
+      filterID = "filter="+jql.toString();
+    }
+    else
+    { // search by key...
+      filterID = "key="+jql.toString();
+    }
+
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
     console.log("get_InitiativeListfromJira : filterID = ", filterID);
     //var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
@@ -371,7 +379,7 @@ function get_InitiativeListfromJira(filterID)
   });
 }
 
-function get_InitiativeListfromJiraWithChangeLog(filterID)
+function get_InitiativeListfromJiraWithChangeLog(querymode, jql)
 {
     return new Promise(function (resolve, reject){
       var xhttp = new XMLHttpRequest();
@@ -398,7 +406,15 @@ function get_InitiativeListfromJiraWithChangeLog(filterID)
       }
     }
 
-    filterID = "filter="+filterID.toString();
+    if(querymode == "filterID")
+    { // search by filterID
+      filterID = "filter="+jql.toString();
+    }
+    else
+    { // search by key...
+      filterID = "key="+jql.toString();
+    }
+    
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/?expand=changelog';
     console.log("get_InitiativeListfromJiraWithChangeLog : filterID = ", filterID);
     //var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
@@ -664,13 +680,13 @@ var get_errors =
 };
 
 
-async function makeSnapshot_InitiativeInfofromJira(filterID)
+async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
 {
   var date = starttime = new Date();
   var time = date.getHours().toString();
   var min = date.getMinutes().toString();
   var snapshot = date.toISOString().substring(0, 10);
-  snapshot = snapshot + "T" + time + ":" + min;
+  snapshot = querymode+"_"+filterID+"_"+snapshot + "T" + time + ":" + min;
   initiative_DB['snapshotDate'] = snapshot;
 
   var get_InitiativelistfromJirafunc = null;
@@ -684,7 +700,7 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
   }
 
   // Use Promise Object
-  await get_InitiativelistfromJirafunc(filterID)
+  await get_InitiativelistfromJirafunc(querymode, filterID)
   .then((initiativelist) => {
     // input : initiative filter id --> the search result of initiative (JSON Object)
     // output : epic list and update of basic epic info depend on initiative 
@@ -721,21 +737,6 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
       current_workflow['Status'] = initparse.getStatus(issue);
       current_workflow = initparse.parseWorkflow(initiativelist['issues'][i]['changelog'], current_workflow);
       current_initiative_info['Workflow'] = JSON.parse(JSON.stringify(current_workflow)); 
-
-      
-      /*
-      current_initiative_info['AbnormalSprint'] = false; // need to update     
-      current_initiative_info['StatusSummarymgrCnt'] = 0;  // need to update    
-      current_initiative_info['Demo'] = 0; // need to update    
-      current_initiative_info['RelatedInitiative'] = []; // need to update    
-      current_initiative_info['StoryPoint'] = []; // need to update    
-      current_initiative_info['Workflow'] = {}; // need to update 
-      current_initiative_info['MileStone'] = {}; // need to update 
-      current_initiative_info['ReleaseSprint'] = { };  // need to update 
-      current_initiative_info['StakeHolders'] = []; // need to update 
-      current_initiative_info['STORY_SUMMARY'] = {}; // need to update 
-      current_initiative_info['EPIC'] = {}; // need to update 
-      */
     
       //console.log("^^^^Initiative Key = ", initiativelist['issues'][i]['key']);
       //console.log(current_initiative_info);
@@ -764,6 +765,7 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
     }
   });
 }
+
 
 
 async function makeSnapshot_EpicInfofromJira(initkeylist)

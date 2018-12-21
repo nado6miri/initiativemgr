@@ -58,7 +58,9 @@ function periodic_DBjobs()
   //initapi.makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
   //initapi.makeSnapshot_InitiativeInfofromJira(46093);   // webOS4.5 MR minor
   //console.log('curruent time = ', moment());
-  initapi.makeSnapshot_InitiativeInfofromJira(46610);   // webOS4.5 MR minor
+  //initapi.makeSnapshot_InitiativeInfofromJira(46610);   // webOS4.5 MR minor
+  //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46610);   // webOS4.5 MR minor
+  initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-8716");   // webOS4.5 MR minor
 
   /*
   lgldap.get_UserInfofromLDAP('boyoung.cho');  
