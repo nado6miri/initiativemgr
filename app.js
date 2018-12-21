@@ -13,8 +13,11 @@ var initiativeRouter = require('./routes/initiative');
 var tmr = require('./routes/mytimer');
 var initapi = require('./routes/initapi');
 var lgldap = require('./routes/lgeldap');
+var moment = require('moment-timezone')
 
 var app = express();
+
+moment.tz.setDefault("Asiz/Seoul");
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -52,8 +55,10 @@ function periodic_DBjobs()
 {
   // Use Promise Object
   //initapi.makeSnapshot_InitiativeInfofromJira(42101); // webOS4.5
-  initapi.makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
+  //initapi.makeSnapshot_InitiativeInfofromJira(45400);   // webOS5.0
   //initapi.makeSnapshot_InitiativeInfofromJira(46093);   // webOS4.5 MR minor
+  //console.log('curruent time = ', moment());
+  initapi.makeSnapshot_InitiativeInfofromJira(46610);   // webOS4.5 MR minor
 
   /*
   lgldap.get_UserInfofromLDAP('boyoung.cho');  

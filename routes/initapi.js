@@ -8,6 +8,7 @@ var initparse = require('./parsejirafields');
 var ldap = require('./lgeldap.js')
 
 var async_mode = true;
+var changelog = true;
 
 // initiative filter result (json) - webOS45 webOS45MR, webOS5.0 
 var initiative_FilterResult;
@@ -74,6 +75,19 @@ var epic_info =
     'Zephyr' : 
     {
       'ZephyrCnt': 0,
+      'ZephyrResolutionCnt' : 0,
+      'ZephyrExecutionCnt' : 0,
+      'ZephyrExecutionRate' : 0, 
+      'ZephyrExecutionPortion' : 0, 
+      'Zephyr_S_Draft' : 0, 
+      'Zephyr_S_Review' : 0, 
+      'Zephyr_S_Update' : 0, 
+      'Zephyr_S_Active' : 0, 
+      'executionStatus_unEXEC' : 0, 
+      'executionStatus_PASS' : 0, 
+      'executionStatus_FAIL' : 0, 
+      'executionStatus_WIP' : 0, 
+      'executionStatus_BLOCK' : 0,     
       "ZephyrTC": [],       
     },
     'STORY' : 
@@ -92,22 +106,89 @@ var epic_info =
     },
 };
 
+var current_OrgInfo = {};
 var OrgInfo =     
 { 
-  'OrgName' : '', 'EpicCnt' : 0, 'Epic Portion' : 0, 'Epic ResolRate' :0, 'Story Portion' : 0, 'Story Cnt' : 0, 'Story ResolRate' : 0,  
-  'Zephyr Total' : 0, 'Epic ZephyrCnt' :0, 'Story ZephyrCnt' : 0,
-  'Zephyr Portion' : 0, 'Epic Zephyr Portion' :0, 'Story Zephyr Portion' : 0,
-  'Zephyr Exection Rate' : 0, 'Zephyr Exection Portion' : 0, 
+  'OrgName' : '', 
+  'TotalStatics' : 
+  {
+    'ZephyrTotalCnt' : 0,
+    'ZephyrPortion' : 0, 
+    'ZephyrExecutionCnt' : 0, 
+    'ZephyrExecutionRate' : 0, 
+    'ZephyrExecutionPortion' : 0, 
+    'Zephyr_S_Draft' : 0, 
+    'Zephyr_S_Review' : 0, 
+    'Zephyr_S_Update' : 0, 
+    'Zephyr_S_Active' : 0, 
+    'executionStatus_unEXEC' : 0, 
+    'executionStatus_PASS' : 0, 
+    'executionStatus_FAIL' : 0, 
+    'executionStatus_WIP' : 0, 
+    'executionStatus_BLOCK' : 0, 
+  },
+  'EpicStatics' : 
+  {
+    'EpicTotalCnt': 0,
+    'EpicDevelCnt': 0,
+    'EpicGovOrDeploymentCnt': 0,
+    'EpicTotalResolutionCnt' : 0,
+    'EpicDevelResolutionCnt' : 0,
+    'EpicGovOrDeploymentResolutionCnt' : 0,
+    'EpicDelayedCnt' : 0,
+    'EpicDevelPortion' : 0, 
+    'EpicNeedtoDefine' : 0,
+    'EpicZephyrCnt' : 0, 
+    'EpicZephyrPortion' : 0, 
+    'EpicZephyrExecutionCnt' : 0, 
+    'EpicZephyrExecutionRate' : 0, 
+    'EpicZephyrExecutionPortion' : 0, 
+    'EpicZephyr_S_Draft' : 0, 
+    'EpicZephyr_S_Review' : 0, 
+    'EpicZephyr_S_Update' : 0, 
+    'EpicZephyr_S_Active' : 0, 
+    'EpicexecutionStatus_unEXEC' : 0, 
+    'EpicexecutionStatus_PASS' : 0, 
+    'EpicexecutionStatus_FAIL' : 0, 
+    'EpicexecutionStatus_WIP' : 0, 
+    'EpicexecutionStatus_BLOCK' : 0, 
+    //“-1” UNEXECUTED, “1” PASS, “2” FAIL, “3” WIP, “4” BLOCKED” 
+  },
+  'StoryStatics' : 
+  {
+    'StoryTotalCnt': 0,
+    'StoryDevelCnt': 0,
+    'StoryGovOrDeploymentCnt': 0,
+    'StoryTotalResolutionCnt' : 0,
+    'StoryDevelResolutionCnt' : 0,
+    'StoryGovOrDeploymentResolutionCnt' : 0,
+    'StoryDelayedCnt' : 0,
+    'StoryDevelPortion' : 0, 
+    'StoryNeedtoDefine' : 0,
+    'StoryZephyrCnt' : 0,
+    'StoryZephyrPortion' : 0, 
+    'StoryZephyrExecutionCnt' : 0, 
+    'StoryZephyrExecutionRate' : 0, 
+    'StoryZephyrExecutionPortion' : 0, 
+    'StoryZephyr_S_Draft' : 0, 
+    'StoryZephyr_S_Review' : 0, 
+    'StoryZephyr_S_Update' : 0, 
+    'StoryZephyr_S_Active' : 0, 
+    'StoryexecutionStatus_unEXEC' : 0, 
+    'StoryexecutionStatus_PASS' : 0, 
+    'StoryexecutionStatus_FAIL' : 0, 
+    'StoryexecutionStatus_WIP' : 0, 
+    'StoryexecutionStatus_BLOCK' : 0, 
+    //“-1” UNEXECUTED, “1” PASS, “2” FAIL, “3” WIP, “4” BLOCKED”
+  },
 };
 
-var orglist = [
-  { 'name' : '', 'orgname' : '' },  
-]
 
 var current_initiative_info = { };
 var initiative_info =
 {
   'Initiative Key' : '',
+  'created' : '',
   'Summary' : '',
   'Assignee' : '',
   '관리대상' : '',
@@ -122,60 +203,20 @@ var initiative_info =
   'STESDET_OnSite' : '',
   'AbnormalSprint' : false,
   "GovOrDeployment" : '',
-  'StatusSummarymgrCnt' : '',
   'Demo' : [],
-  'RelatedInitiative' : [], 
   'StoryPoint' : { },
   'FixVersion' : [ ],
-  'Organization' :
-  [
-    { 'OrgName' : '', 'EpicCnt' : 0, 'Epic Portion' : 0, 'Epic ResolRate' :0, 'Story Portion' : 0, 'Story Cnt' : 0, 'Story ResolRate' : 0,  
-      'Zephyr Total' : 0, 'Epic ZephyrCnt' :0, 'Story ZephyrCnt' : 0,
-      'Zephyr Portion' : 0, 'Epic Zephyr Portion' :0, 'Story Zephyr Portion' : 0,
-      'Zephyr Exection Rate' : 0, 'Zephyr Exection Portion' : 0, 
-    },
-  ],  
-  'Workflow' :
-  {   
-      'CreatedDate' : '',
-      'Status' : '',
-      'History' :
-      [
-          { "Draft" : '2019-01-01', "Period" : "10" } ,                
-          { "PO Review" : '2019-01-10', "Period" : "10" } ,                
-          { "ELTReview" : '2019-01-20', "Period" : "10" } ,                
-          { "Approved" : '2019-01-30', "Period" : "10" } ,                
-          { "Ready" : '2019-02-01', "Period" : "10" } ,                
-          { "InProgress" : '2019-02-03' , "Period" : "10" } ,                
-          { "Delivered" : '2019-04-01' , "Period" : "50" } ,                
-      ],
-  },    
-  'MileStone' :
-  {   
-      'total' : 0,
-      'rescheduleCnt' : 0,
-      'history' :
-      [
-          { "Item1" : '2019-01-01' , "Schedule" : [ '2019-01-01', '2019-01-10', ] },                
-      ],
-  },    
+  'Organization' : [ ],  
+  'Workflow' : { }, 
   'ReleaseSprint' :  
   {
       'CurRelease_SP' : 'TVSP11',
       'RescheduleCnt' : 0,
       'History' :
       [
-          { 'orginal' : '' }, 
+          { 'orginal' : '' },  // History 상에 Ready 단계 이후 처음으로 입력된 value.
       ],
   },
-  /* Organization 통폐함 
-  'StakeHolders' : 
-  [
-    { "OrgName1" : 'TV 화질' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
-    { "OrgName1" : 'TV 음질' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
-    { "OrgName1" : 'TV SystemCore' , "EpicCnt" : "3", "StoryCnt" : 5, 'DelayedEpic' : 0, 'DelayedStory' : 0, 'EpicResolution' : 3, 'StoryResolution' : 5, 'EpicPortion' : 80, 'StoryPortion' : 30 },                
-  ],
-  */
   'STORY_SUMMARY' : 
   {
       'StoryTotalCnt': 0,
@@ -219,6 +260,17 @@ var story_info =
     'ZephyrCnt': 0,
     'ZephyrResolutionCnt' : 0,
     'ZephyrExecutionCnt' : 0,
+    'ZephyrExecutionRate' : 0, 
+    'ZephyrExecutionPortion' : 0, 
+    'Zephyr_S_Draft' : 0, 
+    'Zephyr_S_Review' : 0, 
+    'Zephyr_S_Update' : 0, 
+    'Zephyr_S_Active' : 0, 
+    'executionStatus_unEXEC' : 0, 
+    'executionStatus_PASS' : 0, 
+    'executionStatus_FAIL' : 0, 
+    'executionStatus_WIP' : 0, 
+    'executionStatus_BLOCK' : 0,     
     'ZephyrTC': [],       
   },
 };
@@ -251,6 +303,24 @@ var zephyr_exeinfo =
   'cycleName': ''
 }
 
+var current_workflow = {};
+var workflow = 
+{   
+  'CreatedDate' : '',
+  'Status' : '',
+  "DRAFTING" : { "Duration" : '', 'History' :[ ] } ,             
+  "PO REVIEW" : { "Duration" : '', 'History' :[ ] } ,             
+  "ELT REVIEW" : { "Duration" : '', 'History' :[ ] } ,             
+  "APPROVED" : { "Duration" : '', 'History' :[ ] } ,             
+  "BACKLOG REFINEMENT" : { "Duration" : '', 'History' :[ ] } ,             
+  "READY" : { "Duration" : '', 'History' :[ ] } ,             
+  "IN PROGRESS" : { "Duration" : '', 'History' :[ ] } ,             
+  "DELIVERED" : { "Duration" : '', 'History' :[ ] } ,             
+  "DEFERRED" : { "Duration" : '', 'History' :[ ] } ,             
+  "ClOSED" : { "Duration" : '', 'History' :[ ] }  ,             
+}    
+
+
 // Javascript 비동기 및 callback function.
 // https://joshua1988.github.io/web-development/javascript/javascript-asynchronous-operation/
 // Use Promise Object
@@ -282,15 +352,15 @@ function get_InitiativeListfromJira(filterID)
     }
 
     filterID = "filter="+filterID.toString();
-    //console.log("filterID = ", filterID);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
+    console.log("get_InitiativeListfromJira : filterID = ", filterID);
     //var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
     //var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
     var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,
                   "fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks", "resolution", "components", "issuetype", "customfield_15926",
                               "customfield_15710", "customfield_15711", "customfield_16988", "customfield_16984", "customfield_16983", "customfield_15228", 
                               "customfield_16986", "created", "updated", "duedate", "resolutiondate", "labels", "description", "fixVersions", "customfield_15104", 
-                              "reporter", "assignee", "customfield_10105", "customfield_16985",
+                              "reporter", "assignee", "customfield_10105", "customfield_16985", 
                              ] };
 
     //console.log("param=", JSON.stringify(param));
@@ -301,6 +371,53 @@ function get_InitiativeListfromJira(filterID)
   });
 }
 
+function get_InitiativeListfromJiraWithChangeLog(filterID)
+{
+    return new Promise(function (resolve, reject){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (xhttp.readyState === 4)
+        {
+          if (xhttp.status === 200)
+          {
+            var resultJSON = initiative_FilterResult = JSON.parse(xhttp.responseText);
+            var json = JSON.stringify(resultJSON);
+            fse.outputFileSync("./public/json/initiative_list.json", json, 'utf-8', function(e){
+              if(e){
+                console.log(e);
+              }else{
+                console.log("Download is done!");	
+              }
+            });
+            resolve(resultJSON);
+          }
+          else
+          {
+            reject(xhttp.status);
+          }        
+      }
+    }
+
+    filterID = "filter="+filterID.toString();
+    var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/?expand=changelog';
+    console.log("get_InitiativeListfromJiraWithChangeLog : filterID = ", filterID);
+    //var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
+    //var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
+    var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,
+                  "expand" : ["changelog"], 
+                  "fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks", "resolution", "components", "issuetype", "customfield_15926",
+                              "customfield_15710", "customfield_15711", "customfield_16988", "customfield_16984", "customfield_16983", "customfield_15228", 
+                              "customfield_16986", "created", "updated", "duedate", "resolutiondate", "labels", "description", "fixVersions", "customfield_15104", 
+                              "reporter", "assignee", "customfield_10105", "customfield_16985", 
+                             ] };
+
+    //console.log("param=", JSON.stringify(param));
+    xhttp.open("POST", searchURL, true);
+    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+    xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+    xhttp.send(JSON.stringify(param));  
+  });
+}
 
 function getEpicListfromJira(initiativeKey)
 {
@@ -556,8 +673,18 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
   snapshot = snapshot + "T" + time + ":" + min;
   initiative_DB['snapshotDate'] = snapshot;
 
+  var get_InitiativelistfromJirafunc = null;
+  if(changelog)
+  {
+    get_InitiativelistfromJirafunc = get_InitiativeListfromJiraWithChangeLog;
+  }
+  else
+  {
+    get_InitiativelistfromJirafunc = get_InitiativeListfromJira;
+  }
+
   // Use Promise Object
-  await get_InitiativeListfromJira(filterID)
+  await get_InitiativelistfromJirafunc(filterID)
   .then((initiativelist) => {
     // input : initiative filter id --> the search result of initiative (JSON Object)
     // output : epic list and update of basic epic info depend on initiative 
@@ -572,6 +699,7 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
       // need to be update initiative info
       current_initiative_info = JSON.parse(JSON.stringify(initiative_info)); // initialize...
       current_initiative_info['Initiative Key'] = initparse.getKey(issue);        
+      current_initiative_info['created'] = initparse.getCreatedDate(issue);        
       current_initiative_info['Summary'] = initparse.getSummary(issue);        
       current_initiative_info['Assignee'] = initparse.getAssignee(issue);        
       current_initiative_info['관리대상'] = initparse.checkLabels(issue, 'SPE_M');
@@ -586,9 +714,16 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
       current_initiative_info['STESDET_OnSite'] = initparse.getSTESDET_Support(issue);        
       current_initiative_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);    
       current_initiative_info['FixVersion'] = initparse.getFixVersions(issue);     
+      //current_initiative_info['Organization'].push(JSON.parse(JSON.stringify(current_OrgInfo)));    
+
+      current_workflow = JSON.parse(JSON.stringify(workflow)); // initialize...
+      current_workflow['CreatedDate'] = initparse.getCreatedDate(issue);
+      current_workflow['Status'] = initparse.getStatus(issue);
+      current_workflow = initparse.parseWorkflow(initiativelist['issues'][i]['changelog'], current_workflow);
+      current_initiative_info['Workflow'] = JSON.parse(JSON.stringify(current_workflow)); 
+
       
       /*
-      //current_initiative_info['Organization'] = JSON.parse(JSON.stringify(orgInfo));    
       current_initiative_info['AbnormalSprint'] = false; // need to update     
       current_initiative_info['StatusSummarymgrCnt'] = 0;  // need to update    
       current_initiative_info['Demo'] = 0; // need to update    
@@ -616,7 +751,7 @@ async function makeSnapshot_InitiativeInfofromJira(filterID)
     console.log("[Catch] get_InitiativeListfromJira - exception error = ", error)
   });
 
-  await makeSnapshot_EpicInfofromJira(initiative_keylist);
+  //await makeSnapshot_EpicInfofromJira(initiative_keylist);
   console.log("[final] Save file = initiative_DB");
   saveInitDB(initiative_DB);
   console.log("[final] Save end : initiative_DB");

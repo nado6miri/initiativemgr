@@ -1,3 +1,4 @@
+var moment = require('moment-timezone');
 
 const Y2019_SP_Schedule = 
 [ 
@@ -924,6 +925,120 @@ function checkIsDelayed(DueDate)
 }
 
 
+
+//===========================================================================
+// parseWorkflow : make the history of workflow from changelog
+// [param] changelog, workflow
+// [return] workflow
+//===========================================================================
+function parseWorkflow(changelog, workflow)
+{
+    console.log("parseWorkflow function")
+    if(workflow != null && changelog != null)
+    {
+        let log = changelog['histories'];
+        let today = moment().locale('ko');
+        let createddate = workflow['CreatedDate'].split('+');
+        let created = moment(createddate[0]).add(9, 'Hour');
+        let start = 0;
+        let end = 0;
+        for(let i = 0; i < changelog.total; i++)
+        {
+            for(let j = 0; j < log[i]['items'].length; j++)
+            {
+                let item = log[i]['items'][j];
+                if(item['field'] == 'status') // Status - Workflow
+                {
+                    let item_created = log[i]['created'];
+                    item_created = item_created.split('+');
+                    if(start == 0) { start = created; } else { start = end; }
+                    end = moment(item_created[0]).add(9, 'Hour');
+                    let period = (end - start) / (1000*60*60*24);
+     
+                    let from = item['fromString'];
+                    let to = item['toString'];
+                    console.log("From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+
+                    // normal flow
+                    if(from == 'DRAFTING' && to == "PO REVIEW") 
+                    { 
+                        workflow['DRAFTING']['Duration'] += period; 
+                        workflow['DRAFTING']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+                    
+                    if(from == 'PO REVIEW' && to == "ELT REVIEW")
+                    { 
+                        workflow['PO REVIEW']['Duration'] += period; 
+                        workflow['PO REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    if(from == 'ELT REVIEW' && to == "Approved")
+                    { 
+                        workflow['ELT REVIEW']['Duration'] += period; 
+                        workflow['ELT REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    if(from == 'Approved' && to == "BACKLOG REFINEMENT")
+                    { 
+                        workflow['APPROVED']['Duration'] += period; 
+                        workflow['APPROVED']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    if(from == 'BACKLOG REFINEMENT' && to == "READY")
+                    { 
+                        workflow['BACKLOG REFINEMENT']['Duration'] += period; 
+                        workflow['BACKLOG REFINEMENT']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    if(from == 'READY' && to == "In Progress")
+                    { 
+                        workflow['READY']['Duration'] += period; 
+                        workflow['READY']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    if(from == 'In Progress' && to == "Delivered")
+                    { 
+                        workflow['IN PROGRESS']['Duration'] += period; 
+                        workflow['IN PROGRESS']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        workflow['DELIVERED']['Duration'] = (today - end) / (1000*60*60*24); 
+                        workflow['DELIVERED']['History'].push({ "startdate" : end, "enddate" : today, "peroid" : period });
+                    }
+
+                    // rest : closed / defer case
+                    //workflow['DRAFTING']['History'].push({ "startdate" : modifyDate, "peroid" : 0 });
+                    //workflow['DRAFTING']['Duration'] += getElapsedDays(day1, day2);
+                }
+            }
+        }
+        return workflow;
+    }
+    console.log("[Exception] : parseWorkflow")
+    return null;
+}
+
+
+
+//===========================================================================
+// getElapsedDays : get elapsed days
+// [param] day1(moment), day2 (moment)
+// [return] diff = day2 - day1
+//===========================================================================
+function getElapsedDays(date1, date2)
+{
+    /*
+    console("cur time = ", moment().format("YYYY-MM-DDTHH:MM:SS"));
+    created = new Date("2018-12-06T11:46:34.000+0900");
+    current = moment();
+    diff = current - created;
+    console.log("day = ", diff/(1000*60*60*24));
+    */
+    let date1 = moment(date1);
+    let date2 = moment(date2);
+    let diffday = (date2 - date1)/(1000*60*60*24);
+    console.log("Dff Day = ", diffday);
+}
+
+
 module.exports = { 
     // var
     Y2019_SP_Schedule,
@@ -972,6 +1087,8 @@ module.exports = {
     checkAbnormalSP,
     checkIsDelivered,
     checkIsDelayed,
+    parseWorkflow,
+    getElapsedDays,
    };
   
   
