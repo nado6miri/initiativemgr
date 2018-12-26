@@ -208,15 +208,7 @@ var initiative_info =
   'FixVersion' : [ ],
   'Organization' : [ ],  
   'Workflow' : { }, 
-  'ReleaseSprint' :  
-  {
-      'CurRelease_SP' : 'TVSP11',
-      'RescheduleCnt' : 0,
-      'History' :
-      [
-          { 'orginal' : '' },  // History 상에 Ready 단계 이후 처음으로 입력된 value.
-      ],
-  },
+  'ReleaseSprint' : { },
   'STORY_SUMMARY' : 
   {
       'StoryTotalCnt': 0,
@@ -308,17 +300,30 @@ var workflow =
 {   
   'CreatedDate' : '',
   'Status' : '',
-  "DRAFTING" : { "Duration" : '', 'History' :[ ] } ,             
-  "PO REVIEW" : { "Duration" : '', 'History' :[ ] } ,             
-  "ELT REVIEW" : { "Duration" : '', 'History' :[ ] } ,             
-  "APPROVED" : { "Duration" : '', 'History' :[ ] } ,             
-  "BACKLOG REFINEMENT" : { "Duration" : '', 'History' :[ ] } ,             
-  "READY" : { "Duration" : '', 'History' :[ ] } ,             
-  "IN PROGRESS" : { "Duration" : '', 'History' :[ ] } ,             
-  "DELIVERED" : { "Duration" : '', 'History' :[ ] } ,             
-  "DEFERRED" : { "Duration" : '', 'History' :[ ] } ,             
-  "ClOSED" : { "Duration" : '', 'History' :[ ] }  ,             
-}    
+  "DRAFTING" : { "Duration" : 0, 'History' :[ ] } ,             
+  "PO REVIEW" : { "Duration" : 0, 'History' :[ ] } ,             
+  "ELT REVIEW" : { "Duration" : 0, 'History' :[ ] } ,             
+  "APPROVED" : { "Duration" : 0, 'History' :[ ] } ,             
+  "BACKLOG REFINEMENT" : { "Duration" : 0, 'History' :[ ] } ,             
+  "READY" : { "Duration" : 0, 'History' :[ ] } ,             
+  "IN PROGRESS" : { "Duration" : 0, 'History' :[ ] } ,             
+  "DELIVERED" : { "Duration" : 0, 'History' :[ ] } ,             
+  "PROPOSED TO DEFER" : { "Duration" : 0, 'History' :[ ] } ,             
+  "DEFERRED" : { "Duration" : 0, 'History' :[ ] } ,             
+  "CLOSED" : { "Duration" : 0, 'History' :[ ] }  ,             
+};
+
+var current_ReleaseSP = {};
+var ReleaseSP = 
+{
+  'OrgRelease_SP' : '',
+  'CurRelease_SP' : '',
+  'RescheduleCnt' : 0,
+  'History' :
+  [
+     // { 'ChangeSP' : 'TVSP6', 'ChangeDate' : '20190101', "ReleaseSP" : "" },  // History 상에 Ready 단계 이후 처음으로 입력된 value.
+  ],
+};
 
 
 // Javascript 비동기 및 callback function.
@@ -412,7 +417,7 @@ function get_InitiativeListfromJiraWithChangeLog(querymode, jql)
     }
     else
     { // search by key...
-      filterID = "key="+jql.toString();
+      filterID = "type = Initiative and key="+jql.toString();
     }
     
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/?expand=changelog';
@@ -732,6 +737,13 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
       current_initiative_info['FixVersion'] = initparse.getFixVersions(issue);     
       //current_initiative_info['Organization'].push(JSON.parse(JSON.stringify(current_OrgInfo)));    
 
+      // Release Sprint
+      current_ReleaseSP = JSON.parse(JSON.stringify(ReleaseSP)); // initialize...
+      current_ReleaseSP['CurRelease_SP'] = initparse.conversionReleaseSprintToSprint(initparse.getReleaseSprint(issue));
+      current_ReleaseSP = initparse.parseReleaseSprint(initiativelist['issues'][i]['changelog'], current_ReleaseSP);
+      current_initiative_info['ReleaseSprint'] = JSON.parse(JSON.stringify(current_ReleaseSP)); 
+
+      // workflow
       current_workflow = JSON.parse(JSON.stringify(workflow)); // initialize...
       current_workflow['CreatedDate'] = initparse.getCreatedDate(issue);
       current_workflow['Status'] = initparse.getStatus(issue);
@@ -752,7 +764,7 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
     console.log("[Catch] get_InitiativeListfromJira - exception error = ", error)
   });
 
-  //await makeSnapshot_EpicInfofromJira(initiative_keylist);
+  await makeSnapshot_EpicInfofromJira(initiative_keylist);
   console.log("[final] Save file = initiative_DB");
   saveInitDB(initiative_DB);
   console.log("[final] Save end : initiative_DB");
@@ -824,7 +836,7 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
         epic['issues'][j] = JSON.parse(JSON.stringify(current_epic_info));
         initiative_DB['issues'][i]['AbnormalSprint'] = current_epic_info['AbnormalSprint'];
 
-        if(initparse.checkIsDelayed(current_epic_info['duedate']) == true) { epic['EpicDelayedCnt']++; }
+        if(initparse.checkIsDelayed(current_epic_info['duedate']) == true && initparse.checkIsDelivered(epic_Status) == false) { epic['EpicDelayedCnt']++; }
         if(current_epic_info['GovOrDeployment'] == true) 
         {
           epic['EpicDevelCnt']--;
@@ -1011,7 +1023,7 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
         initiative_DB['issues'][init_index]['EPIC']['issues'][i]['STORY']['issues'][j] = JSON.parse(JSON.stringify(current_story_info));   
         initiative_DB['issues'][init_index]['EPIC']['issues'][i]['AbnormalSprint'] = current_story_info['AbnormalSprint'];
 
-        if(initparse.checkIsDelayed(current_story_info['duedate']) == true) { epicstorysummary['StoryDelayedCnt']++; }
+        if(initparse.checkIsDelayed(current_story_info['duedate']) == true && initparse.checkIsDelivered(story_Status) == false) { epicstorysummary['StoryDelayedCnt']++; }
         if(current_story_info['GovOrDeployment'] == true) 
         {
           epicstorysummary['StoryDevelCnt']--;
