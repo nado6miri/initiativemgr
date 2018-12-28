@@ -911,7 +911,7 @@ function checkIsDelivered(Status)
 //===========================================================================
 // checkIsDelayed : check delayed or not
 // [param] duedate
-// [return] delayed : true, not delayed : false
+// [return] delayed or due date is null : true, not delayed : false
 //===========================================================================
 function checkIsDelayed(DueDate)
 {
@@ -921,7 +921,7 @@ function checkIsDelayed(DueDate)
         var today = new Date();
         if(duedate < today) { return true; }
     }
-    return false;
+    return true; 
 }
 
 
