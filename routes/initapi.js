@@ -234,6 +234,8 @@ var Initiative_Zephyer_Statics =
             'Zephyr_S_Review' : 0, 
             'Zephyr_S_Update' : 0, 
             'Zephyr_S_Active' : 0, 
+            'Zephyr_S_Approval' : 0, 
+            'Zephyr_S_Archived' : 0, 
             'executionStatus_PASS' : 0, // “1” PASS
             'executionStatus_FAIL' : 0, // “2” FAIL
             'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
@@ -241,8 +243,8 @@ var Initiative_Zephyer_Statics =
             'PassEipcCnt' : 0,
             'PassStoryCnt' : 0,
         },
-        'ORGANIZATION' : [],
-        'DEVELOPER' : [],
+        'ORGANIZATION' : {},
+        'DEVELOPER' : {},
     },
 
     'EPIC_ZEPHYR' : 
@@ -256,6 +258,8 @@ var Initiative_Zephyer_Statics =
             'Zephyr_S_Review' : 0, 
             'Zephyr_S_Update' : 0, 
             'Zephyr_S_Active' : 0, 
+            'Zephyr_S_Approval' : 0, 
+            'Zephyr_S_Archived' : 0, 
             'executionStatus_PASS' : 0, // “1” PASS
             'executionStatus_FAIL' : 0, // “2” FAIL
             'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
@@ -263,8 +267,8 @@ var Initiative_Zephyer_Statics =
             'PassEipcCnt' : 0,
             'PassStoryCnt' : 0,
         },
-        'ORGANIZATION' : [],
-        'DEVELOPER' : [],
+        'ORGANIZATION' : {},
+        'DEVELOPER' : {},
     },
 
     'STORY_ZEPHYR' : 
@@ -278,6 +282,8 @@ var Initiative_Zephyer_Statics =
             'Zephyr_S_Review' : 0, 
             'Zephyr_S_Update' : 0, 
             'Zephyr_S_Active' : 0, 
+            'Zephyr_S_Approval' : 0, 
+            'Zephyr_S_Archived' : 0, 
             'executionStatus_PASS' : 0, // “1” PASS
             'executionStatus_FAIL' : 0, // “2” FAIL
             'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
@@ -285,8 +291,8 @@ var Initiative_Zephyer_Statics =
             'PassEipcCnt' : 0,
             'PassStoryCnt' : 0,
         },
-        'ORGANIZATION' : [],
-        'DEVELOPER' : [],
+        'ORGANIZATION' : {},
+        'DEVELOPER' : {},
     },    
 }
 
@@ -294,13 +300,14 @@ var current_Org = {};
 var Org_Statics = 
 {
     // Epic 하위, Story 하위 Zephyr 통계
-    'OrgName' : '',
     'ZephyrCnt': 0,
     'ZephyrExecutionCnt' : 0,
     'Zephyr_S_Draft' : 0, 
     'Zephyr_S_Review' : 0, 
     'Zephyr_S_Update' : 0, 
     'Zephyr_S_Active' : 0, 
+    'Zephyr_S_Approval' : 0, 
+    'Zephyr_S_Archived' : 0, 
     'executionStatus_PASS' : 0, // “1” PASS
     'executionStatus_FAIL' : 0, // “2” FAIL
     'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
@@ -313,14 +320,14 @@ var Org_Statics =
 var current_Developer = {};
 var Developer_Statics = 
 {
-    // Epic 하위, Story 하위 Zephyr 통계
-    'DevelName' : '',
     'ZephyrCnt': 0,
     'ZephyrExecutionCnt' : 0,
     'Zephyr_S_Draft' : 0, 
     'Zephyr_S_Review' : 0, 
     'Zephyr_S_Update' : 0, 
     'Zephyr_S_Active' : 0, 
+    'Zephyr_S_Approval' : 0, 
+    'Zephyr_S_Archived' : 0, 
     'executionStatus_PASS' : 0, // “1” PASS
     'executionStatus_FAIL' : 0, // “2” FAIL
     'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
@@ -328,6 +335,7 @@ var Developer_Statics =
     'PassEipcCnt' : 0,
     'PassStoryCnt' : 0,
 }
+
 
 
 // Javascript 비동기 및 callback function.
@@ -382,7 +390,7 @@ function get_InitiativeListfromJira(querymode, jql)
 
     //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
-    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
     xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
     xhttp.send(JSON.stringify(param));  
   });
@@ -438,7 +446,7 @@ function get_InitiativeListfromJiraWithChangeLog(querymode, jql)
 
     //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
-    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
     xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
     xhttp.send(JSON.stringify(param));  
   });
@@ -493,7 +501,7 @@ function getEpicListfromJira(initiativeKey)
                 */
     //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
-    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
     xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
     xhttp.send(JSON.stringify(param));  
   });    
@@ -542,7 +550,7 @@ function getStoryListfromJira(epicKey)
 
     //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
-    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+    xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
     xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
     xhttp.send(JSON.stringify(param));  
   });    
@@ -578,7 +586,7 @@ function getZephyerListfromJira(KeyID)
   var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : ["id", "summary", "key", "assignee", "status", "labels" ] };
 
   xhttp.open("POST", searchURL, true);
-  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
   xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
   xhttp.send(JSON.stringify(param));  
   });    
@@ -610,7 +618,7 @@ function getZephyerExecutionfromJira(IssueID)
   var searchURL = 'http://hlm.lge.com/issue/rest/zapi/latest/execution?issueId=' + IssueID;
   var param = { 'issueId' : IssueID, "fields" : [ "id", "executionStatus", "executedBy", "cycleId", "cycleName" ] };
   xhttp.open("GET", searchURL);
-  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
   xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
   xhttp.send(null);  
   });    
@@ -661,7 +669,7 @@ function get_InitiativeList(res, res, next)
   var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
   var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
   xhttp.open("POST", searchURL, true);
-  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDEwMTA=");
+  xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
   xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
   xhttp.send(param);
 } 
@@ -790,6 +798,7 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
   console.log("[final-Zephyr] Save end : initiative_DB");
 }
 
+var developers = {};
 async function makeZephyrStatics()
 {
   console.log("[Proimse 1] makeZephyrStatics ---- make statics of zephyr Info");
@@ -797,156 +806,37 @@ async function makeZephyrStatics()
 
   // SUM : EPIC + STORY 
   let sum_total = Initiative_Zephyer_Statics['EPIC+STORY']['TOTAL'];
-  sum_total['ZephyrCnt'] = 0;
-  sum_total['ZephyrExceutionCnt'] = 0;
-  sum_total['Zephyr_S_Draft'] = 0;
-  sum_total['Zephyr_S_Review'] = 0;
-  sum_total['Zephyr_S_Update'] = 0;
-  sum_total['Zephyr_S_Active'] = 0;
-  sum_total['executionStatus_PASS'] = 0;
-  sum_total['executionStatus_FAIL'] = 0;
-  sum_total['executionStatus_UNEXEC'] = 0;
-  sum_total['executionStatus_BLOCK'] = 0;
-  sum_total['PassEpicCnt'] = 0;
-  sum_total['PassStoryCnt'] = 0;
-  
   let sum_org = Initiative_Zephyer_Statics['EPIC+STORY']['ORGANIZATION'];
-  current_Org = JSON.stringify(Org_Statics);
-  current_Org['OrgName'] = "";
-  current_Org['ZephyrCnt'] = 0;
-  current_Org['ZephyrExceutionCnt'] = 0;
-  current_Org['Zephyr_S_Draft'] = 0;
-  current_Org['Zephyr_S_Review'] = 0;
-  current_Org['Zephyr_S_Update'] = 0;
-  current_Org['Zephyr_S_Active'] = 0;
-  current_Org['executionStatus_PASS'] = 0;
-  current_Org['executionStatus_FAIL'] = 0;
-  current_Org['executionStatus_UNEXEC'] = 0;
-  current_Org['executionStatus_BLOCK'] = 0;
-  current_Org['PassEpicCnt'] = 0;
-  current_Org['PassStoryCnt'] = 0;   
-  //sum_org.push(JSON.stringify(current_Org));
-
   let sum_devel = Initiative_Zephyer_Statics['EPIC+STORY']['DEVELOPER'];
-  current_Developer = JSON.stringify(Developer_Statics);
-  current_Developer['OrgName'] = "";
-  current_Developer['ZephyrCnt'] = 0;
-  current_Developer['ZephyrExceutionCnt'] = 0;
-  current_Developer['Zephyr_S_Draft'] = 0;
-  current_Developer['Zephyr_S_Review'] = 0;
-  current_Developer['Zephyr_S_Update'] = 0;
-  current_Developer['Zephyr_S_Active'] = 0;
-  current_Developer['executionStatus_PASS'] = 0;
-  current_Developer['executionStatus_FAIL'] = 0;
-  current_Developer['executionStatus_UNEXEC'] = 0;
-  current_Developer['executionStatus_BLOCK'] = 0;
-  current_Developer['PassEpicCnt'] = 0;
-  current_Developer['PassStoryCnt'] = 0;   
-  //sum_devel.push(JSON.stringify(current_Developer));
-
 
   // EPIC  
   let epicz_total = Initiative_Zephyer_Statics['EPIC_ZEPHYR']['TOTAL'];
-  epicz_total['ZephyrCnt'] = 0;
-  epicz_total['ZephyrExceutionCnt'] = 0;
-  epicz_total['Zephyr_S_Draft'] = 0;
-  epicz_total['Zephyr_S_Review'] = 0;
-  epicz_total['Zephyr_S_Update'] = 0;
-  epicz_total['Zephyr_S_Active'] = 0;
-  epicz_total['executionStatus_PASS'] = 0;
-  epicz_total['executionStatus_FAIL'] = 0;
-  epicz_total['executionStatus_UNEXEC'] = 0;
-  epicz_total['executionStatus_BLOCK'] = 0;
-  epicz_total['PassEpicCnt'] = 0;
-  epicz_total['PassStoryCnt'] = 0;
-
   let epicz_org = Initiative_Zephyer_Statics['EPIC_ZEPHYR']['ORGANIZATION'];
-  current_Org = JSON.stringify(Org_Statics);
-  current_Org['OrgName'] = "";
-  current_Org['ZephyrCnt'] = 0;
-  current_Org['ZephyrExceutionCnt'] = 0;
-  current_Org['Zephyr_S_Draft'] = 0;
-  current_Org['Zephyr_S_Review'] = 0;
-  current_Org['Zephyr_S_Update'] = 0;
-  current_Org['Zephyr_S_Active'] = 0;
-  current_Org['executionStatus_PASS'] = 0;
-  current_Org['executionStatus_FAIL'] = 0;
-  current_Org['executionStatus_UNEXEC'] = 0;
-  current_Org['executionStatus_BLOCK'] = 0;
-  current_Org['PassEpicCnt'] = 0;
-  current_Org['PassStoryCnt'] = 0;   
-  //epicz_org.push(JSON.stringify(current_Org));
-
   let epicz_devel = Initiative_Zephyer_Statics['EPIC_ZEPHYR']['DEVELOPER'];
-  epicz_devel = JSON.stringify(Developer_Statics);
-  current_Developer['DevelName'] = "";
-  current_Developer['ZephyrCnt'] = 0;
-  current_Developer['ZephyrExceutionCnt'] = 0;
-  current_Developer['Zephyr_S_Draft'] = 0;
-  current_Developer['Zephyr_S_Review'] = 0;
-  current_Developer['Zephyr_S_Update'] = 0;
-  current_Developer['Zephyr_S_Active'] = 0;
-  current_Developer['executionStatus_PASS'] = 0;
-  current_Developer['executionStatus_FAIL'] = 0;
-  current_Developer['executionStatus_UNEXEC'] = 0;
-  current_Developer['executionStatus_BLOCK'] = 0;
-  current_Developer['PassEpicCnt'] = 0;
-  current_Developer['PassStoryCnt'] = 0;   
-  //epicz_devel.push(JSON.stringify(current_Developer));
 
   // STORY 
   let storyz_total = Initiative_Zephyer_Statics['STORY_ZEPHYR']['TOTAL'];
-  storyz_total['ZephyrCnt'] = 0;
-  storyz_total['ZephyrExceutionCnt'] = 0;
-  storyz_total['Zephyr_S_Draft'] = 0;
-  storyz_total['Zephyr_S_Review'] = 0;
-  storyz_total['Zephyr_S_Update'] = 0;
-  storyz_total['Zephyr_S_Active'] = 0;
-  storyz_total['executionStatus_PASS'] = 0;
-  storyz_total['executionStatus_FAIL'] = 0;
-  storyz_total['executionStatus_UNEXEC'] = 0;
-  storyz_total['executionStatus_BLOCK'] = 0;
-  storyz_total['PassEpicCnt'] = 0;
-  storyz_total['PassStoryCnt'] = 0;
-
   let storyz_org = Initiative_Zephyer_Statics['STORY_ZEPHYR']['ORGANIZATION'];
-  current_Org = JSON.stringify(Org_Statics);
-  current_Org['OrgName'] = "";
-  current_Org['ZephyrCnt'] = 0;
-  current_Org['ZephyrExceutionCnt'] = 0;
-  current_Org['Zephyr_S_Draft'] = 0;
-  current_Org['Zephyr_S_Review'] = 0;
-  current_Org['Zephyr_S_Update'] = 0;
-  current_Org['Zephyr_S_Active'] = 0;
-  current_Org['executionStatus_PASS'] = 0;
-  current_Org['executionStatus_FAIL'] = 0;
-  current_Org['executionStatus_UNEXEC'] = 0;
-  current_Org['executionStatus_BLOCK'] = 0;
-  current_Org['PassEpicCnt'] = 0;
-  current_Org['PassStoryCnt'] = 0;   
-  //storyz_org.push(JSON.stringify(current_Org));
-
   let storyz_devel = Initiative_Zephyer_Statics['STORY_ZEPHYR']['DEVELOPER'];
-  current_Developer = JSON.stringify(Developer_Statics);
-  current_Developer['DevelName'] = "";
-  current_Developer['ZephyrCnt'] = 0;
-  current_Developer['ZephyrExceutionCnt'] = 0;
-  current_Developer['Zephyr_S_Draft'] = 0;
-  current_Developer['Zephyr_S_Review'] = 0;
-  current_Developer['Zephyr_S_Update'] = 0;
-  current_Developer['Zephyr_S_Active'] = 0;
-  current_Developer['executionStatus_PASS'] = 0;
-  current_Developer['executionStatus_FAIL'] = 0;
-  current_Developer['executionStatus_UNEXEC'] = 0;
-  current_Developer['executionStatus_BLOCK'] = 0;
-  current_Developer['PassEpicCnt'] = 0;
-  current_Developer['PassStoryCnt'] = 0;   
-  //storyz_devel.push(JSON.stringify(current_Developer));  
+
 
   for(var i = 0; i < initiative.length; i++)
   {
     console.log("[Initiative] i = ", i, "#######################");
-    let epic = initiative_DB['issues'][i]['EPIC']['issues'];
+    /*
+    // Gathering organization infomation
+    let initiative_assignee = ininitiative_DB['issues'][i]['Assignee'];
+    ldap.get_UserInfofromLDAP(initiative_assignee);
+    let epic_assignee = initiative_DB['issues'][i]['EPIC']['issues'][j]['Assignee'];
+    ldap.get_UserInfofromLDAP(epic_assignee);
+    let story_assignee = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Assignee'];
+    ldap.get_UserInfofromLDAP(story_assignee);
+    let epicz_assignee = initiative_DB['issues'][i]['EPIC']['issues'][j]['Zephyr']['ZephyrTC'][k]['Assignee'];
+    ldap.get_UserInfofromLDAP(epicz_assignee);
+    let storyz_assignee = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Zephyr']['ZephyrTC'][l]['Assignee'];
+    ldap.get_UserInfofromLDAP(storyz_assignee);
+    */
+   let epic = initiative_DB['issues'][i]['EPIC']['issues'];
     for(var j = 0; j < epic.length; j++)
     {
       // epic zephyr search
@@ -954,26 +844,77 @@ async function makeZephyrStatics()
       for(var k = 0; k < epic_zephyr.length; k++)
       {
         console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
+        let epicz_assignee = epic_zephyr[k]['Assignee'];
+        if((epicz_assignee in epicz_devel) == false)
+        {
+          epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+          if((epicz_assignee in developers) == false)
+          {
+            developers[epicz_assignee] = "";
+          }
+          if((epicz_assignee in sum_devel) == false)
+          {
+            sum_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+          }
+        }
+
         epicz_total['ZephyrCnt']++;
         if(epic_zephyr[k]['Status'] == "Draft") { epicz_total['Zephyr_S_Draft']++; }
-        if(epic_zephyr[k]['Status'] == "Review") { epicz_total['Zephyr_S_Review']++; }
-        if(epic_zephyr[k]['Status'] == "Update") { epicz_total['Zephyr_S_Update']++; }
-        if(epic_zephyr[k]['Status'] == "Active") { epicz_total['Zephyr_S_Active']++; }
-  
+        else if(epic_zephyr[k]['Status'] == "Review") { epicz_total['Zephyr_S_Review']++; }
+        else if(epic_zephyr[k]['Status'] == "Update") { epicz_total['Zephyr_S_Update']++; }
+        else if(epic_zephyr[k]['Status'] == "Active") { epicz_total['Zephyr_S_Active']++; }
+        else if(epic_zephyr[k]['Status'] == "Approval") { epicz_total['Zephyr_S_Approval']++; }
+        else if(epic_zephyr[k]['Status'] == "Archived") { epicz_total['Zephyr_S_Archived']++; }
+        else { console.log("[EZ] Status is not Defined = ", epic_zephyr[k]['Status']); }
+
+        epicz_devel[epicz_assignee]['ZephyrCnt']++;
+        if(epic_zephyr[k]['Status'] == "Draft") { epicz_devel[epicz_assignee]['Zephyr_S_Draft']++; }
+        else if(epic_zephyr[k]['Status'] == "Review") { epicz_devel[epicz_assignee]['Zephyr_S_Review']++; }
+        else if(epic_zephyr[k]['Status'] == "Update") { epicz_devel[epicz_assignee]['Zephyr_S_Update']++; }
+        else if(epic_zephyr[k]['Status'] == "Active") { epicz_devel[epicz_assignee]['Zephyr_S_Active']++; }
+        else if(epic_zephyr[k]['Status'] == "Approval") { epicz_devel[epicz_assignee]['Zephyr_S_Approval']++; }
+        else if(epic_zephyr[k]['Status'] == "Archived") { epicz_devel[epicz_assignee]['Zephyr_S_Archived']++; }
+        else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); }
+
         // Epic-Zephyr-Execution Info
         let passed = 0;
         for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
         {
           console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
+          let epicze_assignee = epic_zephyr[k]['Executions'][l]['Assignee'];
+          if((epicze_assignee in epicz_devel) == false)
+          {
+            epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            if((epicze_assignee in developers) == false)
+            {
+              developers[epicze_assignee] = "";
+            }
+            if((epicze_assignee in sum_devel) == false)
+            {
+              sum_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            }
+          }          
+
           epicz_total['ZephyrExceutionCnt']++;
-          let status = epic_zephyr[l]['Executions']['executionsStatus'];
+          let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
           if(status == "1") { epicz_total['executionStatus_PASS']++; passed = true; }
           else if(status == "2") { epicz_total['executionStatus_FAIL']++; }
           else if(status == "-1") { epicz_total['executionStatus_UNEXEC']++; }
           else if(status == "3" || status == "4") { epicz_total['executionStatus_BLOCK']++; }
-          else { }
+          else { console.log("[EZE] executionStatus is not Defined = ", status); }
+
+          epicz_devel[epicze_assignee]['ZephyrExceutionCnt']++;
+          if(status == "1") { epicz_devel[epicze_assignee]['executionStatus_PASS']++; passed = true; }
+          else if(status == "2") { epicz_devel[epicze_assignee]['executionStatus_FAIL']++; }
+          else if(status == "-1") { epicz_devel[epicze_assignee]['executionStatus_UNEXEC']++; }
+          else if(status == "3" || status == "4") { epicz_devel[epicze_assignee]['executionStatus_BLOCK']++; }
+          else { console.log("[EZE] executionStatus is not Defined = ", status); }
         }       
-        if(passed == true) { epicz_total['PassEpicCnt']++; }
+        if(passed == true) 
+        { 
+          epicz_total['PassEpicCnt']++; 
+          epicz_devel[epicz_assignee]['PassEpicCnt']++; 
+        }
       }
 
       // Story zephyr search
@@ -984,45 +925,133 @@ async function makeZephyrStatics()
         let story_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Zephyr']['ZephyrTC'];
         for(var l = 0; l < story_zephyr.length; l++)
         {
+          let storyz_assignee = story_zephyr[l]['Assignee'];
+          if((storyz_assignee in storyz_devel) == false)
+          {
+            storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            if((storyz_assignee in developers) == false)
+            {
+              developers[storyz_assignee] = "";
+            }
+            if((storyz_assignee in sum_devel) == false)
+            {
+              sum_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            }
+            if((storyz_assignee in epicz_devel) == false)
+            {
+              epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            }
+          }
           storyz_total['ZephyrCnt']++;
           if(story_zephyr[l]['Status'] == "Draft") { storyz_total['Zephyr_S_Draft']++; }
-          if(story_zephyr[l]['Status'] == "Review") { storyz_total['Zephyr_S_Review']++; }
-          if(story_zephyr[l]['Status'] == "Update") { storyz_total['Zephyr_S_Update']++; }
-          if(story_zephyr[l]['Status'] == "Active") { storyz_total['Zephyr_S_Active']++; }
+          else if(story_zephyr[l]['Status'] == "Review") { storyz_total['Zephyr_S_Review']++; }
+          else if(story_zephyr[l]['Status'] == "Update") { storyz_total['Zephyr_S_Update']++; }
+          else if(story_zephyr[l]['Status'] == "Active") { storyz_total['Zephyr_S_Active']++; }
+          else if(story_zephyr[l]['Status'] == "Approval") { storyz_total['Zephyr_S_Approval']++; }
+          else if(story_zephyr[l]['Status'] == "Archived") { storyz_total['Zephyr_S_Archived']++; }
+          else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); }
+
+          storyz_devel[storyz_assignee]['ZephyrCnt']++;
+          if(story_zephyr[l]['Status'] == "Draft") { storyz_devel[storyz_assignee]['Zephyr_S_Draft']++; }
+          else if(story_zephyr[l]['Status'] == "Review") { storyz_devel[storyz_assignee]['Zephyr_S_Review']++; }
+          else if(story_zephyr[l]['Status'] == "Update") { storyz_devel[storyz_assignee]['Zephyr_S_Update']++; }
+          else if(story_zephyr[l]['Status'] == "Active") { storyz_devel[storyz_assignee]['Zephyr_S_Active']++; }
+          else if(story_zephyr[l]['Status'] == "Approval") { storyz_devel[storyz_assignee]['Zephyr_S_Approval']++; }
+          else if(story_zephyr[l]['Status'] == "Archived") { storyz_devel[storyz_assignee]['Zephyr_S_Archived']++; }
+          else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); }
+      
           // Story-Zephyr-Execution Info
           console.log("[SZ] i = ", i, " j = ", j, " k = ", k, " l = ", l);
           let passed = 0;
           for(var m = 0; m < story_zephyr[l]['Executions'].length; m++)
           {
+            let storyze_assignee = story_zephyr[l]['Executions'][m]['Assignee'];
+            if((storyze_assignee in storyz_devel) == false)
+            {
+              storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+              if((storyze_assignee in developers) == false)
+              {
+                developers[storyze_assignee] = "";
+              }
+              if((storyze_assignee in sum_devel) == false)
+              {
+                sum_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+              }
+              if((storyze_assignee in epicz_devel) == false)
+              {
+                epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+              }
+            }
+  
             console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
             storyz_total['ZephyrExceutionCnt']++;
-            let status = story_zephyr[l]['Executions']['executionsStatus'];
+            let status = story_zephyr[l]['Executions'][m]['executionStatus'];
             if(status == "1") { storyz_total['executionStatus_PASS']++; passed = true; }
             else if(status == "2") { storyz_total['executionStatus_FAIL']++; }
             else if(status == "-1") { storyz_total['executionStatus_UNEXEC']++; }
             else if(status == "3" || status == "4") { storyz_total['executionStatus_BLOCK']++; }
-            else { }
+            else { console.log("[SZE] executionStatus is not Defined = ", status); }
+
+            storyz_devel[storyze_assignee]['ZephyrExceutionCnt']++;
+            if(status == "1") { storyz_devel[storyze_assignee]['executionStatus_PASS']++; passed = true; }
+            else if(status == "2") { storyz_devel[storyze_assignee]['executionStatus_FAIL']++; }
+            else if(status == "-1") { storyz_devel[storyze_assignee]['executionStatus_UNEXEC']++; }
+            else if(status == "3" || status == "4") { storyz_devel[storyze_assignee]['executionStatus_BLOCK']++; }
+            else { console.log("[SZE] executionStatus is not Defined = ", status); }
           }
-          if(passed == true) { storyz_total['PassStoryCnt']++; }
+          if(passed == true) 
+          { 
+            storyz_total['PassStoryCnt']++;
+            storyz_devel[storyz_assignee]['PassStoryCnt']++; 
+          }
         }       
       }
     }
 
+    // SUM
     sum_total['ZephyrCnt'] = epicz_total['ZephyrCnt'] + storyz_total['ZephyrCnt'];
     sum_total['ZephyrExceutionCnt'] = epicz_total['ZephyrExceutionCnt'] + storyz_total['ZephyrExceutionCnt'];
     sum_total['Zephyr_S_Draft'] = epicz_total['Zephyr_S_Draft'] + storyz_total['Zephyr_S_Draft'];
     sum_total['Zephyr_S_Review'] = epicz_total['Zephyr_S_Review'] + storyz_total['Zephyr_S_Review'];
     sum_total['Zephyr_S_Update'] = epicz_total['Zephyr_S_Update'] + storyz_total['Zephyr_S_Update'];
     sum_total['Zephyr_S_Active'] = epicz_total['Zephyr_S_Active'] + storyz_total['Zephyr_S_Active'];
+    sum_total['Zephyr_S_Approval'] = epicz_total['Zephyr_S_Approval'] + storyz_total['Zephyr_S_Approval'];
+    sum_total['Zephyr_S_Archived'] = epicz_total['Zephyr_S_Archived'] + storyz_total['Zephyr_S_Archived'];
     sum_total['executionStatus_PASS'] = epicz_total['executionStatus_PASS'] + storyz_total['executionStatus_PASS'];
     sum_total['executionStatus_FAIL'] = epicz_total['executionStatus_FAIL'] + storyz_total['executionStatus_FAIL'];
     sum_total['executionStatus_UNEXEC'] = epicz_total['executionStatus_UNEXEC'] + storyz_total['executionStatus_UNEXEC'];
     sum_total['executionStatus_BLOCK'] = epicz_total['executionStatus_BLOCK'] + storyz_total['executionStatus_BLOCK'];
     sum_total['PassEpicCnt'] = epicz_total['PassEpicCnt'] + storyz_total['PassEpicCnt'];
     sum_total['PassStoryCnt'] = epicz_total['PassStoryCnt'] + storyz_total['PassStoryCnt'];
-  }
 
-  initiative_DB['ZEPHYR_SUMMARY'] = Initiative_Zephyer_Statics;
+    // DEVELOPER
+    for(assignee in developers)
+    {
+      if(assignee != "undefined" && assignee != undefined)
+      {
+        console.log("sum_devel[assignee] = ", assignee);
+        console.log("sum_devel[assignee] = ", JSON.stringify(sum_devel[assignee]));
+        console.log("sum_devel[assignee] = ", JSON.stringify(epicz_devel[assignee]));
+        console.log("sum_devel[assignee] = ", JSON.stringify(storyz_devel[assignee]));
+        sum_devel[assignee]['ZephyrCnt'] = epicz_devel[assignee]['ZephyrCnt'] + storyz_devel[assignee]['ZephyrCnt'];
+        sum_devel[assignee]['ZephyrExceutionCnt'] = epicz_devel[assignee]['ZephyrExceutionCnt'] + storyz_devel[assignee]['ZephyrExceutionCnt'];
+        sum_devel[assignee]['Zephyr_S_Draft'] = epicz_devel[assignee]['Zephyr_S_Draft'] + storyz_devel[assignee]['Zephyr_S_Draft'];
+        sum_devel[assignee]['Zephyr_S_Review'] = epicz_devel[assignee]['Zephyr_S_Review'] + storyz_devel[assignee]['Zephyr_S_Review'];
+        sum_devel[assignee]['Zephyr_S_Update'] = epicz_devel[assignee]['Zephyr_S_Update'] + storyz_devel[assignee]['Zephyr_S_Update'];
+        sum_devel[assignee]['Zephyr_S_Active'] = epicz_devel[assignee]['Zephyr_S_Active'] + storyz_devel[assignee]['Zephyr_S_Active'];
+        sum_devel[assignee]['Zephyr_S_Approval'] = epicz_devel[assignee]['Zephyr_S_Approval'] + storyz_devel[assignee]['Zephyr_S_Approval'];
+        sum_devel[assignee]['Zephyr_S_Archived'] = epicz_devel[assignee]['Zephyr_S_Archived'] + storyz_devel[assignee]['Zephyr_S_Archived'];
+        sum_devel[assignee]['executionStatus_PASS'] = epicz_devel[assignee]['executionStatus_PASS'] + storyz_devel[assignee]['executionStatus_PASS'];
+        sum_devel[assignee]['executionStatus_FAIL'] = epicz_devel[assignee]['executionStatus_FAIL'] + storyz_devel[assignee]['executionStatus_FAIL'];
+        sum_devel[assignee]['executionStatus_UNEXEC'] = epicz_devel[assignee]['executionStatus_UNEXEC'] + storyz_devel[assignee]['executionStatus_UNEXEC'];
+        sum_devel[assignee]['executionStatus_BLOCK'] = epicz_devel[assignee]['executionStatus_BLOCK'] + storyz_devel[assignee]['executionStatus_BLOCK'];
+        sum_devel[assignee]['PassEpicCnt'] = epicz_devel[assignee]['PassEpicCnt'] + storyz_devel[assignee]['PassEpicCnt'];
+        sum_devel[assignee]['PassStoryCnt'] = epicz_devel[assignee]['PassStoryCnt'] + storyz_devel[assignee]['PassStoryCnt'];
+      }
+    }
+
+    initiative_DB['issues'][i]['ZEPHYR_SUMMARY'] = Initiative_Zephyer_Statics;
+  }
 }
 
 
