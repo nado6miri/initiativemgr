@@ -240,7 +240,7 @@ var Initiative_Zephyer_Statics =
             'executionStatus_FAIL' : 0, // “2” FAIL
             'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
             'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-            'PassEipcCnt' : 0,
+            'PassEpicCnt' : 0,
             'PassStoryCnt' : 0,
         },
         'ORGANIZATION' : {},
@@ -264,7 +264,7 @@ var Initiative_Zephyer_Statics =
             'executionStatus_FAIL' : 0, // “2” FAIL
             'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
             'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-            'PassEipcCnt' : 0,
+            'PassEpicCnt' : 0,
             'PassStoryCnt' : 0,
         },
         'ORGANIZATION' : {},
@@ -288,7 +288,7 @@ var Initiative_Zephyer_Statics =
             'executionStatus_FAIL' : 0, // “2” FAIL
             'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
             'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-            'PassEipcCnt' : 0,
+            'PassEpicCnt' : 0,
             'PassStoryCnt' : 0,
         },
         'ORGANIZATION' : {},
@@ -312,7 +312,7 @@ var Org_Statics =
     'executionStatus_FAIL' : 0, // “2” FAIL
     'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
     'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-    'PassEipcCnt' : 0,
+    'PassEpicCnt' : 0,
     'PassStoryCnt' : 0,
 }
 
@@ -332,7 +332,7 @@ var Developer_Statics =
     'executionStatus_FAIL' : 0, // “2” FAIL
     'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
     'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-    'PassEipcCnt' : 0,
+    'PassEpicCnt' : 0,
     'PassStoryCnt' : 0,
 }
 
@@ -845,6 +845,7 @@ async function makeZephyrStatics()
       {
         console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
         let epicz_assignee = epic_zephyr[k]['Assignee'];
+        console.log("epicz_assignee =", epicz_assignee);
         if((epicz_assignee in epicz_devel) == false)
         {
           epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
@@ -855,6 +856,10 @@ async function makeZephyrStatics()
           if((epicz_assignee in sum_devel) == false)
           {
             sum_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+          }
+          if((epicz_assignee in storyz_devel) == false)
+          {
+            storyz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
           }
         }
 
@@ -881,7 +886,8 @@ async function makeZephyrStatics()
         for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
         {
           console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
-          let epicze_assignee = epic_zephyr[k]['Executions'][l]['Assignee'];
+          let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
+          console.log("epicze_assignee =", epicze_assignee);
           if((epicze_assignee in epicz_devel) == false)
           {
             epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
@@ -893,17 +899,22 @@ async function makeZephyrStatics()
             {
               sum_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
             }
+            if((epicze_assignee in storyz_devel) == false)
+            {
+              storyz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            }
           }          
 
-          epicz_total['ZephyrExceutionCnt']++;
+          epicz_total['ZephyrExecutionCnt']++;
           let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
+          console.log("[EZE] executionStatus is = ", status);
           if(status == "1") { epicz_total['executionStatus_PASS']++; passed = true; }
           else if(status == "2") { epicz_total['executionStatus_FAIL']++; }
           else if(status == "-1") { epicz_total['executionStatus_UNEXEC']++; }
           else if(status == "3" || status == "4") { epicz_total['executionStatus_BLOCK']++; }
           else { console.log("[EZE] executionStatus is not Defined = ", status); }
 
-          epicz_devel[epicze_assignee]['ZephyrExceutionCnt']++;
+          epicz_devel[epicze_assignee]['ZephyrExecutionCnt']++;
           if(status == "1") { epicz_devel[epicze_assignee]['executionStatus_PASS']++; passed = true; }
           else if(status == "2") { epicz_devel[epicze_assignee]['executionStatus_FAIL']++; }
           else if(status == "-1") { epicz_devel[epicze_assignee]['executionStatus_UNEXEC']++; }
@@ -926,6 +937,7 @@ async function makeZephyrStatics()
         for(var l = 0; l < story_zephyr.length; l++)
         {
           let storyz_assignee = story_zephyr[l]['Assignee'];
+          console.log("storyz_assignee =", storyz_assignee);
           if((storyz_assignee in storyz_devel) == false)
           {
             storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
@@ -965,7 +977,8 @@ async function makeZephyrStatics()
           let passed = 0;
           for(var m = 0; m < story_zephyr[l]['Executions'].length; m++)
           {
-            let storyze_assignee = story_zephyr[l]['Executions'][m]['Assignee'];
+            let storyze_assignee = story_zephyr[l]['Executions'][m]['executedBy'];
+            console.log("storyze_assignee =", storyze_assignee);
             if((storyze_assignee in storyz_devel) == false)
             {
               storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
@@ -979,20 +992,21 @@ async function makeZephyrStatics()
               }
               if((storyze_assignee in epicz_devel) == false)
               {
-                epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+                epicz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
               }
             }
   
             console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
-            storyz_total['ZephyrExceutionCnt']++;
+            storyz_total['ZephyrExecutionCnt']++;
             let status = story_zephyr[l]['Executions'][m]['executionStatus'];
+            console.log("[SZE] executionStatus is = ", status);
             if(status == "1") { storyz_total['executionStatus_PASS']++; passed = true; }
             else if(status == "2") { storyz_total['executionStatus_FAIL']++; }
             else if(status == "-1") { storyz_total['executionStatus_UNEXEC']++; }
             else if(status == "3" || status == "4") { storyz_total['executionStatus_BLOCK']++; }
             else { console.log("[SZE] executionStatus is not Defined = ", status); }
 
-            storyz_devel[storyze_assignee]['ZephyrExceutionCnt']++;
+            storyz_devel[storyze_assignee]['ZephyrExecutionCnt']++;
             if(status == "1") { storyz_devel[storyze_assignee]['executionStatus_PASS']++; passed = true; }
             else if(status == "2") { storyz_devel[storyze_assignee]['executionStatus_FAIL']++; }
             else if(status == "-1") { storyz_devel[storyze_assignee]['executionStatus_UNEXEC']++; }
@@ -1010,7 +1024,7 @@ async function makeZephyrStatics()
 
     // SUM
     sum_total['ZephyrCnt'] = epicz_total['ZephyrCnt'] + storyz_total['ZephyrCnt'];
-    sum_total['ZephyrExceutionCnt'] = epicz_total['ZephyrExceutionCnt'] + storyz_total['ZephyrExceutionCnt'];
+    sum_total['ZephyrExecutionCnt'] = epicz_total['ZephyrExecutionCnt'] + storyz_total['ZephyrExecutionCnt'];
     sum_total['Zephyr_S_Draft'] = epicz_total['Zephyr_S_Draft'] + storyz_total['Zephyr_S_Draft'];
     sum_total['Zephyr_S_Review'] = epicz_total['Zephyr_S_Review'] + storyz_total['Zephyr_S_Review'];
     sum_total['Zephyr_S_Update'] = epicz_total['Zephyr_S_Update'] + storyz_total['Zephyr_S_Update'];
@@ -1024,30 +1038,29 @@ async function makeZephyrStatics()
     sum_total['PassEpicCnt'] = epicz_total['PassEpicCnt'] + storyz_total['PassEpicCnt'];
     sum_total['PassStoryCnt'] = epicz_total['PassStoryCnt'] + storyz_total['PassStoryCnt'];
 
+    console.log("developers = ", JSON.stringify(developers));
     // DEVELOPER
     for(assignee in developers)
     {
-      if(assignee != "undefined" && assignee != undefined)
-      {
-        console.log("sum_devel[assignee] = ", assignee);
-        console.log("sum_devel[assignee] = ", JSON.stringify(sum_devel[assignee]));
-        console.log("sum_devel[assignee] = ", JSON.stringify(epicz_devel[assignee]));
-        console.log("sum_devel[assignee] = ", JSON.stringify(storyz_devel[assignee]));
-        sum_devel[assignee]['ZephyrCnt'] = epicz_devel[assignee]['ZephyrCnt'] + storyz_devel[assignee]['ZephyrCnt'];
-        sum_devel[assignee]['ZephyrExceutionCnt'] = epicz_devel[assignee]['ZephyrExceutionCnt'] + storyz_devel[assignee]['ZephyrExceutionCnt'];
-        sum_devel[assignee]['Zephyr_S_Draft'] = epicz_devel[assignee]['Zephyr_S_Draft'] + storyz_devel[assignee]['Zephyr_S_Draft'];
-        sum_devel[assignee]['Zephyr_S_Review'] = epicz_devel[assignee]['Zephyr_S_Review'] + storyz_devel[assignee]['Zephyr_S_Review'];
-        sum_devel[assignee]['Zephyr_S_Update'] = epicz_devel[assignee]['Zephyr_S_Update'] + storyz_devel[assignee]['Zephyr_S_Update'];
-        sum_devel[assignee]['Zephyr_S_Active'] = epicz_devel[assignee]['Zephyr_S_Active'] + storyz_devel[assignee]['Zephyr_S_Active'];
-        sum_devel[assignee]['Zephyr_S_Approval'] = epicz_devel[assignee]['Zephyr_S_Approval'] + storyz_devel[assignee]['Zephyr_S_Approval'];
-        sum_devel[assignee]['Zephyr_S_Archived'] = epicz_devel[assignee]['Zephyr_S_Archived'] + storyz_devel[assignee]['Zephyr_S_Archived'];
-        sum_devel[assignee]['executionStatus_PASS'] = epicz_devel[assignee]['executionStatus_PASS'] + storyz_devel[assignee]['executionStatus_PASS'];
-        sum_devel[assignee]['executionStatus_FAIL'] = epicz_devel[assignee]['executionStatus_FAIL'] + storyz_devel[assignee]['executionStatus_FAIL'];
-        sum_devel[assignee]['executionStatus_UNEXEC'] = epicz_devel[assignee]['executionStatus_UNEXEC'] + storyz_devel[assignee]['executionStatus_UNEXEC'];
-        sum_devel[assignee]['executionStatus_BLOCK'] = epicz_devel[assignee]['executionStatus_BLOCK'] + storyz_devel[assignee]['executionStatus_BLOCK'];
-        sum_devel[assignee]['PassEpicCnt'] = epicz_devel[assignee]['PassEpicCnt'] + storyz_devel[assignee]['PassEpicCnt'];
-        sum_devel[assignee]['PassStoryCnt'] = epicz_devel[assignee]['PassStoryCnt'] + storyz_devel[assignee]['PassStoryCnt'];
-      }
+      console.log("[assignee] = ", assignee);
+      console.log("sum_devel[assignee] = ", JSON.stringify(sum_devel[assignee]));
+      console.log("epicz_devel[assignee] = ", JSON.stringify(epicz_devel[assignee]));
+      console.log("storyz_devel[assignee] = ", JSON.stringify(storyz_devel[assignee]));
+      if(assignee == undefined) { console.log("break"); break; }
+      sum_devel[assignee]['ZephyrCnt'] = epicz_devel[assignee]['ZephyrCnt'] + storyz_devel[assignee]['ZephyrCnt'];
+      sum_devel[assignee]['ZephyrExecutionCnt'] = epicz_devel[assignee]['ZephyrExecutionCnt'] + storyz_devel[assignee]['ZephyrExecutionCnt'];
+      sum_devel[assignee]['Zephyr_S_Draft'] = epicz_devel[assignee]['Zephyr_S_Draft'] + storyz_devel[assignee]['Zephyr_S_Draft'];
+      sum_devel[assignee]['Zephyr_S_Review'] = epicz_devel[assignee]['Zephyr_S_Review'] + storyz_devel[assignee]['Zephyr_S_Review'];
+      sum_devel[assignee]['Zephyr_S_Update'] = epicz_devel[assignee]['Zephyr_S_Update'] + storyz_devel[assignee]['Zephyr_S_Update'];
+      sum_devel[assignee]['Zephyr_S_Active'] = epicz_devel[assignee]['Zephyr_S_Active'] + storyz_devel[assignee]['Zephyr_S_Active'];
+      sum_devel[assignee]['Zephyr_S_Approval'] = epicz_devel[assignee]['Zephyr_S_Approval'] + storyz_devel[assignee]['Zephyr_S_Approval'];
+      sum_devel[assignee]['Zephyr_S_Archived'] = epicz_devel[assignee]['Zephyr_S_Archived'] + storyz_devel[assignee]['Zephyr_S_Archived'];
+      sum_devel[assignee]['executionStatus_PASS'] = epicz_devel[assignee]['executionStatus_PASS'] + storyz_devel[assignee]['executionStatus_PASS'];
+      sum_devel[assignee]['executionStatus_FAIL'] = epicz_devel[assignee]['executionStatus_FAIL'] + storyz_devel[assignee]['executionStatus_FAIL'];
+      sum_devel[assignee]['executionStatus_UNEXEC'] = epicz_devel[assignee]['executionStatus_UNEXEC'] + storyz_devel[assignee]['executionStatus_UNEXEC'];
+      sum_devel[assignee]['executionStatus_BLOCK'] = epicz_devel[assignee]['executionStatus_BLOCK'] + storyz_devel[assignee]['executionStatus_BLOCK'];
+      sum_devel[assignee]['PassEpicCnt'] = epicz_devel[assignee]['PassEpicCnt'] + storyz_devel[assignee]['PassEpicCnt'];
+      sum_devel[assignee]['PassStoryCnt'] = epicz_devel[assignee]['PassStoryCnt'] + storyz_devel[assignee]['PassStoryCnt'];
     }
 
     initiative_DB['issues'][i]['ZEPHYR_SUMMARY'] = Initiative_Zephyer_Statics;
