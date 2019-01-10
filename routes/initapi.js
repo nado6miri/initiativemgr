@@ -38,6 +38,7 @@ var initiative_DB = {
   'total' : 0,
   'snapshotDate' : '2018',
   'issues' : [], // initiative issue list
+  'developers' : { },
 };  
 
 var current_demo_info = {
@@ -136,7 +137,8 @@ var initiative_info =
     'EpicDelayedCnt' : 0,
     'issues' : [],    
   },
-  'ZEPHYR_SUMMARY' : { },
+  'STATICS' : { },
+  'developers' : { },
 };
 
 var current_story_info;
@@ -221,12 +223,28 @@ var ReleaseSP =
     //initiative_DB['issues'][i]['Organization'] = 
 */
 
-var Initiative_Zephyer_Statics = 
+var Initiative_Statics = 
 {
-    'EPIC+STORY' :
+    'EPIC+STORY_STATICS' :
     {
         'TOTAL' : 
         {
+            // Epic
+            'EpicTotalCnt': 0,
+            'EpicDevelCnt': 0,
+            'EpicGovOrDeploymentCnt': 0,
+            'EpicTotalResolutionCnt' : 0,
+            'EpicDevelResolutionCnt' : 0,
+            'EpicGovOrDeploymentResolutionCnt' : 0,
+            'EpicDelayedCnt' : 0,
+            // Story
+            'StoryTotalCnt': 0,
+            'StoryDevelCnt': 0,
+            'StoryGovOrDeploymentCnt': 0,
+            'StoryTotalResolutionCnt' : 0,
+            'StoryDevelResolutionCnt' : 0,
+            'StoryGovOrDeploymentResolutionCnt' : 0,
+            'StoryDelayedCnt' : 0,
             // Epic 하위, Story 하위 Zephyr 통계
             'ZephyrCnt': 0,
             'ZephyrExecutionCnt' : 0,
@@ -247,10 +265,26 @@ var Initiative_Zephyer_Statics =
         'DEVELOPER' : {},
     },
 
-    'EPIC_ZEPHYR' : 
+    'EPIC_STATICS' : 
     {
         'TOTAL' : 
         {
+            // Epic
+            'EpicTotalCnt': 0,
+            'EpicDevelCnt': 0,
+            'EpicGovOrDeploymentCnt': 0,
+            'EpicTotalResolutionCnt' : 0,
+            'EpicDevelResolutionCnt' : 0,
+            'EpicGovOrDeploymentResolutionCnt' : 0,
+            'EpicDelayedCnt' : 0,
+            // Story
+            'StoryTotalCnt': 0,
+            'StoryDevelCnt': 0,
+            'StoryGovOrDeploymentCnt': 0,
+            'StoryTotalResolutionCnt' : 0,
+            'StoryDevelResolutionCnt' : 0,
+            'StoryGovOrDeploymentResolutionCnt' : 0,
+            'StoryDelayedCnt' : 0,
             // Epic 하위, Story 하위 Zephyr 통계
             'ZephyrCnt': 0,
             'ZephyrExecutionCnt' : 0,
@@ -271,10 +305,26 @@ var Initiative_Zephyer_Statics =
         'DEVELOPER' : {},
     },
 
-    'STORY_ZEPHYR' : 
+    'STORY_STATICS' : 
     {
         'TOTAL' : 
         {
+            // Epic
+            'EpicTotalCnt': 0,
+            'EpicDevelCnt': 0,
+            'EpicGovOrDeploymentCnt': 0,
+            'EpicTotalResolutionCnt' : 0,
+            'EpicDevelResolutionCnt' : 0,
+            'EpicGovOrDeploymentResolutionCnt' : 0,
+            'EpicDelayedCnt' : 0,
+            // Story
+            'StoryTotalCnt': 0,
+            'StoryDevelCnt': 0,
+            'StoryGovOrDeploymentCnt': 0,
+            'StoryTotalResolutionCnt' : 0,
+            'StoryDevelResolutionCnt' : 0,
+            'StoryGovOrDeploymentResolutionCnt' : 0,
+            'StoryDelayedCnt' : 0,
             // Epic 하위, Story 하위 Zephyr 통계
             'ZephyrCnt': 0,
             'ZephyrExecutionCnt' : 0,
@@ -299,6 +349,22 @@ var Initiative_Zephyer_Statics =
 var current_Org = {};
 var Org_Statics = 
 {
+    // Epic
+    'EpicTotalCnt': 0,
+    'EpicDevelCnt': 0,
+    'EpicGovOrDeploymentCnt': 0,
+    'EpicTotalResolutionCnt' : 0,
+    'EpicDevelResolutionCnt' : 0,
+    'EpicGovOrDeploymentResolutionCnt' : 0,
+    'EpicDelayedCnt' : 0,
+    // Story
+    'StoryTotalCnt': 0,
+    'StoryDevelCnt': 0,
+    'StoryGovOrDeploymentCnt': 0,
+    'StoryTotalResolutionCnt' : 0,
+    'StoryDevelResolutionCnt' : 0,
+    'StoryGovOrDeploymentResolutionCnt' : 0,
+    'StoryDelayedCnt' : 0,
     // Epic 하위, Story 하위 Zephyr 통계
     'ZephyrCnt': 0,
     'ZephyrExecutionCnt' : 0,
@@ -320,6 +386,23 @@ var Org_Statics =
 var current_Developer = {};
 var Developer_Statics = 
 {
+    // Epic
+    'EpicTotalCnt': 0,
+    'EpicDevelCnt': 0,
+    'EpicGovOrDeploymentCnt': 0,
+    'EpicTotalResolutionCnt' : 0,
+    'EpicDevelResolutionCnt' : 0,
+    'EpicGovOrDeploymentResolutionCnt' : 0,
+    'EpicDelayedCnt' : 0,
+    // Story
+    'StoryTotalCnt': 0,
+    'StoryDevelCnt': 0,
+    'StoryGovOrDeploymentCnt': 0,
+    'StoryTotalResolutionCnt' : 0,
+    'StoryDevelResolutionCnt' : 0,
+    'StoryGovOrDeploymentResolutionCnt' : 0,
+    'StoryDelayedCnt' : 0,
+    // Zephyr
     'ZephyrCnt': 0,
     'ZephyrExecutionCnt' : 0,
     'Zephyr_S_Draft' : 0, 
@@ -336,6 +419,7 @@ var Developer_Statics =
     'PassStoryCnt' : 0,
 }
 
+var developerslist = {};
 
 
 // Javascript 비동기 및 callback function.
@@ -625,15 +709,50 @@ function getZephyerExecutionfromJira(IssueID)
 }  
 
 
-function saveInitDB(jsonObject)
+function saveInitDB(jsonObject, filename)
 {
   var json = JSON.stringify(jsonObject);
-  fse.outputFileSync("./public/json/initiative_DB_"+initiative_DB['snapshotDate']+".json", json, 'utf-8', function(e){
+  fse.outputFileSync(filename, json, 'utf-8', function(e){
     if(e){
       console.log(e);
     }else{
       console.log("Download is done!");	
     }
+  });
+}
+
+function load_DevelopersDB(filename)
+{
+  return new Promise(function (resolve, reject) {
+    fs.exists(filename, (exist) => {
+      if(exist)
+      {
+        /*
+        console.log("file is exist");
+        fs.readFile(filename, 'utf8', (e, data) => {
+          if(e){ console.log("error=", e); } 
+          else 
+          { 
+            let jsonObject = JSON.parse(data); 
+            console.log("Read developers DB = ", JSON.stringify(jsonObject)); 
+            return jsonObject;
+          }
+        });
+        */
+       console.log("file is exist");
+       let data = fs.readFileSync(filename, 'utf8');
+       developerslist = JSON.parse(data); 
+       //console.log("Read developers DB = ", JSON.stringify(developerslist)); 
+       //resolve(developerslist);
+      }
+      else
+      {
+        console.log('Not Found!');
+        developerslist = {};   
+        //reject(developerslist);
+      }
+      resolve(developerslist);
+    });      
   });
 }
 
@@ -705,6 +824,10 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
   var snapshot = date.toISOString().substring(0, 10);
   snapshot = querymode+"_"+filterID+"_"+snapshot + "T" + time + ":" + min;
   initiative_DB['snapshotDate'] = snapshot;
+
+  load_DevelopersDB('./public/json/developers.json').then((result) => {
+    console.log("[TEST] Read developers DB = ", JSON.stringify(developerslist));
+  })
 
   var get_InitiativelistfromJirafunc = null;
   if(changelog)
@@ -779,7 +902,7 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
   await makeSnapshot_EpicInfofromJira(initiative_keylist);
 
   console.log("[final] Save file = initiative_DB");
-  saveInitDB(initiative_DB);
+  saveInitDB(initiative_DB, "./public/json/initiative_DB_"+initiative_DB['snapshotDate']+".json");
   console.log("[final] Save end : initiative_DB");
 
   console.log("Error List = ", JSON.stringify(get_errors));
@@ -794,75 +917,152 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
 
   await makeZephyrStatics();
   console.log("[final-Zephyr] Save file = initiative_DB");
-  saveInitDB(initiative_DB);
+  saveInitDB(initiative_DB, "./public/json/initiative_DB_"+initiative_DB['snapshotDate']+".json");
   console.log("[final-Zephyr] Save end : initiative_DB");
+  saveInitDB(developerslist, "./public/json/developers.json");
 }
 
-var developers = {};
 async function makeZephyrStatics()
 {
   console.log("[Proimse 1] makeZephyrStatics ---- make statics of zephyr Info");
   let initiative = initiative_DB['issues'];  
+  let developers = {};
 
-  // SUM : EPIC + STORY 
-  let sum_total = Initiative_Zephyer_Statics['EPIC+STORY']['TOTAL'];
-  let sum_org = Initiative_Zephyer_Statics['EPIC+STORY']['ORGANIZATION'];
-  let sum_devel = Initiative_Zephyer_Statics['EPIC+STORY']['DEVELOPER'];
-
-  // EPIC  
-  let epicz_total = Initiative_Zephyer_Statics['EPIC_ZEPHYR']['TOTAL'];
-  let epicz_org = Initiative_Zephyer_Statics['EPIC_ZEPHYR']['ORGANIZATION'];
-  let epicz_devel = Initiative_Zephyer_Statics['EPIC_ZEPHYR']['DEVELOPER'];
-
-  // STORY 
-  let storyz_total = Initiative_Zephyer_Statics['STORY_ZEPHYR']['TOTAL'];
-  let storyz_org = Initiative_Zephyer_Statics['STORY_ZEPHYR']['ORGANIZATION'];
-  let storyz_devel = Initiative_Zephyer_Statics['STORY_ZEPHYR']['DEVELOPER'];
-
-
+  // [INITIATIVE LOOP]
   for(var i = 0; i < initiative.length; i++)
   {
+    developers = {};
     console.log("[Initiative] i = ", i, "#######################");
-    /*
-    // Gathering organization infomation
-    let initiative_assignee = ininitiative_DB['issues'][i]['Assignee'];
-    ldap.get_UserInfofromLDAP(initiative_assignee);
-    let epic_assignee = initiative_DB['issues'][i]['EPIC']['issues'][j]['Assignee'];
-    ldap.get_UserInfofromLDAP(epic_assignee);
-    let story_assignee = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Assignee'];
-    ldap.get_UserInfofromLDAP(story_assignee);
-    let epicz_assignee = initiative_DB['issues'][i]['EPIC']['issues'][j]['Zephyr']['ZephyrTC'][k]['Assignee'];
-    ldap.get_UserInfofromLDAP(epicz_assignee);
-    let storyz_assignee = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Zephyr']['ZephyrTC'][l]['Assignee'];
-    ldap.get_UserInfofromLDAP(storyz_assignee);
-    */
-   let epic = initiative_DB['issues'][i]['EPIC']['issues'];
+    // SUM : EPIC + STORY 
+    let current_Statics = JSON.parse(JSON.stringify(Initiative_Statics));
+    let sum_total = current_Statics['EPIC+STORY_STATICS']['TOTAL'];
+    let sum_org = current_Statics['EPIC+STORY_STATICS']['ORGANIZATION'];
+    let sum_devel = current_Statics['EPIC+STORY_STATICS']['DEVELOPER'];
+
+    // EPIC  
+    let epicz_total = current_Statics['EPIC_STATICS']['TOTAL'];
+    let epicz_org = current_Statics['EPIC_STATICS']['ORGANIZATION'];
+    let epicz_devel = current_Statics['EPIC_STATICS']['DEVELOPER'];
+
+    // STORY 
+    let storyz_total = current_Statics['STORY_STATICS']['TOTAL'];
+    let storyz_org = current_Statics['STORY_STATICS']['ORGANIZATION'];
+    let storyz_devel = current_Statics['STORY_STATICS']['DEVELOPER'];
+
+    // [EPIC LOOP]
+    let epic = initiative_DB['issues'][i]['EPIC']['issues'];
     for(var j = 0; j < epic.length; j++)
     {
-      // epic zephyr search
+      var epicowner = epic[j]['Assignee'];
+      if(epicowner == "Unassigned" || epicowner == null)
+      {
+        console.log("1. epicowner = ", epicowner)
+        epicowner = "Unassigned";
+        developerslist['Unassigned'] = 'None';
+        developers['Unassigned'] = 'None';
+      }
+      //else
+      {
+        if((epicowner in developers) == false) { developers[epicowner] = '------'; }
+        if((epicowner in developerslist) == false) 
+        {
+          await ldap.getLDAP_Info(epicowner)
+          .then((result) => { 
+            developerslist[epicowner] = result['department']; 
+            developers[epicowner] = result['department']; 
+            console.log("Assignee = ", epicowner, " Department = ", result['department']);
+          })
+          .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+        }
+        else
+        {
+          developers[epicowner] = developerslist[epicowner];
+        }
+      }
+
+      //if((epicowner in sum_total) == false) { sum_total[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+      //if((epicowner in sum_org) == false) { sum_org[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+      if((epicowner in sum_devel) == false) { sum_devel[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+
+      //if((epicowner in epicz_total) == false) { epicz_total[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+      //if((epicowner in epicz_org) == false) { epicz_org[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+      if((epicowner in epicz_devel) == false) { epicz_devel[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+
+      //if((epicowner in storyz_total) == false) { storyz_total[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+      //if((epicowner in storyz_org) == false) { storyz_org[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+      if((epicowner in storyz_devel) == false) { storyz_devel[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+
+      epicz_devel[epicowner]['EpicTotalCnt']++;
+      if(initparse.checkIsDelayed(epic[j]['duedate']) == true && initparse.checkIsDelivered(epic[j]['Status']) == false) { epicz_devel[epicowner]['EpicDelayedCnt']++; }
+
+      if(epic[j]['GovOrDeployment'] == true) 
+      {
+        epicz_devel[epicowner]['EpicDevelCnt']++;
+        epicz_devel[epicowner]['EpicGovOrDeploymentCnt']++;
+        if(initparse.checkIsDelivered(epic[j]['Status']) == true)
+        {
+          epicz_devel[epicowner]['EpicTotalResolutionCnt']++;
+          epicz_devel[epicowner]['EpicGovOrDeploymentResolutionCnt']++;
+        }
+      }
+      else
+      {
+        if(initparse.checkIsDelivered(epic[j]['Status']) == true)
+        {
+          epicz_devel[epicowner]['EpicTotalResolutionCnt']++;
+          epicz_devel[epicowner]['EpicDevelResolutionCnt']++;
+        }
+      }
+
+      // [EPIC ZEPHYR LOOP]
       let epic_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['Zephyr']['ZephyrTC'];
       for(var k = 0; k < epic_zephyr.length; k++)
       {
         console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
         let epicz_assignee = epic_zephyr[k]['Assignee'];
-        console.log("epicz_assignee =", epicz_assignee);
-        if((epicz_assignee in epicz_devel) == false)
+        if(epicz_assignee == "Unassigned" || epicz_assignee == null)
         {
-          epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-          if((epicz_assignee in developers) == false)
+          console.log("2. epicz_assignee = ", epicz_assignee)
+          epicz_assignee = "Unassigned";
+          developerslist['Unassigned'] = 'None';
+          developers['Unassigned'] = 'None';
+        }
+        //else
+        {
+          if((epicz_assignee in developers) == false) { developers[epicz_assignee] = '------'; }
+          //console.log("epicz_assignee =", epicz_assignee);
+          if((epicz_assignee in epicz_devel) == false)
           {
-            developers[epicz_assignee] = "";
-          }
-          if((epicz_assignee in sum_devel) == false)
-          {
-            sum_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-          }
-          if((epicz_assignee in storyz_devel) == false)
-          {
-            storyz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            if((epicz_assignee in developerslist) == false)
+            {
+              await ldap.getLDAP_Info(epicz_assignee)
+              .then((result) => { 
+                developerslist[epicz_assignee] = result['department']; 
+                developers[epicz_assignee] = result['department']; 
+                console.log("Assignee = ", epicz_assignee, " Department = ", result['department']);
+              })
+              .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+            }
+            else
+            {
+              developers[epicz_assignee] = developerslist[epicz_assignee];
+            }
           }
         }
 
+        //if((epicz_assignee in sum_total) == false) { sum_total[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        //if((epicz_assignee in sum_org) == false) { sum_org[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        if((epicz_assignee in sum_devel) == false) { sum_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+  
+        //if((epicz_assignee in epicz_total) == false) { epicz_total[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        //if((epicz_assignee in epicz_org) == false) { epicz_org[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        if((epicz_assignee in epicz_devel) == false) { epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+  
+        //if((epicz_assignee in storyz_total) == false) { storyz_total[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        //if((epicz_assignee in storyz_org) == false) { storyz_org[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        if((epicz_assignee in storyz_devel) == false) { storyz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+      
         epicz_total['ZephyrCnt']++;
         if(epic_zephyr[k]['Status'] == "Draft") { epicz_total['Zephyr_S_Draft']++; }
         else if(epic_zephyr[k]['Status'] == "Review") { epicz_total['Zephyr_S_Review']++; }
@@ -881,33 +1081,57 @@ async function makeZephyrStatics()
         else if(epic_zephyr[k]['Status'] == "Archived") { epicz_devel[epicz_assignee]['Zephyr_S_Archived']++; }
         else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); }
 
-        // Epic-Zephyr-Execution Info
+        // [EPIC ZEPHYR EXECUTION LOOP]
         let passed = 0;
         for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
         {
           console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
           let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
-          console.log("epicze_assignee =", epicze_assignee);
-          if((epicze_assignee in epicz_devel) == false)
+          if(epicze_assignee == "Unassigned" || epicze_assignee == null)
           {
-            epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-            if((epicze_assignee in developers) == false)
+            console.log("3. epicze_assignee = ", epicze_assignee);
+            epicze_assignee = "Unassigned";
+            developerslist['Unassigned'] = 'None';
+            developers['Unassigned'] = 'None';
+          }
+          //else
+          {
+            if((epicze_assignee in developers) == false) { developers[epicze_assignee] = '------'; }
+            if((epicze_assignee in epicz_devel) == false)
             {
-              developers[epicze_assignee] = "";
+              epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+              if((epicze_assignee in developerslist) == false)
+              {
+                await ldap.getLDAP_Info(epicze_assignee)
+                .then((result) => { 
+                  developerslist[epicze_assignee] = result['department']; 
+                  developers[epicze_assignee] = result['department']; 
+                  console.log("Assignee = ", epicze_assignee, " Department = ", result['department']);
+                })
+                .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+              }
+              else
+              {
+                developers[epicze_assignee] = developerslist[epicze_assignee];
+              }
             }
-            if((epicze_assignee in sum_devel) == false)
-            {
-              sum_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-            }
-            if((epicze_assignee in storyz_devel) == false)
-            {
-              storyz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-            }
-          }          
+          }
+
+          //if((epicze_assignee in sum_total) == false) { sum_total[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          //if((epicze_assignee in sum_org) == false) { sum_org[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          if((epicze_assignee in sum_devel) == false) { sum_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+    
+          //if((epicze_assignee in epicz_total) == false) { epicz_total[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          //if((epicze_assignee in epicz_org) == false) { epicz_org[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          if((epicze_assignee in epicz_devel) == false) { epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+    
+          //if((epicze_assignee in storyz_total) == false) { storyz_total[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          //if((epicze_assignee in storyz_org) == false) { storyz_org[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          if((epicze_assignee in storyz_devel) == false) { storyz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+                  
 
           epicz_total['ZephyrExecutionCnt']++;
           let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
-          console.log("[EZE] executionStatus is = ", status);
           if(status == "1") { epicz_total['executionStatus_PASS']++; passed = true; }
           else if(status == "2") { epicz_total['executionStatus_FAIL']++; }
           else if(status == "-1") { epicz_total['executionStatus_UNEXEC']++; }
@@ -928,32 +1152,119 @@ async function makeZephyrStatics()
         }
       }
 
-      // Story zephyr search
+      // [STORY LOOP]
       let story = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'];
       for(var k = 0; k < story.length; k++)
       {
-        // Story-Zephyr Info
+        var storyowner = story[k]['Assignee'];
+        if(storyowner == "Unassigned" || storyowner == null)
+        {
+          console.log("4. storyowner = ", storyowner);
+          storyowner = "Unassigned";
+          developerslist['Unassigned'] = 'None';
+          developers['Unassigned'] = 'None';
+        }
+        //else
+        {
+          if((storyowner in developers) == false) { developers[storyowner] = '------'; }
+          if((storyowner in developerslist) == false) 
+          {
+            await ldap.getLDAP_Info(storyowner)
+            .then((result) => { 
+              developerslist[storyowner] = result['department']; 
+              developers[storyowner] = result['department']; 
+              console.log("Assignee = ", storyowner, " Department = ", result['department']);
+            })
+            .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+          }
+          else
+          {
+            developers[storyowner] = developerslist[storyowner];
+          }
+        }
+
+        //if((storyowner in sum_total) == false) { sum_total[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        //if((storyowner in sum_org) == false) { sum_org[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        if((storyowner in sum_devel) == false) { sum_devel[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+  
+        //if((storyowner in epicz_total) == false) { epicz_total[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        //if((storyowner in epicz_org) == false) { epicz_org[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        if((storyowner in epicz_devel) == false) { epicz_devel[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+  
+        //if((storyowner in storyz_total) == false) { storyz_total[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        //if((storyowner in storyz_org) == false) { storyz_org[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        if((storyowner in storyz_devel) == false) { storyz_devel[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+
+
+        storyz_devel[storyowner]['StoryTotalCnt']++;
+        if(initparse.checkIsDelayed(story[k]['duedate']) == true && initparse.checkIsDelivered(story[k]['Status']) == false) { storyz_devel[storyowner]['StoryDelayedCnt']++; }
+  
+        if(story[k]['GovOrDeployment'] == true) 
+        {
+          storyz_devel[storyowner]['StoryDevelCnt']++;
+          storyz_devel[storyowner]['StoryGovOrDeploymentCnt']++;
+          if(initparse.checkIsDelivered(story[k]['Status']) == true)
+          {
+            storyz_devel[storyowner]['StoryTotalResolutionCnt']++;
+            storyz_devel[storyowner]['StoryGovOrDeploymentResolutionCnt']++;
+          }
+        }
+        else
+        {
+          if(initparse.checkIsDelivered(story[k]['Status']) == true)
+          {
+            storyz_devel[storyowner]['StoryTotalResolutionCnt']++;
+            storyz_devel[storyowner]['StoryDevelResolutionCnt']++;
+          }
+        }
+  
+        // [STORY ZEPHYR LOOP]
         let story_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Zephyr']['ZephyrTC'];
         for(var l = 0; l < story_zephyr.length; l++)
         {
           let storyz_assignee = story_zephyr[l]['Assignee'];
-          console.log("storyz_assignee =", storyz_assignee);
-          if((storyz_assignee in storyz_devel) == false)
+          if(storyz_assignee == "Unassigned" || storyz_assignee == null)
           {
-            storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-            if((storyz_assignee in developers) == false)
+            console.log("5. storyz_assignee = ", storyz_assignee);
+            storyz_assignee = "Unassigned";
+            developerslist['Unassigned'] = 'None';
+            developers['Unassigned'] = 'None';
+          }
+          //else
+          {
+            if((storyz_assignee in developers) == false) { developers[storyz_assignee] = '------'; }
+            if((storyz_assignee in storyz_devel) == false)
             {
-              developers[storyz_assignee] = "";
-            }
-            if((storyz_assignee in sum_devel) == false)
-            {
-              sum_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-            }
-            if((storyz_assignee in epicz_devel) == false)
-            {
-              epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+              storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+              if((storyz_assignee in developerslist) == false)
+              {
+                await ldap.getLDAP_Info(storyz_assignee)
+                .then((result) => { 
+                  developerslist[storyz_assignee] = result['department']; 
+                  developers[storyz_assignee] = result['department']; 
+                  console.log("Assignee = ", storyz_assignee, " Department = ", result['department']);
+                })
+                .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+              }
+              else
+              {
+                developers[storyz_assignee] = developerslist[storyz_assignee];
+              }
             }
           }
+
+          //if((storyz_assignee in sum_total) == false) { sum_total[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          //if((storyz_assignee in sum_org) == false) { sum_org[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          if((storyz_assignee in sum_devel) == false) { sum_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+    
+          //if((storyz_assignee in epicz_total) == false) { epicz_total[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          //if((storyz_assignee in epicz_org) == false) { epicz_org[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          if((storyz_assignee in epicz_devel) == false) { epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+    
+          //if((storyz_assignee in storyz_total) == false) { storyz_total[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          //if((storyz_assignee in storyz_org) == false) { storyz_org[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          if((storyz_assignee in storyz_devel) == false) { storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        
           storyz_total['ZephyrCnt']++;
           if(story_zephyr[l]['Status'] == "Draft") { storyz_total['Zephyr_S_Draft']++; }
           else if(story_zephyr[l]['Status'] == "Review") { storyz_total['Zephyr_S_Review']++; }
@@ -972,34 +1283,57 @@ async function makeZephyrStatics()
           else if(story_zephyr[l]['Status'] == "Archived") { storyz_devel[storyz_assignee]['Zephyr_S_Archived']++; }
           else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); }
       
-          // Story-Zephyr-Execution Info
+          // [STORY ZEPHYR EXECUTION LOOP]
           console.log("[SZ] i = ", i, " j = ", j, " k = ", k, " l = ", l);
           let passed = 0;
           for(var m = 0; m < story_zephyr[l]['Executions'].length; m++)
           {
             let storyze_assignee = story_zephyr[l]['Executions'][m]['executedBy'];
-            console.log("storyze_assignee =", storyze_assignee);
-            if((storyze_assignee in storyz_devel) == false)
+            if(storyze_assignee == "Unassigned" || storyze_assignee == null)
             {
-              storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-              if((storyze_assignee in developers) == false)
-              {
-                developers[storyze_assignee] = "";
-              }
-              if((storyze_assignee in sum_devel) == false)
-              {
-                sum_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-              }
-              if((storyze_assignee in epicz_devel) == false)
-              {
-                epicz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
-              }
+              console.log("6. storyze_assignee = ", storyze_assignee);
+              storyze_assignee = "Unassigned";
+              developerslist['Unassigned'] = 'None';
+              developers['Unassigned'] = 'None';
             }
-  
+            //else
+            {
+              if((storyze_assignee in developers) == false) { developers[storyze_assignee] = '------'; }
+              if((storyze_assignee in storyz_devel) == false)
+              {
+                storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+                if((storyze_assignee in developerslist) == false)
+                {
+                  await ldap.getLDAP_Info(storyze_assignee)
+                  .then((result) => { 
+                    developerslist[storyze_assignee] = result['department']; 
+                    developers[storyze_assignee] = result['department']; 
+                    console.log("Assignee = ", storyze_assignee, " Department = ", result['department']);
+                  })
+                  .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+                }
+                else
+                {
+                  developers[storyze_assignee] = developerslist[storyze_assignee];
+                }
+              }
+
+              //if((storyze_assignee in sum_total) == false) { sum_total[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+              //if((storyze_assignee in sum_org) == false) { sum_org[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+              if((storyze_assignee in sum_devel) == false) { sum_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        
+              //if((storyze_assignee in epicz_total) == false) { epicz_total[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+              //if((storyze_assignee in epicz_org) == false) { epicz_org[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+              if((storyze_assignee in epicz_devel) == false) { epicz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        
+              //if((storyze_assignee in storyz_total) == false) { storyz_total[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+              //if((storyze_assignee in storyz_org) == false) { storyz_org[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+              if((storyze_assignee in storyz_devel) == false) { storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+            }
+
             console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
             storyz_total['ZephyrExecutionCnt']++;
             let status = story_zephyr[l]['Executions'][m]['executionStatus'];
-            console.log("[SZE] executionStatus is = ", status);
             if(status == "1") { storyz_total['executionStatus_PASS']++; passed = true; }
             else if(status == "2") { storyz_total['executionStatus_FAIL']++; }
             else if(status == "-1") { storyz_total['executionStatus_UNEXEC']++; }
@@ -1022,7 +1356,217 @@ async function makeZephyrStatics()
       }
     }
 
-    // SUM
+    console.log("developers = ", JSON.stringify(developers));
+    // DEVELOPER
+    for(assignee in developers)
+    {
+      /*
+      console.log("[assignee] = ", assignee);
+      console.log("sum_devel[assignee] = ", JSON.stringify(sum_devel[assignee]));
+      console.log("epicz_devel[assignee] = ", JSON.stringify(epicz_devel[assignee]));
+      console.log("storyz_devel[assignee] = ", JSON.stringify(storyz_devel[assignee]));
+      */
+      if(assignee == null)
+      {
+        console.log("############################################");
+        console.log("*******????????????????*******assignee = ", assignee);
+        /*
+        assignee = "Unassigned";
+        sum_devel[assignee]['ZephyrCnt'] += epicz_devel[assignee]['ZephyrCnt'] + storyz_devel[assignee]['ZephyrCnt'];
+        sum_devel[assignee]['ZephyrExecutionCnt'] += epicz_devel[assignee]['ZephyrExecutionCnt'] + storyz_devel[assignee]['ZephyrExecutionCnt'];
+        sum_devel[assignee]['Zephyr_S_Draft'] += epicz_devel[assignee]['Zephyr_S_Draft'] + storyz_devel[assignee]['Zephyr_S_Draft'];
+        sum_devel[assignee]['Zephyr_S_Review'] += epicz_devel[assignee]['Zephyr_S_Review'] + storyz_devel[assignee]['Zephyr_S_Review'];
+        sum_devel[assignee]['Zephyr_S_Update'] += epicz_devel[assignee]['Zephyr_S_Update'] + storyz_devel[assignee]['Zephyr_S_Update'];
+        sum_devel[assignee]['Zephyr_S_Active'] += epicz_devel[assignee]['Zephyr_S_Active'] + storyz_devel[assignee]['Zephyr_S_Active'];
+        sum_devel[assignee]['Zephyr_S_Approval'] += epicz_devel[assignee]['Zephyr_S_Approval'] + storyz_devel[assignee]['Zephyr_S_Approval'];
+        sum_devel[assignee]['Zephyr_S_Archived'] += epicz_devel[assignee]['Zephyr_S_Archived'] + storyz_devel[assignee]['Zephyr_S_Archived'];
+        sum_devel[assignee]['executionStatus_PASS'] += epicz_devel[assignee]['executionStatus_PASS'] + storyz_devel[assignee]['executionStatus_PASS'];
+        sum_devel[assignee]['executionStatus_FAIL'] += epicz_devel[assignee]['executionStatus_FAIL'] + storyz_devel[assignee]['executionStatus_FAIL'];
+        sum_devel[assignee]['executionStatus_UNEXEC'] += epicz_devel[assignee]['executionStatus_UNEXEC'] + storyz_devel[assignee]['executionStatus_UNEXEC'];
+        sum_devel[assignee]['executionStatus_BLOCK'] += epicz_devel[assignee]['executionStatus_BLOCK'] + storyz_devel[assignee]['executionStatus_BLOCK'];
+        sum_devel[assignee]['PassEpicCnt'] += epicz_devel[assignee]['PassEpicCnt'] + storyz_devel[assignee]['PassEpicCnt'];
+        sum_devel[assignee]['PassStoryCnt'] += epicz_devel[assignee]['PassStoryCnt'] + storyz_devel[assignee]['PassStoryCnt'];
+        */
+      }
+      else
+      {
+        //################################################################################
+        // Developer Statics
+        //################################################################################
+        // Epic
+        sum_devel[assignee]['EpicTotalCnt'] = epicz_devel[assignee]['EpicTotalCnt'] + storyz_devel[assignee]['EpicTotalCnt'];
+        sum_devel[assignee]['EpicDevelCnt'] = epicz_devel[assignee]['EpicDevelCnt'] + storyz_devel[assignee]['EpicDevelCnt'];
+        sum_devel[assignee]['EpicGovOrDeploymentCnt'] = epicz_devel[assignee]['EpicGovOrDeploymentCnt'] + storyz_devel[assignee]['EpicGovOrDeploymentCnt'];
+        sum_devel[assignee]['EpicTotalResolutionCnt'] = epicz_devel[assignee]['EpicTotalResolutionCnt'] + storyz_devel[assignee]['EpicTotalResolutionCnt'];
+        sum_devel[assignee]['EpicDevelResolutionCnt'] = epicz_devel[assignee]['EpicDevelResolutionCnt'] + storyz_devel[assignee]['EpicDevelResolutionCnt'];
+        sum_devel[assignee]['EpicGovOrDeploymentResolutionCnt'] = epicz_devel[assignee]['EpicGovOrDeploymentResolutionCnt'] + storyz_devel[assignee]['EpicGovOrDeploymentResolutionCnt'];
+        sum_devel[assignee]['EpicDelayedCnt'] = epicz_devel[assignee]['EpicDelayedCnt'] + storyz_devel[assignee]['EpicDelayedCnt'];
+        epicz_total['EpicTotalCnt'] += sum_devel[assignee]['EpicTotalCnt'];
+        epicz_total['EpicDevelCnt'] += sum_devel[assignee]['EpicDevelCnt'];
+        epicz_total['EpicGovOrDeploymentCnt'] += sum_devel[assignee]['EpicGovOrDeploymentCnt'];
+        epicz_total['EpicTotalResolutionCnt'] += sum_devel[assignee]['EpicTotalResolutionCnt'];
+        epicz_total['EpicDevelResolutionCnt'] += sum_devel[assignee]['EpicDevelResolutionCnt'];
+        epicz_total['EpicGovOrDeploymentResolutionCnt'] += sum_devel[assignee]['EpicGovOrDeploymentResolutionCnt'];
+        epicz_total['EpicDelayedCnt'] += sum_devel[assignee]['EpicDelayedCnt'];
+        // Story
+        sum_devel[assignee]['StoryTotalCnt'] = epicz_devel[assignee]['StoryTotalCnt'] + storyz_devel[assignee]['StoryTotalCnt'];
+        sum_devel[assignee]['StoryDevelCnt'] = epicz_devel[assignee]['StoryDevelCnt'] + storyz_devel[assignee]['StoryDevelCnt'];
+        sum_devel[assignee]['StoryGovOrDeploymentCnt'] = epicz_devel[assignee]['StoryGovOrDeploymentCnt'] + storyz_devel[assignee]['StoryGovOrDeploymentCnt'];
+        sum_devel[assignee]['StoryTotalResolutionCnt'] = epicz_devel[assignee]['StoryTotalResolutionCnt'] + storyz_devel[assignee]['StoryTotalResolutionCnt'];
+        sum_devel[assignee]['StoryDevelResolutionCnt'] = epicz_devel[assignee]['StoryDevelResolutionCnt'] + storyz_devel[assignee]['StoryDevelResolutionCnt'];
+        sum_devel[assignee]['StoryGovOrDeploymentResolutionCnt'] = epicz_devel[assignee]['StoryGovOrDeploymentResolutionCnt'] + storyz_devel[assignee]['StoryGovOrDeploymentResolutionCnt'];
+        sum_devel[assignee]['StoryDelayedCnt'] = epicz_devel[assignee]['StoryDelayedCnt'] + storyz_devel[assignee]['StoryDelayedCnt'];
+        storyz_total['StoryTotalCnt'] += sum_devel[assignee]['StoryTotalCnt'];
+        storyz_total['StoryDevelCnt'] += sum_devel[assignee]['StoryDevelCnt'];
+        storyz_total['StoryGovOrDeploymentCnt'] += sum_devel[assignee]['StoryGovOrDeploymentCnt'];
+        storyz_total['StoryTotalResolutionCnt'] += sum_devel[assignee]['StoryTotalResolutionCnt'];
+        storyz_total['StoryDevelResolutionCnt'] += sum_devel[assignee]['StoryDevelResolutionCnt'];
+        storyz_total['StoryGovOrDeploymentResolutionCnt'] += sum_devel[assignee]['StoryGovOrDeploymentResolutionCnt'];
+        storyz_total['StoryDelayedCnt'] += sum_devel[assignee]['StoryDelayedCnt'];
+        // Zephyr
+        sum_devel[assignee]['ZephyrCnt'] = epicz_devel[assignee]['ZephyrCnt'] + storyz_devel[assignee]['ZephyrCnt'];
+        sum_devel[assignee]['ZephyrExecutionCnt'] = epicz_devel[assignee]['ZephyrExecutionCnt'] + storyz_devel[assignee]['ZephyrExecutionCnt'];
+        sum_devel[assignee]['Zephyr_S_Draft'] = epicz_devel[assignee]['Zephyr_S_Draft'] + storyz_devel[assignee]['Zephyr_S_Draft'];
+        sum_devel[assignee]['Zephyr_S_Review'] = epicz_devel[assignee]['Zephyr_S_Review'] + storyz_devel[assignee]['Zephyr_S_Review'];
+        sum_devel[assignee]['Zephyr_S_Update'] = epicz_devel[assignee]['Zephyr_S_Update'] + storyz_devel[assignee]['Zephyr_S_Update'];
+        sum_devel[assignee]['Zephyr_S_Active'] = epicz_devel[assignee]['Zephyr_S_Active'] + storyz_devel[assignee]['Zephyr_S_Active'];
+        sum_devel[assignee]['Zephyr_S_Approval'] = epicz_devel[assignee]['Zephyr_S_Approval'] + storyz_devel[assignee]['Zephyr_S_Approval'];
+        sum_devel[assignee]['Zephyr_S_Archived'] = epicz_devel[assignee]['Zephyr_S_Archived'] + storyz_devel[assignee]['Zephyr_S_Archived'];
+        sum_devel[assignee]['executionStatus_PASS'] = epicz_devel[assignee]['executionStatus_PASS'] + storyz_devel[assignee]['executionStatus_PASS'];
+        sum_devel[assignee]['executionStatus_FAIL'] = epicz_devel[assignee]['executionStatus_FAIL'] + storyz_devel[assignee]['executionStatus_FAIL'];
+        sum_devel[assignee]['executionStatus_UNEXEC'] = epicz_devel[assignee]['executionStatus_UNEXEC'] + storyz_devel[assignee]['executionStatus_UNEXEC'];
+        sum_devel[assignee]['executionStatus_BLOCK'] = epicz_devel[assignee]['executionStatus_BLOCK'] + storyz_devel[assignee]['executionStatus_BLOCK'];
+        sum_devel[assignee]['PassEpicCnt'] = epicz_devel[assignee]['PassEpicCnt'] + storyz_devel[assignee]['PassEpicCnt'];
+        sum_devel[assignee]['PassStoryCnt'] = epicz_devel[assignee]['PassStoryCnt'] + storyz_devel[assignee]['PassStoryCnt'];
+
+        //################################################################################
+        // Organization Statics
+        //################################################################################
+        let orgname = developerslist[assignee];
+        if(orgname == null || orgname == undefined) { console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"); } else { console.log("Org Name = ", orgname); }
+        if((orgname in sum_org) == false) { sum_org[orgname] = JSON.parse(JSON.stringify(Org_Statics)); }
+        if((orgname in epicz_org) == false) { epicz_org[orgname] = JSON.parse(JSON.stringify(Org_Statics)); }
+        if((orgname in storyz_org) == false) { storyz_org[orgname] = JSON.parse(JSON.stringify(Org_Statics)); }
+
+        // epic
+        epicz_org[orgname]['EpicTotalCnt'] += epicz_devel[assignee]['EpicTotalCnt'];
+        epicz_org[orgname]['EpicDevelCnt'] += epicz_devel[assignee]['EpicDevelCnt'];
+        epicz_org[orgname]['EpicGovOrDeploymentCnt'] += epicz_devel[assignee]['EpicGovOrDeploymentCnt'];
+        epicz_org[orgname]['EpicTotalResolutionCnt'] += epicz_devel[assignee]['EpicTotalResolutionCnt'];
+        epicz_org[orgname]['EpicDevelResolutionCnt'] += epicz_devel[assignee]['EpicDevelResolutionCnt'];
+        epicz_org[orgname]['EpicGovOrDeploymentResolutionCnt'] += epicz_devel[assignee]['EpicGovOrDeploymentResolutionCnt'];
+        epicz_org[orgname]['EpicDelayedCnt'] += epicz_devel[assignee]['EpicDelayedCnt'];
+
+        epicz_org[orgname]['StoryTotalCnt'] += epicz_devel[assignee]['StoryTotalCnt'];
+        epicz_org[orgname]['StoryDevelCnt'] += epicz_devel[assignee]['StoryDevelCnt'];
+        epicz_org[orgname]['StoryGovOrDeploymentCnt'] += epicz_devel[assignee]['StoryGovOrDeploymentCnt'];
+        epicz_org[orgname]['StoryTotalResolutionCnt'] += epicz_devel[assignee]['StoryTotalResolutionCnt'];
+        epicz_org[orgname]['StoryDevelResolutionCnt'] += epicz_devel[assignee]['StoryDevelResolutionCnt'];
+        epicz_org[orgname]['StoryGovOrDeploymentResolutionCnt'] += epicz_devel[assignee]['StoryGovOrDeploymentResolutionCnt'];
+        epicz_org[orgname]['StoryDelayedCnt'] += epicz_devel[assignee]['StoryDelayedCnt'];
+
+        epicz_org[orgname]['ZephyrCnt'] += epicz_devel[assignee]['EpicTotalCnt'];
+        epicz_org[orgname]['ZephyrExecutionCnt'] += epicz_devel[assignee]['ZephyrExecutionCnt'];
+        epicz_org[orgname]['Zephyr_S_Draft'] += epicz_devel[assignee]['Zephyr_S_Draft'];
+        epicz_org[orgname]['Zephyr_S_Review'] += epicz_devel[assignee]['Zephyr_S_Review'];
+        epicz_org[orgname]['Zephyr_S_Update'] += epicz_devel[assignee]['Zephyr_S_Update'];
+        epicz_org[orgname]['Zephyr_S_Active'] += epicz_devel[assignee]['Zephyr_S_Active'];
+        epicz_org[orgname]['Zephyr_S_Approval'] += epicz_devel[assignee]['Zephyr_S_Approval'];
+        epicz_org[orgname]['Zephyr_S_Archived'] += epicz_devel[assignee]['Zephyr_S_Archived'];
+        epicz_org[orgname]['executionStatus_PASS'] += epicz_devel[assignee]['executionStatus_PASS'];
+        epicz_org[orgname]['executionStatus_FAIL'] += epicz_devel[assignee]['executionStatus_FAIL'];
+        epicz_org[orgname]['executionStatus_UNEXEC'] += epicz_devel[assignee]['executionStatus_UNEXEC'];
+        epicz_org[orgname]['executionStatus_BLOCK'] += epicz_devel[assignee]['executionStatus_BLOCK'];
+        epicz_org[orgname]['PassEpicCnt'] += epicz_devel[assignee]['PassEpicCnt'];
+        epicz_org[orgname]['PassStoryCnt'] += epicz_devel[assignee]['PassStoryCnt'];
+
+        // Story
+        storyz_org[orgname]['EpicTotalCnt'] += storyz_devel[assignee]['EpicTotalCnt'];
+        storyz_org[orgname]['EpicDevelCnt'] += storyz_devel[assignee]['EpicDevelCnt'];
+        storyz_org[orgname]['EpicGovOrDeploymentCnt'] += storyz_devel[assignee]['EpicGovOrDeploymentCnt'];
+        storyz_org[orgname]['EpicTotalResolutionCnt'] += storyz_devel[assignee]['EpicTotalResolutionCnt'];
+        storyz_org[orgname]['EpicDevelResolutionCnt'] += storyz_devel[assignee]['EpicDevelResolutionCnt'];
+        storyz_org[orgname]['EpicGovOrDeploymentResolutionCnt'] += storyz_devel[assignee]['EpicGovOrDeploymentResolutionCnt'];
+        storyz_org[orgname]['EpicDelayedCnt'] += storyz_devel[assignee]['EpicDelayedCnt'];
+
+        storyz_org[orgname]['StoryTotalCnt'] += storyz_devel[assignee]['StoryTotalCnt'];
+        storyz_org[orgname]['StoryDevelCnt'] += storyz_devel[assignee]['StoryDevelCnt'];
+        storyz_org[orgname]['StoryGovOrDeploymentCnt'] += storyz_devel[assignee]['StoryGovOrDeploymentCnt'];
+        storyz_org[orgname]['StoryTotalResolutionCnt'] += storyz_devel[assignee]['StoryTotalResolutionCnt'];
+        storyz_org[orgname]['StoryDevelResolutionCnt'] += storyz_devel[assignee]['StoryDevelResolutionCnt'];
+        storyz_org[orgname]['StoryGovOrDeploymentResolutionCnt'] += storyz_devel[assignee]['StoryGovOrDeploymentResolutionCnt'];
+        storyz_org[orgname]['StoryDelayedCnt'] += storyz_devel[assignee]['StoryDelayedCnt'];
+
+        storyz_org[orgname]['ZephyrCnt'] += storyz_devel[assignee]['EpicTotalCnt'];
+        storyz_org[orgname]['ZephyrExecutionCnt'] += storyz_devel[assignee]['ZephyrExecutionCnt'];
+        storyz_org[orgname]['Zephyr_S_Draft'] += storyz_devel[assignee]['Zephyr_S_Draft'];
+        storyz_org[orgname]['Zephyr_S_Review'] += storyz_devel[assignee]['Zephyr_S_Review'];
+        storyz_org[orgname]['Zephyr_S_Update'] += storyz_devel[assignee]['Zephyr_S_Update'];
+        storyz_org[orgname]['Zephyr_S_Active'] += storyz_devel[assignee]['Zephyr_S_Active'];
+        storyz_org[orgname]['Zephyr_S_Approval'] += storyz_devel[assignee]['Zephyr_S_Approval'];
+        storyz_org[orgname]['Zephyr_S_Archived'] += storyz_devel[assignee]['Zephyr_S_Archived'];
+        storyz_org[orgname]['executionStatus_PASS'] += storyz_devel[assignee]['executionStatus_PASS'];
+        storyz_org[orgname]['executionStatus_FAIL'] += storyz_devel[assignee]['executionStatus_FAIL'];
+        storyz_org[orgname]['executionStatus_UNEXEC'] += storyz_devel[assignee]['executionStatus_UNEXEC'];
+        storyz_org[orgname]['executionStatus_BLOCK'] += storyz_devel[assignee]['executionStatus_BLOCK'];
+        storyz_org[orgname]['PassEpicCnt'] += storyz_devel[assignee]['PassEpicCnt'];
+        storyz_org[orgname]['PassStoryCnt'] += storyz_devel[assignee]['PassStoryCnt'];
+
+        // SUM = Organization Statics
+        // Epic
+        sum_org[orgname]['EpicTotalCnt'] = epicz_org[orgname]['EpicTotalCnt'] + storyz_org[orgname]['EpicTotalCnt'];
+        sum_org[orgname]['EpicDevelCnt'] = epicz_org[orgname]['EpicDevelCnt'] + storyz_org[orgname]['EpicDevelCnt'];
+        sum_org[orgname]['EpicGovOrDeploymentCnt'] = epicz_org[orgname]['EpicGovOrDeploymentCnt'] + storyz_org[orgname]['EpicGovOrDeploymentCnt'];
+        sum_org[orgname]['EpicTotalResolutionCnt'] = epicz_org[orgname]['EpicTotalResolutionCnt'] + storyz_org[orgname]['EpicTotalResolutionCnt'];
+        sum_org[orgname]['EpicDevelResolutionCnt'] = epicz_org[orgname]['EpicDevelResolutionCnt'] + storyz_org[orgname]['EpicDevelResolutionCnt'];
+        sum_org[orgname]['EpicGovOrDeploymentResolutionCnt'] = epicz_org[orgname]['EpicGovOrDeploymentResolutionCnt'] + storyz_org[orgname]['EpicGovOrDeploymentResolutionCnt'];
+        sum_org[orgname]['EpicDelayedCnt'] = epicz_org[orgname]['EpicDelayedCnt'] + storyz_org[orgname]['EpicDelayedCnt'];
+        // Story
+        sum_org[orgname]['StoryTotalCnt'] = epicz_org[orgname]['StoryTotalCnt'] + storyz_org[orgname]['StoryTotalCnt'];
+        sum_org[orgname]['StoryDevelCnt'] = epicz_org[orgname]['StoryDevelCnt'] + storyz_org[orgname]['StoryDevelCnt'];
+        sum_org[orgname]['StoryGovOrDeploymentCnt'] = epicz_org[orgname]['StoryGovOrDeploymentCnt'] + storyz_org[orgname]['StoryGovOrDeploymentCnt'];
+        sum_org[orgname]['StoryTotalResolutionCnt'] = epicz_org[orgname]['StoryTotalResolutionCnt'] + storyz_org[orgname]['StoryTotalResolutionCnt'];
+        sum_org[orgname]['StoryDevelResolutionCnt'] = epicz_org[orgname]['StoryDevelResolutionCnt'] + storyz_org[orgname]['StoryDevelResolutionCnt'];
+        sum_org[orgname]['StoryGovOrDeploymentResolutionCnt'] = epicz_org[orgname]['StoryGovOrDeploymentResolutionCnt'] + storyz_org[orgname]['StoryGovOrDeploymentResolutionCnt'];
+        sum_org[orgname]['StoryDelayedCnt'] = epicz_org[orgname]['StoryDelayedCnt'] + storyz_org[orgname]['StoryDelayedCnt'];
+        // Zephyr
+        sum_org[orgname]['ZephyrCnt'] = epicz_org[orgname]['ZephyrCnt'] + storyz_org[orgname]['ZephyrCnt'];
+        sum_org[orgname]['ZephyrExecutionCnt'] = epicz_org[orgname]['ZephyrExecutionCnt'] + storyz_org[orgname]['ZephyrExecutionCnt'];
+        sum_org[orgname]['Zephyr_S_Draft'] = epicz_org[orgname]['Zephyr_S_Draft'] + storyz_org[orgname]['Zephyr_S_Draft'];
+        sum_org[orgname]['Zephyr_S_Review'] = epicz_org[orgname]['Zephyr_S_Review'] + storyz_org[orgname]['Zephyr_S_Review'];
+        sum_org[orgname]['Zephyr_S_Update'] = epicz_org[orgname]['Zephyr_S_Update'] + storyz_org[orgname]['Zephyr_S_Update'];
+        sum_org[orgname]['Zephyr_S_Active'] = epicz_org[orgname]['Zephyr_S_Active'] + storyz_org[orgname]['Zephyr_S_Active'];
+        sum_org[orgname]['Zephyr_S_Approval'] = epicz_org[orgname]['Zephyr_S_Approval'] + storyz_org[orgname]['Zephyr_S_Approval'];
+        sum_org[orgname]['Zephyr_S_Archived'] = epicz_org[orgname]['Zephyr_S_Archived'] + storyz_org[orgname]['Zephyr_S_Archived'];
+        sum_org[orgname]['executionStatus_PASS'] = epicz_org[orgname]['executionStatus_PASS'] + storyz_org[orgname]['executionStatus_PASS'];
+        sum_org[orgname]['executionStatus_FAIL'] = epicz_org[orgname]['executionStatus_FAIL'] + storyz_org[orgname]['executionStatus_FAIL'];
+        sum_org[orgname]['executionStatus_UNEXEC'] = epicz_org[orgname]['executionStatus_UNEXEC'] + storyz_org[orgname]['executionStatus_UNEXEC'];
+        sum_org[orgname]['executionStatus_BLOCK'] = epicz_org[orgname]['executionStatus_BLOCK'] + storyz_org[orgname]['executionStatus_BLOCK'];
+        sum_org[orgname]['PassEpicCnt'] = epicz_org[orgname]['PassEpicCnt'] + storyz_org[orgname]['PassEpicCnt'];
+        sum_org[orgname]['PassStoryCnt'] = epicz_org[orgname]['PassStoryCnt'] + storyz_org[orgname]['PassStoryCnt'];        
+      }
+    }
+
+    //################################################################################
+    // EPIC + STORY Statics
+    //################################################################################
+    // Epic
+    sum_total['EpicTotalCnt'] = epicz_total['EpicTotalCnt'] + storyz_total['EpicTotalCnt'];
+    sum_total['EpicDevelCnt'] = epicz_total['EpicDevelCnt'] + storyz_total['EpicDevelCnt'];
+    sum_total['EpicGovOrDeploymentCnt'] = epicz_total['EpicGovOrDeploymentCnt'] + storyz_total['EpicGovOrDeploymentCnt'];
+    sum_total['EpicTotalResolutionCnt'] = epicz_total['EpicTotalResolutionCnt'] + storyz_total['EpicTotalResolutionCnt'];
+    sum_total['EpicDevelResolutionCnt'] = epicz_total['EpicDevelResolutionCnt'] + storyz_total['EpicDevelResolutionCnt'];
+    sum_total['EpicGovOrDeploymentResolutionCnt'] = epicz_total['EpicGovOrDeploymentResolutionCnt'] + storyz_total['EpicGovOrDeploymentResolutionCnt'];
+    sum_total['EpicDelayedCnt'] = epicz_total['EpicDelayedCnt'] + storyz_total['EpicDelayedCnt'];
+    // Story
+    sum_total['StoryTotalCnt'] = epicz_total['StoryTotalCnt'] + storyz_total['StoryTotalCnt'];
+    sum_total['StoryDevelCnt'] = epicz_total['StoryDevelCnt'] + storyz_total['StoryDevelCnt'];
+    sum_total['StoryGovOrDeploymentCnt'] = epicz_total['StoryGovOrDeploymentCnt'] + storyz_total['StoryGovOrDeploymentCnt'];
+    sum_total['StoryTotalResolutionCnt'] = epicz_total['StoryTotalResolutionCnt'] + storyz_total['StoryTotalResolutionCnt'];
+    sum_total['StoryDevelResolutionCnt'] = epicz_total['StoryDevelResolutionCnt'] + storyz_total['StoryDevelResolutionCnt'];
+    sum_total['StoryGovOrDeploymentResolutionCnt'] = epicz_total['StoryGovOrDeploymentResolutionCnt'] + storyz_total['StoryGovOrDeploymentResolutionCnt'];
+    sum_total['StoryDelayedCnt'] = epicz_total['StoryDelayedCnt'] + storyz_total['StoryDelayedCnt'];
+    // Zephyr 
     sum_total['ZephyrCnt'] = epicz_total['ZephyrCnt'] + storyz_total['ZephyrCnt'];
     sum_total['ZephyrExecutionCnt'] = epicz_total['ZephyrExecutionCnt'] + storyz_total['ZephyrExecutionCnt'];
     sum_total['Zephyr_S_Draft'] = epicz_total['Zephyr_S_Draft'] + storyz_total['Zephyr_S_Draft'];
@@ -1036,35 +1580,12 @@ async function makeZephyrStatics()
     sum_total['executionStatus_UNEXEC'] = epicz_total['executionStatus_UNEXEC'] + storyz_total['executionStatus_UNEXEC'];
     sum_total['executionStatus_BLOCK'] = epicz_total['executionStatus_BLOCK'] + storyz_total['executionStatus_BLOCK'];
     sum_total['PassEpicCnt'] = epicz_total['PassEpicCnt'] + storyz_total['PassEpicCnt'];
-    sum_total['PassStoryCnt'] = epicz_total['PassStoryCnt'] + storyz_total['PassStoryCnt'];
+    sum_total['PassStoryCnt'] = epicz_total['PassStoryCnt'] + storyz_total['PassStoryCnt'];    
 
-    console.log("developers = ", JSON.stringify(developers));
-    // DEVELOPER
-    for(assignee in developers)
-    {
-      console.log("[assignee] = ", assignee);
-      console.log("sum_devel[assignee] = ", JSON.stringify(sum_devel[assignee]));
-      console.log("epicz_devel[assignee] = ", JSON.stringify(epicz_devel[assignee]));
-      console.log("storyz_devel[assignee] = ", JSON.stringify(storyz_devel[assignee]));
-      if(assignee == undefined) { console.log("break"); break; }
-      sum_devel[assignee]['ZephyrCnt'] = epicz_devel[assignee]['ZephyrCnt'] + storyz_devel[assignee]['ZephyrCnt'];
-      sum_devel[assignee]['ZephyrExecutionCnt'] = epicz_devel[assignee]['ZephyrExecutionCnt'] + storyz_devel[assignee]['ZephyrExecutionCnt'];
-      sum_devel[assignee]['Zephyr_S_Draft'] = epicz_devel[assignee]['Zephyr_S_Draft'] + storyz_devel[assignee]['Zephyr_S_Draft'];
-      sum_devel[assignee]['Zephyr_S_Review'] = epicz_devel[assignee]['Zephyr_S_Review'] + storyz_devel[assignee]['Zephyr_S_Review'];
-      sum_devel[assignee]['Zephyr_S_Update'] = epicz_devel[assignee]['Zephyr_S_Update'] + storyz_devel[assignee]['Zephyr_S_Update'];
-      sum_devel[assignee]['Zephyr_S_Active'] = epicz_devel[assignee]['Zephyr_S_Active'] + storyz_devel[assignee]['Zephyr_S_Active'];
-      sum_devel[assignee]['Zephyr_S_Approval'] = epicz_devel[assignee]['Zephyr_S_Approval'] + storyz_devel[assignee]['Zephyr_S_Approval'];
-      sum_devel[assignee]['Zephyr_S_Archived'] = epicz_devel[assignee]['Zephyr_S_Archived'] + storyz_devel[assignee]['Zephyr_S_Archived'];
-      sum_devel[assignee]['executionStatus_PASS'] = epicz_devel[assignee]['executionStatus_PASS'] + storyz_devel[assignee]['executionStatus_PASS'];
-      sum_devel[assignee]['executionStatus_FAIL'] = epicz_devel[assignee]['executionStatus_FAIL'] + storyz_devel[assignee]['executionStatus_FAIL'];
-      sum_devel[assignee]['executionStatus_UNEXEC'] = epicz_devel[assignee]['executionStatus_UNEXEC'] + storyz_devel[assignee]['executionStatus_UNEXEC'];
-      sum_devel[assignee]['executionStatus_BLOCK'] = epicz_devel[assignee]['executionStatus_BLOCK'] + storyz_devel[assignee]['executionStatus_BLOCK'];
-      sum_devel[assignee]['PassEpicCnt'] = epicz_devel[assignee]['PassEpicCnt'] + storyz_devel[assignee]['PassEpicCnt'];
-      sum_devel[assignee]['PassStoryCnt'] = epicz_devel[assignee]['PassStoryCnt'] + storyz_devel[assignee]['PassStoryCnt'];
-    }
-
-    initiative_DB['issues'][i]['ZEPHYR_SUMMARY'] = Initiative_Zephyer_Statics;
+    initiative_DB['issues'][i]['STATICS'] = current_Statics;
+    initiative_DB['issues'][i]['developers'] = developers;
   }
+  initiative_DB['developers'] = developerslist;
 }
 
 
@@ -1303,6 +1824,7 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
         current_story_info['AbnormalSprint'] = initparse.checkAbnormalSP(epic_ReleaseSP,epic_Status, story_ReleaseSP, story_Status); 
         current_story_info['Label'] = initparse.getLabels(issue);     
         current_story_info['StoryPoint'] = 0; // need to be updated     
+
         /*  
         current_story_info['Zephyr'] = 0; // need to be updated      
         */
@@ -1463,54 +1985,22 @@ async function makeSnapshot_SyncStoryZephyrExecutionInfofromJira(init_index, epi
   }
 }
 
+async function Test()
+{
+  load_DevelopersDB('./public/json/developers.json').then((result) => {
+    console.log("[TEST] Read developers DB = ", JSON.stringify(developerslist));
+  });
+}
+
 module.exports = { 
   initiative_DB,              // final DB
   // function
   get_InitiativeListfromJira,  // promise
   get_InitiativeList,          // callback
   makeSnapshot_InitiativeInfofromJira,
+  Test,
  };
 
 
 
 
- /*
- current_OrgStatics = JSON.stringify(OrgStatics);
-//initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['ZEPHYR_SUMMARY'].push(current_OrgStatics);
-//let storyzephyrsummary = initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['ZEPHYR_SUMMARY'][0];
-
-current_OrgStatics['OrgName'] = "StoryTotal";
-current_OrgStatics['ZephyrCnt'] += zephyrlist.total;
-current_OrgStatics['Zephyr_S_Draft'] = 0;
-current_OrgStatics['Zephyr_S_Review'] = 0;
-current_OrgStatics['Zephyr_S_Update'] = 0;
-current_OrgStatics['Zephyr_S_Active'] = 0;
-current_OrgStatics['ZephyrExecutionCnt'] = 0;
-current_OrgStatics['executionStatus_PASS'] = 0;
-current_OrgStatics['executionStatus_FAIL'] = 0;
-current_OrgStatics['executionStatus_UNEXEC'] = 0;
-current_OrgStatics['executionStatus_BLOCK'] = 0;
-
-    //let storyzephyrsummary = initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['ZEPHYR_SUMMARY'][0];   
-    storyzephyrsummary['OrgName'] = "StoryTotal";
-    storyzephyrsummary['ZephyrExecutionCnt'] += zephyrExecution['executions'].length;
-    storyzephyrsummary['executionStatus_PASS'] = 0;
-    storyzephyrsummary['executionStatus_FAIL'] = 0;
-    storyzephyrsummary['executionStatus_UNEXEC'] = 0;
-    storyzephyrsummary['executionStatus_BLOCK'] = 0;
-    if(status == 1) { storyzephyrsummary['executionStatus_PASS']++; }
-    else if(status == 2) { storyzephyrsummary['executionStatus_FAIL']++; }
-    else if(status == -1) { storyzephyrsummary['executionStatus_UNEXEC']++; }
-    else if(status == 0) { storyzephyrsummary['executionStatus_BLOCK']++; }
-    else { }
-
-    // story zephyr statics
-    if(status == "Draft") { current_OrgStatics['Zephyr_S_Draft']++; }
-    if(status == "Review") { current_OrgStatics['Zephyr_S_Review']++; }
-    if(status == "Update") { current_OrgStatics['Zephyr_S_Update']++; }
-    if(status == "Active") { current_OrgStatics['Zephyr_S_Active']++; }
- 
-    // Gathering organization infomation
-    //ldap.get_UserInfofromLDAP(current_epic_info['Assignee']);
-    //initiative_DB['issues'][i]['Organization'] = 
-*/
