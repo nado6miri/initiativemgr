@@ -361,6 +361,8 @@ function conversionReleaseSprintToSprint(ReleaseSprint) {
     let sprint = String(ReleaseSprint);
     let b = 0;
 
+    if(sprint == "SP_UNDEF") { return "SP_UNDEF"; }
+
     // webOS5.0 Sprint
     if(sprint.includes("2019_IR1"))
     {
@@ -611,8 +613,12 @@ function getResolutionDate(jiraIssue) {
 //===========================================================================
 function getLabels(jiraIssue) {
     let value = jiraIssue['fields']['labels'];
-    console.log("getLabels = ", value)
-    return value;
+    if(value != null) 
+    {
+        console.log("getLabels = ", value)
+        return value;
+    }
+    return [];
 }
 
 
@@ -728,9 +734,9 @@ function getWatchers(jiraIssue) {
 
 
 //===========================================================================
-// Check STE On Site Initiative or Not
+// Check labels
 // [param] dissue : jira issue
-// [return] True (STE On Site) or False (null)
+// [return] True (label is exist) or False (label is not exisit)
 //===========================================================================
 function checkLabels(jiraIssue, labelname) {
     let labels = getLabels(jiraIssue);
@@ -863,31 +869,38 @@ function getZephyrExeinfo_cycleName(ZephyrIssue) {
 // [param] epic Release SP, story Release SP
 // [return] init >= epicstory (false) else true
 //===========================================================================
-function checkAbnormalSP(initSP, initStatus, epicstorySP, epicstoryStatus)
+function checkAbnormalSP(ParentSP, ParentStatus, ChildSP, ChildStatus)
 {
-    var epic_story_SP = epicstorySP;
-    var init_SP = conversionReleaseSprintToSprint(initSP);
-    var init_index = 0, epic_story_index = 0;
+    var CSP = conversionReleaseSprintToSprint(ChildSP);
+    var PSP = conversionReleaseSprintToSprint(ParentSP);
+    var Parent_Index = 0, Child_Index = 0;
 
-    if(initSP == "SP_UNDEF" || epicstorySP == "SP_UNDEF") 
+    // abnormal case 1 : Parent / child duedate is Null. Can't estimate schedule. 
+    if(ParentSP == "SP_UNDEF" || ChildSP == "SP_UNDEF") 
     { 
-        if(checkIsDelivered(epicstoryStatus) == true) { return false } else { return true; } 
+        console.log("[abnormal case 1] ParentSP = ", ParentSP, PSP, " ChildSP = ", ChildSP, CSP);
+        if(checkIsDelivered(ChildStatus) == true) { return false } else { return true; } 
+    }
+
+    // abnormal case 2 : parent is delivered but childs(current) is not delivered. 
+    if(checkIsDelivered(ParentStatus) == true && checkIsDelivered(ChildStatus) == false) 
+    {
+        console.log("[abnormal case 2] = ", checkIsDelivered(ParentStatus), checkIsDelivered(ChildStatus));
+        return true; 
     }
 
     for(var i = 0; i < Y2019_SP_Schedule.length; i++)
     {
-        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == init_SP) { init_index = i; }
-        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == epic_story_SP) { epic_story_index = i; }
+        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == PSP) { Parent_Index = i; }
+        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == CSP) { Child_Index = i; }
     }
 
-    if(i >= Y2019_SP_Schedule.length) { return false; }
-    else
+    // abnormal case 3 : child duedate is greater than parent duedate. 
+    if(Parent_Index >= Child_Index) { return false; } 
+    else 
     {
-        if(init_index >= epic_story_index) {return false; } 
-        else 
-        {
-            if(checkIsDelivered(epicstoryStatus) == true) { return false } else { return true; } 
-        }
+        console.log("[abnormal case 3] = ", Parent_Index, Child_Index);
+        if(checkIsDelivered(ChildStatus) == true) { return false } else { return true; } 
     }
 }
 
@@ -900,7 +913,8 @@ function checkAbnormalSP(initSP, initStatus, epicstorySP, epicstoryStatus)
 //===========================================================================
 function checkIsDelivered(Status)
 {
-    if(Status == 'Resolved' || Status == 'Closed' || Status == 'delivered' || Status == 'Deferred' || Status == "Withdrwan" || Status == 'Verify')
+    if(Status == 'Resolved' || Status == 'Closed' || Status == 'Delivered' || Status == 'Deferred' 
+        || Status == "Withdrwan" || Status == 'Verify')
     { 
         return true; 
     }
@@ -938,10 +952,12 @@ function parseWorkflow(changelog, workflow)
     {
         let log = changelog['histories'];
         let today = moment().locale('ko');
+        today = moment(today).add(9, 'Hour');
         let createddate = workflow['CreatedDate'].split('+');
         let created = moment(createddate[0]).add(9, 'Hour');
         let start = 0;
         let end = 0;
+        let period = 0;
         for(let i = 0; i < changelog.total; i++)
         {
             for(let j = 0; j < log[i]['items'].length; j++)
@@ -953,7 +969,7 @@ function parseWorkflow(changelog, workflow)
                     item_created = item_created.split('+');
                     if(start == 0) { start = created; } else { start = end; }
                     end = moment(item_created[0]).add(9, 'Hour');
-                    let period = (end - start) / (1000*60*60*24);
+                    period = (end - start) / (1000*60*60*24);
      
                     let from = item['fromString'];
                     let to = item['toString'];
@@ -984,8 +1000,8 @@ function parseWorkflow(changelog, workflow)
                     if(from == 'Approved' && to == "BACKLOG REFINEMENT")
                     { 
                         //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
-                        workflow['APPROVED']['Duration'] += period; 
-                        workflow['APPROVED']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        workflow['Approved']['Duration'] += period; 
+                        workflow['Approved']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                     }
 
                     if(from == 'BACKLOG REFINEMENT' && to == "READY")
@@ -1005,19 +1021,19 @@ function parseWorkflow(changelog, workflow)
                     if(from == 'In Progress' && to == "Delivered")
                     { 
                         //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
-                        workflow['IN PROGRESS']['Duration'] += period; 
-                        workflow['IN PROGRESS']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        workflow['In Progress']['Duration'] += period; 
+                        workflow['In Progress']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                         // need to check...
-                        workflow['DELIVERED']['Duration'] = (today - end) / (1000*60*60*24); 
-                        workflow['DELIVERED']['History'].push({ "startdate" : end, "enddate" : today, "peroid" : period });
+                        //workflow['Delivered']['Duration'] = (today - end) / (1000*60*60*24); 
+                        //workflow['Delivered']['History'].push({ "startdate" : end, "enddate" : today, "peroid" : period });
                     }
 
                     // EXCEPTIONAL CASE
                     if(from == 'Deferred' && to == "In Progress")
                     { 
                         //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
-                        workflow['DEFERRED']['Duration'] += period; 
-                        workflow['DEFERRED']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        workflow['Deferred']['Duration'] += period; 
+                        workflow['Deferred']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                     }
 
                     if(from == 'PO REVIEW' && to == "DRAFTING")
@@ -1034,11 +1050,12 @@ function parseWorkflow(changelog, workflow)
                         workflow['ELT REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                     }
 
-                    if(from == 'DELIVERED' && to == "In Progress")
+                    if(from == 'Delivered' && to == "In Progress")
                     { 
                         //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
-                        workflow['DELIVERED']['Duration'] += period; 
-                        workflow['DELIVERED']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    if(from == 'Delivered' && to == "In Progress")
+                        workflow['Delivered']['Duration'] += period; 
+                        workflow['Delivered']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                     }
 
                     if(to == "Closed")
@@ -1064,25 +1081,25 @@ function parseWorkflow(changelog, workflow)
                         if(from == "In Progress")
                         {
                             //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
-                            workflow['IN PROGRESS']['Duration'] += period; 
-                            workflow['IN PROGRESS']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            workflow['In Progress']['Duration'] += period; 
+                            workflow['In Progress']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                         }
                     }
 
                     if(from == 'Closed' && to == "DRAFTING")
                     { 
                         //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
-                        workflow['CLOSED']['Duration'] += period; 
-                        workflow['CLOSED']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        workflow['Closed']['Duration'] += period; 
+                        workflow['Closed']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                     }
 
                     if(to == "PROPOSED TO DEFER")
                     { 
-                        if(from == "APPROVED")
+                        if(from == "Approved")
                         {
                             //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
-                            workflow['APPROVED']['Duration'] += period; 
-                            workflow['APPROVED']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            workflow['Approved']['Duration'] += period; 
+                            workflow['Approved']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                         }
                         if(from == "BACKLOG REFINEMENT")
                         {
@@ -1099,8 +1116,8 @@ function parseWorkflow(changelog, workflow)
                         if(from == "In Progress")
                         {
                             //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
-                            workflow['IN PROGRESS']['Duration'] += period; 
-                            workflow['IN PROGRESS']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            workflow['In Progress']['Duration'] += period; 
+                            workflow['In Progress']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
                         }
                     }
 
@@ -1113,6 +1130,11 @@ function parseWorkflow(changelog, workflow)
                 }
             }
         }
+
+        let cur_status = workflow['Status'];
+        workflow[cur_status]['Duration'] = (today - end) / (1000*60*60*24); 
+        workflow[cur_status]['History'].push({ "startdate" : end, "enddate" : today, "peroid" : workflow[cur_status]['Duration'] });
+
         return workflow;
     }
     console.log("[Exception] : parseWorkflow")
@@ -1146,6 +1168,7 @@ function parseReleaseSprint(changelog, releaseSP)
     {
         let log = changelog['histories'];
         let today = moment().locale('ko');
+        today = moment(today).add(9, 'Hour');
         for(let i = 0; i < changelog.total; i++)
         {
             for(let j = 0; j < log[i]['items'].length; j++)

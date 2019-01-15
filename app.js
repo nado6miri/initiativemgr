@@ -62,8 +62,8 @@ function periodic_DBjobs()
   //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 45400);   // webOS5.0
 
   //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46610);   // webOS4.5 MR minor test 2ea
-  initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46093);   // webOS4.5 MR minor
-  //initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
+  //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46093);   // webOS4.5 MR minor
+  initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
 
   //initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-11552");   // webOS4.5 MR minor // shinchiho
   //initapi.Test();
