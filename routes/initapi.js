@@ -6,6 +6,7 @@ var url = require('url');
 var XMLHttpRequest = require('xmlhttprequest-ssl').XMLHttpRequest;
 var initparse = require('./parsejirafields');
 var ldap = require('./lgeldap.js')
+var moment = require('moment-timezone');
 
 var async_mode = true;
 var changelog = true;
@@ -227,151 +228,27 @@ var Initiative_Statics =
 {
     'EPIC+STORY_STATICS' :
     {
-        'TOTAL' : 
-        {
-            // Epic
-            'EpicTotalCnt': 0,
-            'EpicDevelCnt': 0,
-            'EpicGovOrDeploymentCnt': 0,
-            'EpicTotalResolutionCnt' : 0,
-            'EpicDevelResolutionCnt' : 0,
-            'EpicGovOrDeploymentResolutionCnt' : 0,
-            'EpicDelayedCnt' : 0,
-            'EpicDevelTCCnt' : 0, // zephyr tc 필요항목 (개발)
-            'EpicNonDevelTCCnt' : 0,    // zephyr tc 불필요항목 (비개발)
-            'EpicNeedtoCheckCnt' : 0, // 개발 / 비개발 확인 필요 항목
-            'EpicHasTCCnt' : 0, // 연결률 계산..
-            // Story
-            'StoryTotalCnt': 0,
-            'StoryDevelCnt': 0,
-            'StoryGovOrDeploymentCnt': 0,
-            'StoryTotalResolutionCnt' : 0,
-            'StoryDevelResolutionCnt' : 0,
-            'StoryGovOrDeploymentResolutionCnt' : 0,
-            'StoryDelayedCnt' : 0,
-            'StoryDevelTCCnt' : 0, // zephyr tc 필요항목
-            'StoryNonDevelTCCnt' : 0,    // zephyr tc 불필요항목 
-            'StoryNeedtoCheckCnt' : 0, // 개발 / 비개발 확인 필요 항목
-            'StoryHasTCCnt' : 0, // 연결률 계산..
-            // Epic 하위, Story 하위 Zephyr 통계
-            'ZephyrCnt': 0,
-            'ZephyrExecutionCnt' : 0,
-            'Zephyr_S_Draft' : 0, 
-            'Zephyr_S_Review' : 0, 
-            'Zephyr_S_Update' : 0, 
-            'Zephyr_S_Active' : 0, 
-            'Zephyr_S_Approval' : 0, 
-            'Zephyr_S_Archived' : 0, 
-            'executionStatus_PASS' : 0, // “1” PASS
-            'executionStatus_FAIL' : 0, // “2” FAIL
-            'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
-            'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-            'PassEpicCnt' : 0,
-            'PassStoryCnt' : 0,
-        },
+        'TOTAL' : {},
         'ORGANIZATION' : {},
         'DEVELOPER' : {},
     },
 
     'EPIC_STATICS' : 
     {
-        'TOTAL' : 
-        {
-            // Epic
-            'EpicTotalCnt': 0,
-            'EpicDevelCnt': 0,
-            'EpicGovOrDeploymentCnt': 0,
-            'EpicTotalResolutionCnt' : 0,
-            'EpicDevelResolutionCnt' : 0,
-            'EpicGovOrDeploymentResolutionCnt' : 0,
-            'EpicDelayedCnt' : 0,
-            'EpicDevelTCCnt' : 0, // zephyr tc 필요항목 (개발)
-            'EpicNonDevelTCCnt' : 0,    // zephyr tc 불필요항목 (비개발)
-            'EpicNeedtoCheckCnt' : 0, // 개발 / 비개발 확인 필요 항목
-            'EpicHasTCCnt' : 0, // 연결률 계산..
-            // Story
-            'StoryTotalCnt': 0,
-            'StoryDevelCnt': 0,
-            'StoryGovOrDeploymentCnt': 0,
-            'StoryTotalResolutionCnt' : 0,
-            'StoryDevelResolutionCnt' : 0,
-            'StoryGovOrDeploymentResolutionCnt' : 0,
-            'StoryDelayedCnt' : 0,
-            'StoryDevelTCCnt' : 0, // zephyr tc 필요항목
-            'StoryNonDevelTCCnt' : 0,    // zephyr tc 불필요항목 
-            'StoryNeedtoCheckCnt' : 0, // 개발 / 비개발 확인 필요 항목
-            'StoryHasTCCnt' : 0, // 연결률 계산..
-            // Epic 하위, Story 하위 Zephyr 통계
-            'ZephyrCnt': 0,
-            'ZephyrExecutionCnt' : 0,
-            'Zephyr_S_Draft' : 0, 
-            'Zephyr_S_Review' : 0, 
-            'Zephyr_S_Update' : 0, 
-            'Zephyr_S_Active' : 0, 
-            'Zephyr_S_Approval' : 0, 
-            'Zephyr_S_Archived' : 0, 
-            'executionStatus_PASS' : 0, // “1” PASS
-            'executionStatus_FAIL' : 0, // “2” FAIL
-            'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
-            'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-            'PassEpicCnt' : 0,
-            'PassStoryCnt' : 0,
-        },
+        'TOTAL' : {}, 
         'ORGANIZATION' : {},
         'DEVELOPER' : {},
     },
 
     'STORY_STATICS' : 
     {
-        'TOTAL' : 
-        {
-            // Epic
-            'EpicTotalCnt': 0,
-            'EpicDevelCnt': 0,
-            'EpicGovOrDeploymentCnt': 0,
-            'EpicTotalResolutionCnt' : 0,
-            'EpicDevelResolutionCnt' : 0,
-            'EpicGovOrDeploymentResolutionCnt' : 0,
-            'EpicDelayedCnt' : 0,
-            'EpicDevelTCCnt' : 0, // zephyr tc 필요항목 (개발)
-            'EpicNonDevelTCCnt' : 0,    // zephyr tc 불필요항목 (비개발)
-            'EpicNeedtoCheckCnt' : 0, // 개발 / 비개발 확인 필요 항목
-            'EpicHasTCCnt' : 0, // 연결률 계산..
-            // Story
-            'StoryTotalCnt': 0,
-            'StoryDevelCnt': 0,
-            'StoryGovOrDeploymentCnt': 0,
-            'StoryTotalResolutionCnt' : 0,
-            'StoryDevelResolutionCnt' : 0,
-            'StoryGovOrDeploymentResolutionCnt' : 0,
-            'StoryDelayedCnt' : 0,
-            'StoryDevelTCCnt' : 0, // zephyr tc 필요항목
-            'StoryNonDevelTCCnt' : 0,    // zephyr tc 불필요항목 
-            'StoryNeedtoCheckCnt' : 0, // 개발 / 비개발 확인 필요 항목
-            'StoryHasTCCnt' : 0, // 연결률 계산..
-            // Epic 하위, Story 하위 Zephyr 통계
-            'ZephyrCnt': 0,
-            'ZephyrExecutionCnt' : 0,
-            'Zephyr_S_Draft' : 0, 
-            'Zephyr_S_Review' : 0, 
-            'Zephyr_S_Update' : 0, 
-            'Zephyr_S_Active' : 0, 
-            'Zephyr_S_Approval' : 0, 
-            'Zephyr_S_Archived' : 0, 
-            'executionStatus_PASS' : 0, // “1” PASS
-            'executionStatus_FAIL' : 0, // “2” FAIL
-            'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
-            'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-            'PassEpicCnt' : 0,
-            'PassStoryCnt' : 0,
-        },
+        'TOTAL' : {},
         'ORGANIZATION' : {},
         'DEVELOPER' : {},
     },    
 }
 
-var current_Org = {};
-var Org_Statics = 
+var StaticsInfo = 
 {
     // Epic
     'EpicTotalCnt': 0,
@@ -414,50 +291,6 @@ var Org_Statics =
     'PassStoryCnt' : 0,
 }
 
-
-var current_Developer = {};
-var Developer_Statics = 
-{
-    // Epic
-    'EpicTotalCnt': 0,
-    'EpicDevelCnt': 0,
-    'EpicGovOrDeploymentCnt': 0,
-    'EpicTotalResolutionCnt' : 0,
-    'EpicDevelResolutionCnt' : 0,
-    'EpicGovOrDeploymentResolutionCnt' : 0,
-    'EpicDelayedCnt' : 0,
-    'EpicDevelTCCnt' : 0, // zephyr tc 필요항목 (개발)
-    'EpicNonDevelTCCnt' : 0,    // zephyr tc 불필요항목 (비개발)
-    'EpicNeedtoCheckCnt' : 0, // 개발 / 비개발 확인 필요 항목
-    'EpicHasTCCnt' : 0, // 연결률 계산..
-    // Story
-    'StoryTotalCnt': 0,
-    'StoryDevelCnt': 0,
-    'StoryGovOrDeploymentCnt': 0,
-    'StoryTotalResolutionCnt' : 0,
-    'StoryDevelResolutionCnt' : 0,
-    'StoryGovOrDeploymentResolutionCnt' : 0,
-    'StoryDelayedCnt' : 0,
-    'StoryDevelTCCnt' : 0, // zephyr tc 필요항목
-    'StoryNonDevelTCCnt' : 0,    // zephyr tc 불필요항목 
-    'StoryNeedtoCheckCnt' : 0, // 개발 / 비개발 확인 필요 항목
-    'StoryHasTCCnt' : 0, // 연결률 계산..
-    // Zephyr
-    'ZephyrCnt': 0,
-    'ZephyrExecutionCnt' : 0,
-    'Zephyr_S_Draft' : 0, 
-    'Zephyr_S_Review' : 0, 
-    'Zephyr_S_Update' : 0, 
-    'Zephyr_S_Active' : 0, 
-    'Zephyr_S_Approval' : 0, 
-    'Zephyr_S_Archived' : 0, 
-    'executionStatus_PASS' : 0, // “1” PASS
-    'executionStatus_FAIL' : 0, // “2” FAIL
-    'executionStatus_UNEXEC' : 0, // “-1” UNEXECUTED
-    'executionStatus_BLOCK' : 0, // “3” WIP, “4” BLOCKED”
-    'PassEpicCnt' : 0,
-    'PassStoryCnt' : 0,
-}
 
 var developerslist = {};
 var developers = {};
@@ -857,10 +690,10 @@ var get_errors =
 };
 
 
+var start = 0, end = 0;
 async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
 {
-  var moment = require('moment-timezone');
-  let today = moment().locale('ko');
+  let today = start = moment().locale('ko');
   //today = moment(today).add(9, 'Hour');
   var snapshot = 0; 
   snapshot = today.format();
@@ -966,6 +799,10 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
   saveInitDB(initiative_DB, "./public/json/initiative_DB_"+initiative_DB['snapshotDate']+".json");
   console.log("[final-Zephyr] Save end : initiative_DB");
   saveInitDB(developerslist, "./public/json/developers.json");
+
+  end = moment().locale('ko');
+  let elapsed = (end - start)/(1000*60);
+  console.log("Elapsed time = ", elapsed, " mins");
 }
 
 
@@ -1114,7 +951,7 @@ async function makeSnapshot_EpicZephyrInfofromJira(init_index, epickeylist)
       get_errors['e_zephyrlist'].push(error_info);
     });
     //sync
-    if(async_mode == false) { await makeSnapshot_EpicZephyrExecutionInfofromJira(init_index, i, zephyr_issueIdlist); }
+    if(async_mode == false) { await makeSnapshot_SyncEpicZephyrExecutionInfofromJira(init_index, i, zephyr_issueIdlist); }
   }
 }
 
@@ -1293,7 +1130,6 @@ async function makeSnapshot_EpicZephyrExecutionInfofromJira(init_index, epic_ind
     for (var i = 0; i < zephyrExecution['executions'].length; i++) 
     {
       current_zephyr_exeinfo = { };
-      //current_zephyr_exeinfo = JSON.parse(JSON.stringify(zephyr_exeinfo));
       issue = zephyrExecution['executions'][i];
       current_zephyr_exeinfo['id'] = initparse.getZephyrExeinfo_ID(issue); 
       current_zephyr_exeinfo['executionStatus'] = initparse.getZephyrExeinfo_Status(issue);
@@ -1315,6 +1151,43 @@ async function makeSnapshot_EpicZephyrExecutionInfofromJira(init_index, epic_ind
   });
 }
 
+
+async function makeSnapshot_SyncEpicZephyrExecutionInfofromJira(init_index, epic_index, zephyr_issueIdlist)
+{
+  console.log("[Promise 4.1] makeSnapshot_SyncEpicZephyrExecutionInfofromJira ---- Update Epic~Zephyr Executions info");
+
+  for(var i = 0; i < zephyr_issueIdlist.length; i++)
+  {
+    var zephyrkeyID = zephyr_issueIdlist[i];
+    await getZephyerExecutionfromJira(zephyrkeyID)
+    .then((zephyrExecution) => {
+      console.log("getZephyerExecutionfromJira ==== [I-index]:", init_index, "[E-index]:", epic_index, "[Z-index]:", i, "[Z-KeyID]:", zephyrkeyID);
+      //console.log(zephyrExecution);
+      let issue = 0;
+      for (var j = 0; j < zephyrExecution['executions'].length; j++) 
+      {
+        current_zephyr_exeinfo = {}; 
+        issue = zephyrExecution['executions'][j];
+        current_zephyr_exeinfo['id'] = initparse.getZephyrExeinfo_ID(issue); 
+        current_zephyr_exeinfo['executionStatus'] = initparse.getZephyrExeinfo_Status(issue);
+        current_zephyr_exeinfo['executionOn'] = initparse.getZephyrExeinfo_Date(issue);
+        current_zephyr_exeinfo['executedBy'] = initparse.getZephyrExeinfo_Tester(issue);
+        current_zephyr_exeinfo['cycleId'] = initparse.getZephyrExeinfo_cycleId(issue);
+        current_zephyr_exeinfo['cycleName'] = initparse.getZephyrExeinfo_cycleName(issue);
+        initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['Zephyr']['ZephyrTC'][i]['Executions'][j] = JSON.parse(JSON.stringify(current_zephyr_exeinfo)); 
+      }
+    }).catch(error => {
+      console.log("[Catch] getZephyerExecutionfromJira ==== [I-index]:", init_index, "[E-index]:", epic_index, "[Z-index]:", 
+      i, "[Z-KeyID]:", zephyrkeyID, " - exception error = ", error);
+      let error_info = { 'IK' : '', 'EK' : '', 'ZK': '', 'ZID' : '' };
+      error_info['IK'] = initiative_DB['issues'][init_index]['Initiative Key'];
+      error_info['EK'] = initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['Epic Key'];
+      error_info['ZK'] = initiative_DB['issues'][init_index]['EPIC']['Zephyr']['Zephyr TC'][i]['Zephyr Key'];
+      error_info['ZID'] = zephyrkeyID;
+      get_errors['e_zephyr_exeinfo'].push(error_info);
+    });
+  }
+}
 
 async function makeSnapshot_StoryZephyrExecutionInfofromJira(init_index, epic_index, story_index, zephyr_index, zephyrkeyID)
 {
@@ -1400,7 +1273,10 @@ async function makeZephyrStatics()
 {
   console.log("[Proimse 1] makeZephyrStatics ---- make statics of zephyr Info");
   let initiative = initiative_DB['issues'];  
-  //let developers = {};
+
+  Initiative_Statics['EPIC+STORY_STATICS']['TOTAL'] = JSON.parse(JSON.stringify(StaticsInfo));
+  Initiative_Statics['EPIC_STATICS']['TOTAL'] = JSON.parse(JSON.stringify(StaticsInfo));
+  Initiative_Statics['STORY_STATICS']['TOTAL'] = JSON.parse(JSON.stringify(StaticsInfo));
 
   // [INITIATIVE LOOP]
   for(var i = 0; i < initiative.length; i++)
@@ -1430,22 +1306,15 @@ async function makeZephyrStatics()
     {
       var epicowner = epic[j]['Assignee'];
       //setDevelopersInformation(epicowner);
-      if(epicowner == "Unassigned" || epicowner == null)
-      {
-        console.log("1. epicowner = ", epicowner)
-        epicowner = "Unassigned";
-        developerslist['Unassigned'] = 'None';
-        developers['Unassigned'] = 'None';
-      }
-
-      if((epicowner in developers) == false) { developers[epicowner] = '------'; }
+      if(epicowner == null) { epicowner = "Unassigned"; }
+      if((epicowner in developers) == false) { developers[epicowner] = []; }
       if((epicowner in developerslist) == false) 
       {
         await ldap.getLDAP_Info(epicowner)
         .then((result) => { 
-          developerslist[epicowner] = result['department']; 
-          developers[epicowner] = result['department']; 
-          console.log("Assignee = ", epicowner, " Department = ", result['department']);
+          initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[epicowner] = developers[epicowner] = result; }); 
+          console.log("name = ", developers[epicowner][0], " position = ", developers[epicowner][1], 
+          " department = ", developers[epicowner][2], " email = ", developers[epicowner][3]);
         })
         .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
       }
@@ -1454,9 +1323,9 @@ async function makeZephyrStatics()
         developers[epicowner] = developerslist[epicowner];
       }
 
-      if((epicowner in sum_devel) == false) { sum_devel[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
-      if((epicowner in epicz_devel) == false) { epicz_devel[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
-      if((epicowner in storyz_devel) == false) { storyz_devel[epicowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+      if((epicowner in sum_devel) == false) { sum_devel[epicowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
+      if((epicowner in epicz_devel) == false) { epicz_devel[epicowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
+      if((epicowner in storyz_devel) == false) { storyz_devel[epicowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
       // 개발TC필요 - 확인 OK, DEVEL TC 임.
       // SDET_CHECKED LABEL 있으면 확인 OK, NonDevel
@@ -1503,26 +1372,19 @@ async function makeZephyrStatics()
         console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
         let epicz_assignee = epic_zephyr[k]['Assignee'];
         //setDevelopersInformation(epicz_assignee);
-        if(epicz_assignee == "Unassigned" || epicz_assignee == null)
-        {
-          console.log("2. epicz_assignee = ", epicz_assignee)
-          epicz_assignee = "Unassigned";
-          developerslist['Unassigned'] = 'None';
-          developers['Unassigned'] = 'None';
-        }
-
-        if((epicz_assignee in developers) == false) { developers[epicz_assignee] = '------'; }
+        if(epicz_assignee == null) { epicz_assignee = "Unassigned"; }
+        if((epicz_assignee in developers) == false) { developers[epicz_assignee] = []; }
         //console.log("epicz_assignee =", epicz_assignee);
         if((epicz_assignee in epicz_devel) == false)
         {
-          epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+          epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
           if((epicz_assignee in developerslist) == false)
           {
             await ldap.getLDAP_Info(epicz_assignee)
             .then((result) => { 
-              developerslist[epicz_assignee] = result['department']; 
-              developers[epicz_assignee] = result['department']; 
-              console.log("Assignee = ", epicz_assignee, " Department = ", result['department']);
+              initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[epicz_assignee] = developers[epicz_assignee] = result; }); 
+              console.log("name = ", developers[epicz_assignee][0], " position = ", developers[epicz_assignee][1], 
+              " department = ", developers[epicz_assignee][2], " email = ", developers[epicz_assignee][3]);
             })
             .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
           }
@@ -1532,9 +1394,9 @@ async function makeZephyrStatics()
           }
         }
 
-        if((epicz_assignee in sum_devel) == false) { sum_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-        if((epicz_assignee in epicz_devel) == false) { epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-        if((epicz_assignee in storyz_devel) == false) { storyz_devel[epicz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        if((epicz_assignee in sum_devel) == false) { sum_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+        if((epicz_assignee in epicz_devel) == false) { epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+        if((epicz_assignee in storyz_devel) == false) { storyz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
         epicz_devel[epicz_assignee]['ZephyrCnt']++;
         if(epic_zephyr[k]['Status'] == "Draft") { epicz_devel[epicz_assignee]['Zephyr_S_Draft']++; }
@@ -1551,25 +1413,18 @@ async function makeZephyrStatics()
           console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
           let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
           //setDevelopersInformation(epicze_assignee);
-          if(epicze_assignee == "Unassigned" || epicze_assignee == null)
-          {
-            console.log("3. epicze_assignee = ", epicze_assignee);
-            epicze_assignee = "Unassigned";
-            developerslist['Unassigned'] = 'None';
-            developers['Unassigned'] = 'None';
-          }
-
-          if((epicze_assignee in developers) == false) { developers[epicze_assignee] = '------'; }
+          if(epicze_assignee == null) { epicze_assignee = "Unassigned"; }
+          if((epicze_assignee in developers) == false) { developers[epicze_assignee] = []; }
           if((epicze_assignee in epicz_devel) == false)
           {
-            epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
             if((epicze_assignee in developerslist) == false)
             {
               await ldap.getLDAP_Info(epicze_assignee)
               .then((result) => { 
-                developerslist[epicze_assignee] = result['department']; 
-                developers[epicze_assignee] = result['department']; 
-                console.log("Assignee = ", epicze_assignee, " Department = ", result['department']);
+                initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[epicze_assignee] = developers[epicze_assignee] = result; }); 
+                console.log("name = ", developers[epicze_assignee][0], " position = ", developers[epicze_assignee][1], 
+                            " department = ", developers[epicze_assignee][2], " email = ", developers[epicze_assignee][3]);
               })
               .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
             }
@@ -1579,9 +1434,9 @@ async function makeZephyrStatics()
             }
           }
 
-          if((epicze_assignee in sum_devel) == false) { sum_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-          if((epicze_assignee in epicz_devel) == false) { epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-          if((epicze_assignee in storyz_devel) == false) { storyz_devel[epicze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          if((epicze_assignee in sum_devel) == false) { sum_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+          if((epicze_assignee in epicz_devel) == false) { epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+          if((epicze_assignee in storyz_devel) == false) { storyz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
           let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
           epicz_devel[epicze_assignee]['ZephyrExecutionCnt']++;
@@ -1605,22 +1460,15 @@ async function makeZephyrStatics()
       {
         var storyowner = story[k]['Assignee'];
         //setDevelopersInformation(storyowner);
-        if(storyowner == "Unassigned" || storyowner == null)
-        {
-          console.log("4. storyowner = ", storyowner);
-          storyowner = "Unassigned";
-          developerslist['Unassigned'] = 'None';
-          developers['Unassigned'] = 'None';
-        }
-
-        if((storyowner in developers) == false) { developers[storyowner] = '------'; }
+        if(storyowner == null) { storyowner = "Unassigned"; }
+        if((storyowner in developers) == false) { developers[storyowner] = []; }
         if((storyowner in developerslist) == false) 
         {
           await ldap.getLDAP_Info(storyowner)
           .then((result) => { 
-            developerslist[storyowner] = result['department']; 
-            developers[storyowner] = result['department']; 
-            console.log("Assignee = ", storyowner, " Department = ", result['department']);
+            initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[storyowner] = developers[storyowner] = result; }); 
+            console.log("name = ", developers[storyowner][0], " position = ", developers[storyowner][1], 
+            " department = ", developers[storyowner][2], " email = ", developers[storyowner][3]);
           })
           .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
         }
@@ -1629,9 +1477,9 @@ async function makeZephyrStatics()
           developers[storyowner] = developerslist[storyowner];
         }
 
-        if((storyowner in sum_devel) == false) { sum_devel[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
-        if((storyowner in epicz_devel) == false) { epicz_devel[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
-        if((storyowner in storyz_devel) == false) { storyz_devel[storyowner] = JSON.parse(JSON.stringify(Developer_Statics)); }
+        if((storyowner in sum_devel) == false) { sum_devel[storyowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
+        if((storyowner in epicz_devel) == false) { epicz_devel[storyowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
+        if((storyowner in storyz_devel) == false) { storyz_devel[storyowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
         // 개발TC필요 - 확인 OK, DEVEL TC 임.
         // SDET_CHECKED LABEL 있으면 확인 OK, NonDevel
@@ -1677,24 +1525,18 @@ async function makeZephyrStatics()
         {
           let storyz_assignee = story_zephyr[l]['Assignee'];
           //setDevelopersInformation(storyz_assignee);
-          if(storyz_assignee == "Unassigned" || storyz_assignee == null)
-          {
-            console.log("5. storyz_assignee = ", storyz_assignee);
-            storyz_assignee = "Unassigned";
-            developerslist['Unassigned'] = 'None';
-            developers['Unassigned'] = 'None';
-          }
-          if((storyz_assignee in developers) == false) { developers[storyz_assignee] = '------'; }
+          if(storyz_assignee == null) { storyz_assignee = "Unassigned"; }
+          if((storyz_assignee in developers) == false) { developers[storyz_assignee] = []; }
           if((storyz_assignee in storyz_devel) == false)
           {
-            storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+            storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
             if((storyz_assignee in developerslist) == false)
             {
               await ldap.getLDAP_Info(storyz_assignee)
               .then((result) => { 
-                developerslist[storyz_assignee] = result['department']; 
-                developers[storyz_assignee] = result['department']; 
-                console.log("Assignee = ", storyz_assignee, " Department = ", result['department']);
+                initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[storyz_assignee] = developers[storyz_assignee] = result; }); 
+                console.log("name = ", developers[storyz_assignee][0], " position = ", developers[storyz_assignee][1], 
+                " department = ", developers[storyz_assignee][2], " email = ", developers[storyz_assignee][3]);
               })
               .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
             }
@@ -1704,9 +1546,9 @@ async function makeZephyrStatics()
             }
           }
 
-          if((storyz_assignee in sum_devel) == false) { sum_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-          if((storyz_assignee in epicz_devel) == false) { epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-          if((storyz_assignee in storyz_devel) == false) { storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+          if((storyz_assignee in sum_devel) == false) { sum_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+          if((storyz_assignee in epicz_devel) == false) { epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+          if((storyz_assignee in storyz_devel) == false) { storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
           storyz_devel[storyz_assignee]['ZephyrCnt']++;
           if(story_zephyr[l]['Status'] == "Draft") { storyz_devel[storyz_assignee]['Zephyr_S_Draft']++; }
@@ -1723,24 +1565,18 @@ async function makeZephyrStatics()
           {
             let storyze_assignee = story_zephyr[l]['Executions'][m]['executedBy'];
             //setDevelopersInformation(storyze_assignee);
-            if(storyze_assignee == "Unassigned" || storyze_assignee == null)
-            {
-              console.log("6. storyze_assignee = ", storyze_assignee);
-              storyze_assignee = "Unassigned";
-              developerslist['Unassigned'] = 'None';
-              developers['Unassigned'] = 'None';
-            }
-            if((storyze_assignee in developers) == false) { developers[storyze_assignee] = '------'; }
+            if(storyze_assignee == null) { storyze_assignee = "Unassigned"; }
+            if((storyze_assignee in developers) == false) { developers[storyze_assignee] = []; }
             if((storyze_assignee in storyz_devel) == false)
             {
-              storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics));
+              storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
               if((storyze_assignee in developerslist) == false)
               {
                 await ldap.getLDAP_Info(storyze_assignee)
                 .then((result) => { 
-                  developerslist[storyze_assignee] = result['department']; 
-                  developers[storyze_assignee] = result['department']; 
-                  console.log("Assignee = ", storyze_assignee, " Department = ", result['department']);
+                  initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[storyze_assignee] = developers[storyze_assignee] = result; }); 
+                  console.log("name = ", developers[storyze_assignee][0], " position = ", developers[storyze_assignee][1], 
+                  " department = ", developers[storyze_assignee][2], " email = ", developers[storyze_assignee][3]);
                 })
                 .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
               }
@@ -1750,9 +1586,9 @@ async function makeZephyrStatics()
               }
             }
 
-            if((storyze_assignee in sum_devel) == false) { sum_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-            if((storyze_assignee in epicz_devel) == false) { epicz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-            if((storyze_assignee in storyz_devel) == false) { storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+            if((storyze_assignee in sum_devel) == false) { sum_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+            if((storyze_assignee in epicz_devel) == false) { epicz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+            if((storyze_assignee in storyz_devel) == false) { storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
             console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
 
@@ -1796,11 +1632,11 @@ async function makeZephyrStatics()
         //################################################################################
         // Organization Statics
         //################################################################################
-        let orgname = developerslist[assignee];
+        let orgname = developerslist[assignee][2];
         if(orgname == null || orgname == undefined) { console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"); } else { console.log("Org Name = ", orgname); }
-        if((orgname in sum_org) == false) { sum_org[orgname] = JSON.parse(JSON.stringify(Org_Statics)); }
-        if((orgname in epicz_org) == false) { epicz_org[orgname] = JSON.parse(JSON.stringify(Org_Statics)); }
-        if((orgname in storyz_org) == false) { storyz_org[orgname] = JSON.parse(JSON.stringify(Org_Statics)); }
+        if((orgname in sum_org) == false) { sum_org[orgname] = JSON.parse(JSON.stringify(StaticsInfo)); }
+        if((orgname in epicz_org) == false) { epicz_org[orgname] = JSON.parse(JSON.stringify(StaticsInfo)); }
+        if((orgname in storyz_org) == false) { storyz_org[orgname] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
         for(key in epicz_org[orgname]) { epicz_org[orgname][key] += epicz_devel[assignee][key]; }
         for(key in storyz_org[orgname]) { storyz_org[orgname][key] += storyz_devel[assignee][key]; }
@@ -1827,37 +1663,19 @@ async function Test()
   });
 }
 
-module.exports = { 
-  initiative_DB,              // final DB
-  // function
-  get_InitiativeListfromJira,  // promise
-  get_InitiativeList,          // callback
-  makeSnapshot_InitiativeInfofromJira,
-  Test,
- };
-
 
 //====================
 async function setDevelopersInformation(assignee)
 {
-  if(assignee == "Unassigned" || assignee == null)
-  {
-    console.log("Assignee = ", assignee)
-    assignee = "Unassigned";
-    developerslist['Unassigned'] = 'None';
-    developers['Unassigned'] = 'None'; // global.........
-  }
-
-  //console.log("assignee =", assignee);
-  if((assignee in developers) == false) { developers[assignee] = '------'; }
-
+  if(assignee == null) { assignee = "Unassigned"; }
+  if((assignee in developers) == false) { developers[assignee] = []; }
   if((assignee in developerslist) == false)
   {
     await ldap.getLDAP_Info(assignee)
     .then((result) => { 
-      developerslist[assignee] = result['department']; 
-      developers[assignee] = result['department']; 
-      console.log("Assignee = ", assignee, " Department = ", result['department']);
+      developerslist[assignee] = developers[assignee] = initparse.getPersonalInfo(result['displayName']); 
+      console.log("name = ", developers[assignee][0], " position = ", developers[assignee][1], 
+      " department = ", developers[assignee][2], " email = ", developers[assignee][3]);
     })
     .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
   }
@@ -1866,7 +1684,17 @@ async function setDevelopersInformation(assignee)
     developers[assignee] = developerslist[assignee];
   }
 
-  if((assignee in sum_devel) == false) { sum_devel[assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-  if((assignee in epicz_devel) == false) { epicz_devel[assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
-  if((assignee in storyz_devel) == false) { storyz_devel[assignee] = JSON.parse(JSON.stringify(Developer_Statics)); }
+  if((assignee in sum_devel) == false) { sum_devel[assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+  if((assignee in epicz_devel) == false) { epicz_devel[assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+  if((assignee in storyz_devel) == false) { storyz_devel[assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
 }
+
+
+module.exports = { 
+  initiative_DB,              // final DB
+  // function
+  get_InitiativeListfromJira,  // promise
+  get_InitiativeList,          // callback
+  makeSnapshot_InitiativeInfofromJira,
+  Test,
+ };

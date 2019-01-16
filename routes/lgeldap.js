@@ -63,6 +63,7 @@ function getLDAP_InfoTest(username)
   }
 }
 
+var exceptionlist = ['Unassigned', 'null', 'heekyoung.seo', 'stan.kim', 'buyoung.yun' ];
 
 
 function getLDAP_Info(username)
@@ -88,8 +89,13 @@ function getLDAP_Info(username)
   });
 
   return new Promise(function (resolve, reject){
-    if(username == "Unassigned" || username == 'null') { console.log("Unassigned user..... skip"); resolve({ 'name' : 'Unassigned', 'department' : "None" }) }
-    if(username == "buyoung.yun" || username == "stan.kim") { console.log("Can't find user..... skip"); resolve({ 'name' : username, 'department' : "퇴사자" }) }
+    if(exceptionlist.includes(username)) 
+    {
+      console.log("Unassigned user..... skip"); 
+      //resolve({ 'name' : 'Unassigned', 'department' : "None" }) }
+      resolve({ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)' });
+    }
+
     client.bind('addhost', '1qaz2wsx', function (error) {
         if(error){
             console.log(error.message);
@@ -105,7 +111,7 @@ function getLDAP_Info(username)
                 }
                 else{
                   console.log("Can't find User..............")
-                  resolve({ 'name' : username, 'department' : "퇴사자" });
+                  resolve({ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)' });
                 }
                 client.unbind(function(error) {if(error){console.log(error.message);} else{console.log('client disconnected2');}});
               });
