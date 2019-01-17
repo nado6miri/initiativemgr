@@ -1,163 +1,59 @@
 var moment = require('moment-timezone');
 
-const Y2019_SP_Schedule = 
-[ 
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP01',
-        'start' : '2018-09-03',
-        'end' : '2018-09-16',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP02',
-        'start' : '2018-09-17',
-        'end' : '2018-09-30',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP03',
-        'start' : '2018-10-01',
-        'end' : '2018-10-14',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP04',
-        'start' : '2018-10-15',
-        'end' : '2018-10-28',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP05',
-        'start' : '2018-10-29',
-        'end' : '2018-11-11',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP06',
-        'start' : '2018-11-12',
-        'end' : '2018-11-25',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP07',
-        'start' : '2018-11-26',
-        'end' : '2018-12-9',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP08',
-        'start' : '2018-12-10',
-        'end' : '2018-12-23',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP09',
-        'start' : '2018-12-24',
-        'end' : '2019-01-06',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP10',
-        'start' : '2019-01-07',
-        'end' : '2019-01-20',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP11',
-        'start' : '2019-01-21',
-        'end' : '2019-02-03',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP12',
-        'start' : '2019-02-04',
-        'end' : '2019-02-17',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP13',
-        'start' : '2019-02-18',
-        'end' : '2019-03-03',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP14',
-        'start' : '2019-03-04',
-        'end' : '2019-03-17',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP15',
-        'start' : '2019-03-18',
-        'end' : '2019-03-31',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP16',
-        'start' : '2019-04-01',
-        'end' : '2019-04-14',
-    },
-    { 
-        'IR' : 'IR1',
-        'SPRINT_SHORT' : 'SP17',
-        'start' : '2019-04-15',
-        'end' : '2019-04-28',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP18',
-        'start' : '2019-04-29',
-        'end' : '2019-05-12',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP19',
-        'start' : '2019-05-13',
-        'end' : '2019-05-26',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP20',
-        'start' : '2019-05-27',
-        'end' : '2019-06-09',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP21',
-        'start' : '2019-06-10',
-        'end' : '2019-06-23',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP22',
-        'start' : '2019-06-24',
-        'end' : '2019-07-07',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP23',
-        'start' : '2019-07-08',
-        'end' : '2019-07-21',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP24',
-        'start' : '2019-07-22',
-        'end' : '2019-08-04',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP25',
-        'start' : '2019-08-05',
-        'end' : '2019-08-18',
-    },
-    { 
-        'IR' : 'IR2',
-        'SPRINT_SHORT' : 'SP26',
-        'start' : '2019-08-19',
-        'end' : '2019-09-01',
-    },
+const HE_SP_Schedule = 
+[   // 2018
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP11', 'start' : '2018-01-15', 'end' : '2018-01-28' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP12', 'start' : '2018-01-29', 'end' : '2018-02-11' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP13', 'start' : '2018-02-12', 'end' : '2018-02-25' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP14', 'start' : '2018-02-26', 'end' : '2018-03-11' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP15', 'start' : '2018-03-12', 'end' : '2018-04-01' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP16', 'start' : '2018-04-02', 'end' : '2018-04-15' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP17', 'start' : '2018-04-16', 'end' : '2018-04-29' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP18', 'start' : '2018-04-30', 'end' : '2018-05-13' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP19', 'start' : '2018-05-14', 'end' : '2018-05-27' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP20', 'start' : '2018-05-28', 'end' : '2018-06-10' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP21', 'start' : '2018-06-11', 'end' : '2018-06-24' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP22', 'start' : '2018-06-25', 'end' : '2018-07-08' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP23', 'start' : '2018-07-09', 'end' : '2018-07-22' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP24', 'start' : '2018-07-23', 'end' : '2018-08-05' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP25', 'start' : '2018-08-06', 'end' : '2018-08-19' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP26', 'start' : '2018-08-20', 'end' : '2018-09-02' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP27/2019_SP01', 'start' : '2018-09-03', 'end' : '2018-09-16' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP28/2019_SP02', 'start' : '2018-09-17', 'end' : '2018-09-30' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP29/2019_SP03', 'start' : '2018-10-01', 'end' : '2018-10-14' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP30/2019_SP04', 'start' : '2018-10-15', 'end' : '2018-10-28' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP31/2019_SP05', 'start' : '2018-10-29', 'end' : '2018-11-11' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP32/2019_SP06', 'start' : '2018-11-12', 'end' : '2018-11-25' },
+
+    // 2019
+    /*
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP01', 'start' : '2018-09-03', 'end' : '2018-09-16' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP02', 'start' : '2018-09-17', 'end' : '2018-09-30' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP03', 'start' : '2018-10-01', 'end' : '2018-10-14' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP04', 'start' : '2018-10-15', 'end' : '2018-10-28' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP05', 'start' : '2018-10-29', 'end' : '2018-11-11' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP06', 'start' : '2018-11-12', 'end' : '2018-11-25' },
+    */
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP07', 'start' : '2018-11-26', 'end' : '2018-12-9'  },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP08', 'start' : '2018-12-10', 'end' : '2018-12-23' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP09', 'start' : '2018-12-24', 'end' : '2019-01-06' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP10', 'start' : '2019-01-07', 'end' : '2019-01-20' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP11', 'start' : '2019-01-21', 'end' : '2019-02-03' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP12', 'start' : '2019-02-04', 'end' : '2019-02-17' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP13', 'start' : '2019-02-18', 'end' : '2019-03-03' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP14', 'start' : '2019-03-04', 'end' : '2019-03-17' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP15', 'start' : '2019-03-18', 'end' : '2019-03-31' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP16', 'start' : '2019-04-01', 'end' : '2019-04-14' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP17', 'start' : '2019-04-15', 'end' : '2019-04-28' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP18', 'start' : '2019-04-29', 'end' : '2019-05-12' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP19', 'start' : '2019-05-13', 'end' : '2019-05-26' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP20', 'start' : '2019-05-27', 'end' : '2019-06-09' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP21', 'start' : '2019-06-10', 'end' : '2019-06-23' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP22', 'start' : '2019-06-24', 'end' : '2019-07-07' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP23', 'start' : '2019-07-08', 'end' : '2019-07-21' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP24', 'start' : '2019-07-22', 'end' : '2019-08-04' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP25', 'start' : '2019-08-05', 'end' : '2019-08-18' },
+    { 'IR' : 'IR2', 'SPRINT_SHORT' : '2019_SP26', 'start' : '2019-08-19', 'end' : '2019-09-01' },
 ];
 
 
@@ -335,14 +231,14 @@ function conversionDuedateToSprint(covdate) {
     let targetDate = conversionDateToDatetime(covdate)
     if(targetDate != null)
     {
-        for(var i = 0; i < Y2019_SP_Schedule.length; i++)
+        for(var i = 0; i < HE_SP_Schedule.length; i++)
         {
-            let start = conversionDateToDatetime(Y2019_SP_Schedule[i]['start']);
-            let end = conversionDateToDatetime(Y2019_SP_Schedule[i]['end']);
-            if(targetDate >= start && targetDate < end)
+            let start = conversionDateToDatetime(HE_SP_Schedule[i]['start']);
+            let end = conversionDateToDatetime(HE_SP_Schedule[i]['end']);
+            if(targetDate >= start && targetDate <= end)
             {
-                //console.log("conversionDuedateToSprint = ", Y2019_SP_Schedule[i]['SPRINT_SHORT']);
-                return Y2019_SP_Schedule[i]['SPRINT_SHORT'];
+                //console.log("conversionDuedateToSprint = ", HE_SP_Schedule[i]['SPRINT_SHORT']);
+                return HE_SP_Schedule[i]['SPRINT_SHORT'];
             }
         }
     }
@@ -889,10 +785,10 @@ function checkAbnormalSP(ParentSP, ParentStatus, ChildSP, ChildStatus)
         return true; 
     }
 
-    for(var i = 0; i < Y2019_SP_Schedule.length; i++)
+    for(var i = 0; i < HE_SP_Schedule.length; i++)
     {
-        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == PSP) { Parent_Index = i; }
-        if(Y2019_SP_Schedule[i]['SPRINT_SHORT'] == CSP) { Child_Index = i; }
+        if(HE_SP_Schedule[i]['SPRINT_SHORT'] == PSP) { Parent_Index = i; }
+        if(HE_SP_Schedule[i]['SPRINT_SHORT'] == CSP) { Child_Index = i; }
     }
 
     // abnormal case 3 : child duedate is greater than parent duedate. 
@@ -1210,6 +1106,26 @@ function parseReleaseSprint(changelog, releaseSP)
 
 
 
+//===========================================================================
+// getPersonalInfo : get Personal Info (Name, Position, Department, email)
+// [param] Key, LDAP-displayName
+// [return] [Name, Position, Department, email]
+//===========================================================================
+function getPersonalInfo(displayName)
+{
+    return new Promise(function (resolve, reject){
+        let parse = displayName.split('/');
+        let name = parse[0];
+        let position = parse[1];
+        let temp = parse[2].replace(')', '');
+        temp = temp.split('(');
+        let department = temp[0];
+        let email = temp[1];
+        console.log("name = ", name, " position = ", position, " department = ", department, " email = ", email);
+        resolve([ name, position, department, email ]);
+    });
+}
+
 
 //===========================================================================
 // getElapsedDays : get elapsed days
@@ -1234,7 +1150,7 @@ function getElapsedDays(date1, date2)
 
 module.exports = { 
     // var
-    Y2019_SP_Schedule,
+    HE_SP_Schedule,
     // function
     getKey,
     getSummary,
@@ -1283,6 +1199,7 @@ module.exports = {
     parseWorkflow,
     parseReleaseSprint,
     getElapsedDays,
+    getPersonalInfo,
    };
   
   

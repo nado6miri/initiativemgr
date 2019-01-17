@@ -854,7 +854,7 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
         current_epic_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);        
         current_epic_info['AbnormalSprint'] = initparse.checkAbnormalSP(init_ReleaseSP, init_Status, epic_ReleaseSP, epic_Status);   
         current_epic_info['Labels'] = initparse.getLabels(issue);     
-        current_epic_info['SDET_NeedtoCheck'] = !initparse.checkLabels(issue, 'SDET_CHECKED'); // label이 없을 경우 True...
+        current_epic_info['SDET_NeedtoCheck'] = !initparse.checkLabels(issue, 'SDET_CHECKED'); // SDET_CHECKED label이 없을 경우 True...
         current_epic_info['SDET_NeedDevelTC'] = initparse.checkLabels(issue, '개발TC필요');
         /*
         current_epic_info['StoryPoint'] = story_point;  // need to be updated      
@@ -919,7 +919,10 @@ async function makeSnapshot_EpicZephyrInfofromJira(init_index, epickeylist)
     await getZephyerListfromJira(epic_keyvalue)
     .then((zephyrlist) => {
       //console.log(zephyrlist);
-      if(zephyrlist.total > 0) { initiative_DB['issues'][init_index]['EPIC']['EpicHasTCCnt']++; }
+      if(initiative_DB['issues'][init_index]['EPIC']['issues'][i]['SDET_NeedDevelTC'] == true)
+      {
+        if(zephyrlist.total > 0) { initiative_DB['issues'][init_index]['EPIC']['EpicHasTCCnt']++; }
+      }
       let epiczephyr = initiative_DB['issues'][init_index]['EPIC']['issues'][i]['Zephyr'];
       console.log("getZephyerListfromJira ==== [I-index]:", init_index, "[I-Key]:", init_keyvalue, "[E-index]:", i, "[E-Key]:", epic_keyvalue, "[Z-Total]:",zephyrlist.total);
       epiczephyr['ZephyrCnt'] = zephyrlist.total; 
@@ -970,11 +973,15 @@ async function makeSnapshot_StoryZephyrInfofromJira(init_index, epic_index, stro
     .then((zephyrlist) => {
       console.log("getZephyerListfromJira ==== [I-index]:", init_index, "[I-Key]:", init_keyvalue, "[E-index]:", epic_index, "[S-Key]:", story_keyvalue, "[Z-Total]:", zephyrlist.total);
       //console.log(zephyrlist);
-      if(zephyrlist.total > 0) // 연결율...
-      { 
-        initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryHasTCCnt']++; 
-        initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['STORY_SUMMARY']['StoryHasTCCnt']++; 
+      if(initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['issues'][i]['SDET_NeedDevelTC'] == true)
+      {
+        if(zephyrlist.total > 0) // 연결율...
+        { 
+          initiative_DB['issues'][init_index]['STORY_SUMMARY']['StoryHasTCCnt']++; 
+          initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['STORY_SUMMARY']['StoryHasTCCnt']++; 
+        }
       }
+
       let storyzephyr = initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['issues'][i]['Zephyr'];
       storyzephyr['ZephyrCnt'] = zephyrlist.total; 
       zephyr_issueIdlist = [];
@@ -1365,93 +1372,104 @@ async function makeZephyrStatics()
 
       // [EPIC ZEPHYR LOOP]
       let epic_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['Zephyr']['ZephyrTC'];
-      // [TBC] 연결율 : Archive zephy만 달려있을 경우에는 EpicHasTCCnt가 0이 되어야 하나 Archive Zephyer개수가 반영되는지 / 예외처리 필요함.
-      if(epic_zephyr.length > 0) { epicz_devel[epicowner]['EpicHasTCCnt']++; }
+
+      if(initiative_DB['issues'][i]['EPIC']['issues'][j]['SDET_NeedDevelTC'] == true)
+      {
+        // [TBC] 연결율 : Archive zephy만 달려있을 경우에는 EpicHasTCCnt가 0이 되어야 하나 Archive Zephyer개수가 반영되는지 / 예외처리 필요함.
+        if(epic_zephyr.length > 0) { epicz_devel[epicowner]['EpicHasTCCnt']++; }
+      }
+
       for(var k = 0; k < epic_zephyr.length; k++)
       {
-        console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
-        let epicz_assignee = epic_zephyr[k]['Assignee'];
-        //setDevelopersInformation(epicz_assignee);
-        if(epicz_assignee == null) { epicz_assignee = "Unassigned"; }
-        if((epicz_assignee in developers) == false) { developers[epicz_assignee] = []; }
-        //console.log("epicz_assignee =", epicz_assignee);
-        if((epicz_assignee in epicz_devel) == false)
+        if(initiative_DB['issues'][i]['EPIC']['issues'][j]['SDET_NeedDevelTC'] == true)
         {
-          epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
-          if((epicz_assignee in developerslist) == false)
+          console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
+          let epicz_assignee = epic_zephyr[k]['Assignee'];
+          //setDevelopersInformation(epicz_assignee);
+          if(epicz_assignee == null) { epicz_assignee = "Unassigned"; }
+          if((epicz_assignee in developers) == false) { developers[epicz_assignee] = []; }
+          //console.log("epicz_assignee =", epicz_assignee);
+          if((epicz_assignee in epicz_devel) == false)
           {
-            await ldap.getLDAP_Info(epicz_assignee)
-            .then((result) => { 
-              initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[epicz_assignee] = developers[epicz_assignee] = result; }); 
-              console.log("name = ", developers[epicz_assignee][0], " position = ", developers[epicz_assignee][1], 
-              " department = ", developers[epicz_assignee][2], " email = ", developers[epicz_assignee][3]);
-            })
-            .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
-          }
-          else
-          {
-            developers[epicz_assignee] = developerslist[epicz_assignee];
-          }
-        }
-
-        if((epicz_assignee in sum_devel) == false) { sum_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-        if((epicz_assignee in epicz_devel) == false) { epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-        if((epicz_assignee in storyz_devel) == false) { storyz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-
-        epicz_devel[epicz_assignee]['ZephyrCnt']++;
-        if(epic_zephyr[k]['Status'] == "Draft") { epicz_devel[epicz_assignee]['Zephyr_S_Draft']++; }
-        else if(epic_zephyr[k]['Status'] == "Review") { epicz_devel[epicz_assignee]['Zephyr_S_Review']++; }
-        else if(epic_zephyr[k]['Status'] == "Update") { epicz_devel[epicz_assignee]['Zephyr_S_Update']++; }
-        else if(epic_zephyr[k]['Status'] == "Active") { epicz_devel[epicz_assignee]['Zephyr_S_Active']++; }
-        else if(epic_zephyr[k]['Status'] == "Approval") { /*epicz_devel[epicz_assignee]['Zephyr_S_Approval']++;*/ epicz_devel[epicz_assignee]['Zephyr_S_Active']++; }
-        else if(epic_zephyr[k]['Status'] == "Archived") { epicz_devel[epicz_assignee]['Zephyr_S_Archived']++; epicz_devel[epicz_assignee]['ZephyrCnt']--; }
-        else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); }
-
-        // [EPIC ZEPHYR EXECUTION LOOP]
-        for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
-        {
-          console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
-          let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
-          //setDevelopersInformation(epicze_assignee);
-          if(epicze_assignee == null) { epicze_assignee = "Unassigned"; }
-          if((epicze_assignee in developers) == false) { developers[epicze_assignee] = []; }
-          if((epicze_assignee in epicz_devel) == false)
-          {
-            epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
-            if((epicze_assignee in developerslist) == false)
+            epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
+            if((epicz_assignee in developerslist) == false)
             {
-              await ldap.getLDAP_Info(epicze_assignee)
+              await ldap.getLDAP_Info(epicz_assignee)
               .then((result) => { 
-                initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[epicze_assignee] = developers[epicze_assignee] = result; }); 
-                console.log("name = ", developers[epicze_assignee][0], " position = ", developers[epicze_assignee][1], 
-                            " department = ", developers[epicze_assignee][2], " email = ", developers[epicze_assignee][3]);
+                initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[epicz_assignee] = developers[epicz_assignee] = result; }); 
+                console.log("name = ", developers[epicz_assignee][0], " position = ", developers[epicz_assignee][1], 
+                " department = ", developers[epicz_assignee][2], " email = ", developers[epicz_assignee][3]);
               })
               .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
             }
             else
             {
-              developers[epicze_assignee] = developerslist[epicze_assignee];
+              developers[epicz_assignee] = developerslist[epicz_assignee];
             }
           }
 
-          if((epicze_assignee in sum_devel) == false) { sum_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-          if((epicze_assignee in epicz_devel) == false) { epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-          if((epicze_assignee in storyz_devel) == false) { storyz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+          if((epicz_assignee in sum_devel) == false) { sum_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+          if((epicz_assignee in epicz_devel) == false) { epicz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+          if((epicz_assignee in storyz_devel) == false) { storyz_devel[epicz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
-          let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
-          epicz_devel[epicze_assignee]['ZephyrExecutionCnt']++;
-          if(status == "1") { epicz_devel[epicze_assignee]['executionStatus_PASS']++; }
-          else if(status == "2") { epicz_devel[epicze_assignee]['executionStatus_FAIL']++; }
-          else if(status == "-1") { epicz_devel[epicze_assignee]['executionStatus_UNEXEC']++; }
-          else if(status == "3" || status == "4") { epicz_devel[epicze_assignee]['executionStatus_BLOCK']++; }
-          else { console.log("[EZE] executionStatus is not Defined = ", status); }
+          epicz_devel[epicz_assignee]['ZephyrCnt']++;
+          if(epic_zephyr[k]['Status'] == "Draft") { epicz_devel[epicz_assignee]['Zephyr_S_Draft']++; }
+          else if(epic_zephyr[k]['Status'] == "Review") { epicz_devel[epicz_assignee]['Zephyr_S_Review']++; }
+          else if(epic_zephyr[k]['Status'] == "Update") { epicz_devel[epicz_assignee]['Zephyr_S_Update']++; }
+          else if(epic_zephyr[k]['Status'] == "Active") { epicz_devel[epicz_assignee]['Zephyr_S_Active']++; }
+          else if(epic_zephyr[k]['Status'] == "Approval") { /*epicz_devel[epicz_assignee]['Zephyr_S_Approval']++;*/ epicz_devel[epicz_assignee]['Zephyr_S_Active']++; }
+          else if(epic_zephyr[k]['Status'] == "Archived") { epicz_devel[epicz_assignee]['Zephyr_S_Archived']++; epicz_devel[epicz_assignee]['ZephyrCnt']--; }
+          else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); }
 
-          // check the result of last test status.
-          if(l == (epic_zephyr[k]['Executions'].length -1) && status == "1") 
-          { 
-            epicz_devel[epicz_assignee]['PassEpicCnt']++; 
-          }
-        }       
+          // [EPIC ZEPHYR EXECUTION LOOP]
+          for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
+          {
+            console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
+            let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
+            //setDevelopersInformation(epicze_assignee);
+            if(epicze_assignee == null) { epicze_assignee = "Unassigned"; }
+            if((epicze_assignee in developers) == false) { developers[epicze_assignee] = []; }
+            if((epicze_assignee in epicz_devel) == false)
+            {
+              epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
+              if((epicze_assignee in developerslist) == false)
+              {
+                await ldap.getLDAP_Info(epicze_assignee)
+                .then((result) => { 
+                  initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[epicze_assignee] = developers[epicze_assignee] = result; }); 
+                  console.log("name = ", developers[epicze_assignee][0], " position = ", developers[epicze_assignee][1], 
+                              " department = ", developers[epicze_assignee][2], " email = ", developers[epicze_assignee][3]);
+                })
+                .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+              }
+              else
+              {
+                developers[epicze_assignee] = developerslist[epicze_assignee];
+              }
+            }
+
+            if((epicze_assignee in sum_devel) == false) { sum_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+            if((epicze_assignee in epicz_devel) == false) { epicz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+            if((epicze_assignee in storyz_devel) == false) { storyz_devel[epicze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+
+            let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
+            epicz_devel[epicze_assignee]['ZephyrExecutionCnt']++;
+            if(status == "1") { epicz_devel[epicze_assignee]['executionStatus_PASS']++; }
+            else if(status == "2") { epicz_devel[epicze_assignee]['executionStatus_FAIL']++; }
+            else if(status == "-1") { epicz_devel[epicze_assignee]['executionStatus_UNEXEC']++; }
+            else if(status == "3" || status == "4") { epicz_devel[epicze_assignee]['executionStatus_BLOCK']++; }
+            else { console.log("[EZE] executionStatus is not Defined = ", status); }
+
+            // check the result of last test status.
+            if(l == (epic_zephyr[k]['Executions'].length -1) && status == "1") 
+            {
+              //if(initiative_DB['issues'][i]['EPIC']['issues'][j]['SDET_NeedDevelTC'] == true)
+              { 
+                epicz_devel[epicz_assignee]['PassEpicCnt']++; 
+              }
+            }
+          }       
+        }
       }
 
       // [STORY LOOP]
@@ -1519,91 +1537,102 @@ async function makeZephyrStatics()
   
         // [STORY ZEPHYR LOOP]
         let story_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Zephyr']['ZephyrTC'];
-        // [TBC] 연결율 : Archive zephy만 달려있을 경우에는 StoryHasTCCnt가 0이 되어야 하나 Archive Zephyer개수가 반영되는지 / 예외처리 필요함.
-        if(story_zephyr.length > 0) { storyz_devel[storyowner]['StoryHasTCCnt']++; }
+
+        if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
+        {
+          // [TBC] 연결율 : Archive zephy만 달려있을 경우에는 StoryHasTCCnt가 0이 되어야 하나 Archive Zephyer개수가 반영되는지 / 예외처리 필요함.
+          if(story_zephyr.length > 0) { storyz_devel[storyowner]['StoryHasTCCnt']++; }
+        }
+
         for(var l = 0; l < story_zephyr.length; l++)
         {
-          let storyz_assignee = story_zephyr[l]['Assignee'];
-          //setDevelopersInformation(storyz_assignee);
-          if(storyz_assignee == null) { storyz_assignee = "Unassigned"; }
-          if((storyz_assignee in developers) == false) { developers[storyz_assignee] = []; }
-          if((storyz_assignee in storyz_devel) == false)
+          if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
           {
-            storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
-            if((storyz_assignee in developerslist) == false)
+            let storyz_assignee = story_zephyr[l]['Assignee'];
+            //setDevelopersInformation(storyz_assignee);
+            if(storyz_assignee == null) { storyz_assignee = "Unassigned"; }
+            if((storyz_assignee in developers) == false) { developers[storyz_assignee] = []; }
+            if((storyz_assignee in storyz_devel) == false)
             {
-              await ldap.getLDAP_Info(storyz_assignee)
-              .then((result) => { 
-                initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[storyz_assignee] = developers[storyz_assignee] = result; }); 
-                console.log("name = ", developers[storyz_assignee][0], " position = ", developers[storyz_assignee][1], 
-                " department = ", developers[storyz_assignee][2], " email = ", developers[storyz_assignee][3]);
-              })
-              .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
-            }
-            else
-            {
-              developers[storyz_assignee] = developerslist[storyz_assignee];
-            }
-          }
-
-          if((storyz_assignee in sum_devel) == false) { sum_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-          if((storyz_assignee in epicz_devel) == false) { epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-          if((storyz_assignee in storyz_devel) == false) { storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-
-          storyz_devel[storyz_assignee]['ZephyrCnt']++;
-          if(story_zephyr[l]['Status'] == "Draft") { storyz_devel[storyz_assignee]['Zephyr_S_Draft']++; }
-          else if(story_zephyr[l]['Status'] == "Review") { storyz_devel[storyz_assignee]['Zephyr_S_Review']++; }
-          else if(story_zephyr[l]['Status'] == "Update") { storyz_devel[storyz_assignee]['Zephyr_S_Update']++; }
-          else if(story_zephyr[l]['Status'] == "Active") { storyz_devel[storyz_assignee]['Zephyr_S_Active']++; }
-          else if(story_zephyr[l]['Status'] == "Approval") { /*storyz_devel[storyz_assignee]['Zephyr_S_Approval']++;*/ storyz_devel[storyz_assignee]['Zephyr_S_Active']++; }
-          else if(story_zephyr[l]['Status'] == "Archived") { storyz_devel[storyz_assignee]['Zephyr_S_Archived']++; storyz_devel[storyz_assignee]['ZephyrCnt']--; }
-          else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); }
-      
-          // [STORY ZEPHYR EXECUTION LOOP]
-          console.log("[SZ] i = ", i, " j = ", j, " k = ", k, " l = ", l);
-          for(var m = 0; m < story_zephyr[l]['Executions'].length; m++)
-          {
-            let storyze_assignee = story_zephyr[l]['Executions'][m]['executedBy'];
-            //setDevelopersInformation(storyze_assignee);
-            if(storyze_assignee == null) { storyze_assignee = "Unassigned"; }
-            if((storyze_assignee in developers) == false) { developers[storyze_assignee] = []; }
-            if((storyze_assignee in storyz_devel) == false)
-            {
-              storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
-              if((storyze_assignee in developerslist) == false)
+              storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
+              if((storyz_assignee in developerslist) == false)
               {
-                await ldap.getLDAP_Info(storyze_assignee)
+                await ldap.getLDAP_Info(storyz_assignee)
                 .then((result) => { 
-                  initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[storyze_assignee] = developers[storyze_assignee] = result; }); 
-                  console.log("name = ", developers[storyze_assignee][0], " position = ", developers[storyze_assignee][1], 
-                  " department = ", developers[storyze_assignee][2], " email = ", developers[storyze_assignee][3]);
+                  initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[storyz_assignee] = developers[storyz_assignee] = result; }); 
+                  console.log("name = ", developers[storyz_assignee][0], " position = ", developers[storyz_assignee][1], 
+                  " department = ", developers[storyz_assignee][2], " email = ", developers[storyz_assignee][3]);
                 })
                 .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
               }
               else
               {
-                developers[storyze_assignee] = developerslist[storyze_assignee];
+                developers[storyz_assignee] = developerslist[storyz_assignee];
               }
             }
 
-            if((storyze_assignee in sum_devel) == false) { sum_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-            if((storyze_assignee in epicz_devel) == false) { epicz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
-            if((storyze_assignee in storyz_devel) == false) { storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+            if((storyz_assignee in sum_devel) == false) { sum_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+            if((storyz_assignee in epicz_devel) == false) { epicz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+            if((storyz_assignee in storyz_devel) == false) { storyz_devel[storyz_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
-            console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
+            storyz_devel[storyz_assignee]['ZephyrCnt']++;
+            if(story_zephyr[l]['Status'] == "Draft") { storyz_devel[storyz_assignee]['Zephyr_S_Draft']++; }
+            else if(story_zephyr[l]['Status'] == "Review") { storyz_devel[storyz_assignee]['Zephyr_S_Review']++; }
+            else if(story_zephyr[l]['Status'] == "Update") { storyz_devel[storyz_assignee]['Zephyr_S_Update']++; }
+            else if(story_zephyr[l]['Status'] == "Active") { storyz_devel[storyz_assignee]['Zephyr_S_Active']++; }
+            else if(story_zephyr[l]['Status'] == "Approval") { /*storyz_devel[storyz_assignee]['Zephyr_S_Approval']++;*/ storyz_devel[storyz_assignee]['Zephyr_S_Active']++; }
+            else if(story_zephyr[l]['Status'] == "Archived") { storyz_devel[storyz_assignee]['Zephyr_S_Archived']++; storyz_devel[storyz_assignee]['ZephyrCnt']--; }
+            else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); }
+        
+            // [STORY ZEPHYR EXECUTION LOOP]
+            console.log("[SZ] i = ", i, " j = ", j, " k = ", k, " l = ", l);
+            for(var m = 0; m < story_zephyr[l]['Executions'].length; m++)
+            {
+              let storyze_assignee = story_zephyr[l]['Executions'][m]['executedBy'];
+              //setDevelopersInformation(storyze_assignee);
+              if(storyze_assignee == null) { storyze_assignee = "Unassigned"; }
+              if((storyze_assignee in developers) == false) { developers[storyze_assignee] = []; }
+              if((storyze_assignee in storyz_devel) == false)
+              {
+                storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo));
+                if((storyze_assignee in developerslist) == false)
+                {
+                  await ldap.getLDAP_Info(storyze_assignee)
+                  .then((result) => { 
+                    initparse.getPersonalInfo(result['displayName']).then((result) => { developerslist[storyze_assignee] = developers[storyze_assignee] = result; }); 
+                    console.log("name = ", developers[storyze_assignee][0], " position = ", developers[storyze_assignee][1], 
+                    " department = ", developers[storyze_assignee][2], " email = ", developers[storyze_assignee][3]);
+                  })
+                  .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+                }
+                else
+                {
+                  developers[storyze_assignee] = developerslist[storyze_assignee];
+                }
+              }
 
-            let status = story_zephyr[l]['Executions'][m]['executionStatus'];
-            storyz_devel[storyze_assignee]['ZephyrExecutionCnt']++;
-            if(status == "1") { storyz_devel[storyze_assignee]['executionStatus_PASS']++; }
-            else if(status == "2") { storyz_devel[storyze_assignee]['executionStatus_FAIL']++; }
-            else if(status == "-1") { storyz_devel[storyze_assignee]['executionStatus_UNEXEC']++; }
-            else if(status == "3" || status == "4") { storyz_devel[storyze_assignee]['executionStatus_BLOCK']++; }
-            else { console.log("[SZE] executionStatus is not Defined = ", status); }
+              if((storyze_assignee in sum_devel) == false) { sum_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+              if((storyze_assignee in epicz_devel) == false) { epicz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
+              if((storyze_assignee in storyz_devel) == false) { storyz_devel[storyze_assignee] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
-            // check the result of last test status.
-            if(m == (story_zephyr[l]['Executions'].length -1) && status == "1") 
-            { 
-              storyz_devel[storyz_assignee]['PassStoryCnt']++; 
+              console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
+
+              let status = story_zephyr[l]['Executions'][m]['executionStatus'];
+              storyz_devel[storyze_assignee]['ZephyrExecutionCnt']++;
+              if(status == "1") { storyz_devel[storyze_assignee]['executionStatus_PASS']++; }
+              else if(status == "2") { storyz_devel[storyze_assignee]['executionStatus_FAIL']++; }
+              else if(status == "-1") { storyz_devel[storyze_assignee]['executionStatus_UNEXEC']++; }
+              else if(status == "3" || status == "4") { storyz_devel[storyze_assignee]['executionStatus_BLOCK']++; }
+              else { console.log("[SZE] executionStatus is not Defined = ", status); }
+
+              // check the result of last test status.
+              if(m == (story_zephyr[l]['Executions'].length -1) && status == "1") 
+              {
+                //if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
+                { 
+                  storyz_devel[storyz_assignee]['PassStoryCnt']++; 
+                }
+              }
             }
           }
         }       
