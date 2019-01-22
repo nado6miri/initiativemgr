@@ -63,27 +63,20 @@ function periodic_DBjobs()
 
   //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46610);   // webOS4.5 MR minor test 2ea
   //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46093);   // webOS4.5 MR minor
-  initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
-
+  //initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
   //initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-11552");   // webOS4.5 MR minor // shinchiho
+
+
+  initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor
+  //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor airplay
+  //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 45400);   // webOS5.0
+
   //initapi.Test();
   //lgldap.getLDAP_Info('stan.kim').then((result) => { console.log("Department = ", result)});  
   /*
   lgldap.getLDAP_Info('boyoung.cho').then((result) => { result = JSON.parse(result); console.log("Department = ", result['department'])});  
   */
  
-  /*
-  var date = new Date();
-  var time = date.getHours().toString();
-  var min = date.getMinutes().toString();
-  var snapshot = date.toISOString().substring(0, 10);
-  snapshot = snapshot + "T" + time + min;
-  console.log(snapshot);
-  var json = { 'snapshotDate' : 0 };
-  json['snapshotDate'] = snapshot; 
-  console.log(json['snapshotDate']);
-  console.log(snapshot);
-  */
 }  
 
 //tmr.Timer_Setting(12, 20, 10, periodic_DBjobs);

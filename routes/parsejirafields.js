@@ -1038,6 +1038,210 @@ function parseWorkflow(changelog, workflow)
 }
 
 
+//===========================================================================
+// parseWorkflow : make the history of workflow from changelog
+// [param] changelog, workflow
+// [return] workflow
+//===========================================================================
+function parseWorkflow2(changelog, workflow)
+{
+    return new Promise(function (resolve, reject){
+        console.log("parseWorkflow function")
+        if(workflow != null && changelog != null)
+        {
+            let log = changelog['histories'];
+            let today = moment().locale('ko');
+            today = moment(today).add(9, 'Hour');
+            let createddate = workflow['CreatedDate'].split('+');
+            let created = moment(createddate[0]).add(9, 'Hour');
+            let start = 0;
+            let end = 0;
+            let period = 0;
+            for(let i = 0; i < changelog.total; i++)
+            {
+                for(let j = 0; j < log[i]['items'].length; j++)
+                {
+                    let item = log[i]['items'][j];
+                    if(item['field'] == 'status') // Status - Workflow
+                    {
+                        let item_created = log[i]['created'];
+                        item_created = item_created.split('+');
+                        if(start == 0) { start = created; } else { start = end; }
+                        end = moment(item_created[0]).add(9, 'Hour');
+                        period = (end - start) / (1000*60*60*24);
+        
+                        let from = item['fromString'];
+                        let to = item['toString'];
+                        console.log("From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+
+                        // normal flow
+                        if(from == 'DRAFTING' && to == "PO REVIEW") 
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['DRAFTING']['Duration'] += period; 
+                            workflow['DRAFTING']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+                        
+                        if(from == 'PO REVIEW' && to == "ELT REVIEW")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['PO REVIEW']['Duration'] += period; 
+                            workflow['PO REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(from == 'ELT REVIEW' && to == "Approved")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['ELT REVIEW']['Duration'] += period; 
+                            workflow['ELT REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(from == 'Approved' && to == "BACKLOG REFINEMENT")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['Approved']['Duration'] += period; 
+                            workflow['Approved']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(from == 'BACKLOG REFINEMENT' && to == "READY")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['BACKLOG REFINEMENT']['Duration'] += period; 
+                            workflow['BACKLOG REFINEMENT']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(from == 'READY' && to == "In Progress")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['READY']['Duration'] += period; 
+                            workflow['READY']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(from == 'In Progress' && to == "Delivered")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['In Progress']['Duration'] += period; 
+                            workflow['In Progress']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            // need to check...
+                            //workflow['Delivered']['Duration'] = (today - end) / (1000*60*60*24); 
+                            //workflow['Delivered']['History'].push({ "startdate" : end, "enddate" : today, "peroid" : period });
+                        }
+
+                        // EXCEPTIONAL CASE
+                        if(from == 'Deferred' && to == "In Progress")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['Deferred']['Duration'] += period; 
+                            workflow['Deferred']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(from == 'PO REVIEW' && to == "DRAFTING")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['PO REVIEW']['Duration'] += period; 
+                            workflow['PO REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(from == 'ELT REVIEW' && to == "PO REVIEW")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['ELT REVIEW']['Duration'] += period; 
+                            workflow['ELT REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(from == 'Delivered' && to == "In Progress")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                        if(from == 'Delivered' && to == "In Progress")
+                            workflow['Delivered']['Duration'] += period; 
+                            workflow['Delivered']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(to == "Closed")
+                        { 
+                            if(from == "DRAFTING")
+                            {
+                                //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                                workflow['DRAFTING']['Duration'] += period; 
+                                workflow['DRAFTING']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            }
+                            if(from == "PO REVIEW")
+                            {
+                                //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                                workflow['PO REVIEW']['Duration'] += period; 
+                                workflow['PO REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            }
+                            if(from == "ELT REVIEW")
+                            {
+                                //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                                workflow['ELT REVIEW']['Duration'] += period; 
+                                workflow['ELT REVIEW']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            }
+                            if(from == "In Progress")
+                            {
+                                //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                                workflow['In Progress']['Duration'] += period; 
+                                workflow['In Progress']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            }
+                        }
+
+                        if(from == 'Closed' && to == "DRAFTING")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['Closed']['Duration'] += period; 
+                            workflow['Closed']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+
+                        if(to == "PROPOSED TO DEFER")
+                        { 
+                            if(from == "Approved")
+                            {
+                                //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                                workflow['Approved']['Duration'] += period; 
+                                workflow['Approved']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            }
+                            if(from == "BACKLOG REFINEMENT")
+                            {
+                                //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                                workflow['BACKLOG REFINEMENT']['Duration'] += period; 
+                                workflow['BACKLOG REFINEMENT']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            }
+                            if(from == "READY")
+                            {
+                                //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                                workflow['READY']['Duration'] += period; 
+                                workflow['READY']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            }
+                            if(from == "In Progress")
+                            {
+                                //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                                workflow['In Progress']['Duration'] += period; 
+                                workflow['In Progress']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                            }
+                        }
+
+                        if(from == 'PROPOSED TO DEFER' && to == "Deferred")
+                        { 
+                            //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                            workflow['PROPOSED TO DEFER']['Duration'] += period; 
+                            workflow['PROPOSED TO DEFER']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                        }
+                    }
+                }
+            }
+
+            let cur_status = workflow['Status'];
+            workflow[cur_status]['Duration'] = (today - end) / (1000*60*60*24); 
+            workflow[cur_status]['History'].push({ "startdate" : end, "enddate" : today, "peroid" : workflow[cur_status]['Duration'] });
+
+            resolve(workflow);
+        }
+        console.log("[Exception] : parseWorkflow")
+        reject(null);
+    });
+}
+
+
 
 //===========================================================================
 // parseReleaseSprint : make the history of Release Sprint from changelog
@@ -1200,6 +1404,7 @@ module.exports = {
     parseReleaseSprint,
     getElapsedDays,
     getPersonalInfo,
+    parseWorkflow2, // test....
    };
   
   

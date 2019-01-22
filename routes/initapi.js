@@ -295,6 +295,7 @@ var StaticsInfo =
 var developerslist = {};
 var developers = {};
 
+var start = 0, end = 0;
 
 // Javascript 비동기 및 callback function.
 // https://joshua1988.github.io/web-development/javascript/javascript-asynchronous-operation/
@@ -326,7 +327,7 @@ function get_InitiativeListfromJira(querymode, jql)
       }
     }
 
-    if(querymode == "filterID")
+    if(querymode == "filterID" || querymode == 'filterID_KeyListOnly')
     { // search by filterID
       filterID = "filter="+jql.toString();
     }
@@ -339,13 +340,20 @@ function get_InitiativeListfromJira(querymode, jql)
     console.log("get_InitiativeListfromJira : filterID = ", filterID);
     //var param = '{ "jql" : "filter=Initiative_webOS4.5_Initial_Dev","maxResults" : 1000, "startAt": 0,"fields" : ["summary", "key", "assignee", "due", "status", "labels"] };';
     //var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
-    var param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,
-                  "fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks", "resolution", "components", "issuetype", "customfield_15926",
-                              "customfield_15710", "customfield_15711", "customfield_16988", "customfield_16984", "customfield_16983", "customfield_15228", 
-                              "customfield_16986", "created", "updated", "duedate", "resolutiondate", "labels", "description", "fixVersions", "customfield_15104", 
-                              "reporter", "assignee", "customfield_10105", "customfield_16985", 
-                             ] };
-
+    var param = {};
+    if(querymode == 'filterID_KeyListOnly')
+    {
+      param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0, "fields" : ["summary", "key", "assignee" ] };
+    }
+    else
+    {
+      param = { "jql" : filterID, "maxResults" : 1000, "startAt": 0,
+                "fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks", "resolution", "components", "issuetype", "customfield_15926",
+                            "customfield_15710", "customfield_15711", "customfield_16988", "customfield_16984", "customfield_16983", "customfield_15228", 
+                            "customfield_16986", "created", "updated", "duedate", "resolutiondate", "labels", "description", "fixVersions", "customfield_15104", 
+                            "reporter", "assignee", "customfield_10105", "customfield_16985", 
+                          ] };
+    }
     //console.log("param=", JSON.stringify(param));
     xhttp.open("POST", searchURL, true);
     xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
@@ -381,7 +389,7 @@ function get_InitiativeListfromJiraWithChangeLog(querymode, jql)
       }
     }
 
-    if(querymode == "filterID")
+    if(querymode == "filterID" || querymode == 'filterID_KeyListOnly')
     { // search by filterID
       filterID = "filter="+jql.toString();
     }
@@ -690,7 +698,237 @@ var get_errors =
 };
 
 
-var start = 0, end = 0;
+//===================================================================================================================
+// Solution : use this function to avoid timeout error when request jira info with change log.
+// New Sequence with change log....
+// makeSnapshot_InitiativeListfromJira --> makeSnapshot_InitiativeDetailInfofromJira --> makeSnapshot_EpicDetailInfofromJira --> Story/Zephyer Detail Info..
+// Example : initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor airplay
+async function makeSnapshot_InitiativeListfromJira(querymode, filterID)
+{
+  let today = start = moment().locale('ko');
+  //today = moment(today).add(9, 'Hour');
+  var snapshot = 0; 
+  snapshot = today.format();
+  snapshot = snapshot.split('+');
+  snapshot = snapshot[0].replace(':', '-');
+  snapshot = snapshot.replace(':', '-');
+  snapshot = querymode+"_"+filterID+"_"+snapshot;
+  initiative_DB['snapshotDate'] = snapshot;
+
+  load_DevelopersDB('./public/json/developers.json').then((result) => {
+    console.log("[TEST] Read developers DB = ", JSON.stringify(developerslist));
+  })
+
+  // Use Promise Object
+  await get_InitiativeListfromJira(querymode, filterID)
+  .then((initiativelist) => {
+    console.log("[Promise 1] Get Initiative Key List from JIRA");
+    initiative_DB['total'] = initiativelist.total;
+    for (var i = 0; i < initiativelist.total; i++) {
+      initiative_keylist.push(initiativelist['issues'][i]['key']);
+    }     
+  }).catch(error => {
+    console.log("[Catch] get_InitiativeListfromJira - exception error = ", error)
+  });
+
+  console.log("Key List = ", initiative_keylist);
+  for(var i = 0; i < initiative_keylist.length; i++)
+  {
+    await makeSnapshot_InitiativeDetailInfofromJira("keyID", initiative_keylist[i], i);
+  }
+
+  console.log("[final] Save file = initiative_DB");
+  saveInitDB(initiative_DB, "./public/json/initiative_DB_"+initiative_DB['snapshotDate']+".json");
+  console.log("[final] Save end : initiative_DB");
+
+  console.log("Error List = ", JSON.stringify(get_errors));
+
+  fse.outputFileSync("./public/json/errorlist.json", JSON.stringify(get_errors), 'utf-8', function(e){
+    if(e){
+      console.log(e);
+    }else{
+      console.log("file write error list - done!");	
+    }
+  });
+
+  await makeZephyrStatics();
+  console.log("[final-Zephyr] Save file = initiative_DB");
+  saveInitDB(initiative_DB, "./public/json/initiative_DB_"+initiative_DB['snapshotDate']+".json");
+  console.log("[final-Zephyr] Save end : initiative_DB");
+  saveInitDB(developerslist, "./public/json/developers.json");
+
+  end = moment().locale('ko');
+  let elapsed = (end - start)/(1000*60);
+  console.log("Elapsed time = ", elapsed, " mins");  
+}
+
+
+async function makeSnapshot_InitiativeDetailInfofromJira(querymode, filterID, index)
+{
+  var get_InitiativelistfromJirafunc = null;
+  if(changelog)
+  {
+    get_InitiativelistfromJirafunc = get_InitiativeListfromJiraWithChangeLog;
+  }
+  else
+  {
+    get_InitiativelistfromJirafunc = get_InitiativeListfromJira;
+  }
+
+  // Use Promise Object
+  await get_InitiativelistfromJirafunc(querymode, filterID)
+  .then((initiativelist) => {
+    console.log("[Promise 1] Get Initiative List / Update Basic Info and Iinitiative Key List from JIRA");
+    //console.log(JSON.stringify(initiativelist));
+    var issue = initiativelist['issues'][0];
+
+    current_initiative_info = JSON.parse(JSON.stringify(initiative_info)); // initialize...
+    current_initiative_info['Initiative Key'] = initparse.getKey(issue);        
+    current_initiative_info['created'] = initparse.getCreatedDate(issue);        
+    current_initiative_info['Summary'] = initparse.getSummary(issue);        
+    current_initiative_info['Assignee'] = initparse.getAssignee(issue);        
+    current_initiative_info['관리대상'] = initparse.checkLabels(issue, 'SPE_M');
+    current_initiative_info['Risk관리대상'] = initparse.checkLabels(issue, 'SPE_R');        
+    current_initiative_info['Initiative Score'] = initparse.getInitiativeScore(issue);        
+    current_initiative_info['Initiative Order'] = initparse.getInitiativeOrder(issue);        
+    current_initiative_info['Status Color'] = initparse.getStatusColor(issue);        
+    current_initiative_info['SE_Delivery'] = initparse.getSE_Delivery(issue);        
+    current_initiative_info['SE_Quality'] = initparse.getSE_Quality(issue);       
+    current_initiative_info['ScopeOfChange'] = initparse.getScopeOfChange(issue);        
+    current_initiative_info['RMS'] = initparse.checkRMSInitiative(issue);       
+    current_initiative_info['STESDET_OnSite'] = initparse.getSTESDET_Support(issue);        
+    current_initiative_info['SDET_STE_Members'] = initparse.getSTEList(issue);     
+    current_initiative_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);    
+    current_initiative_info['FixVersion'] = initparse.getFixVersions(issue);     
+    current_initiative_info['Labels'] = initparse.getLabels(issue);   
+    
+    // Release Sprint
+    current_ReleaseSP = JSON.parse(JSON.stringify(ReleaseSP)); // initialize...
+    current_ReleaseSP['CurRelease_SP'] = initparse.conversionReleaseSprintToSprint(initparse.getReleaseSprint(issue));
+    current_ReleaseSP = initparse.parseReleaseSprint(initiativelist['issues'][0]['changelog'], current_ReleaseSP);
+    current_initiative_info['ReleaseSprint'] = JSON.parse(JSON.stringify(current_ReleaseSP)); 
+
+    // workflow
+    current_workflow = JSON.parse(JSON.stringify(workflow)); // initialize...
+    current_workflow['CreatedDate'] = initparse.getCreatedDate(issue);
+    current_workflow['Status'] = initparse.getStatus(issue);
+
+    current_workflow = initparse.parseWorkflow(initiativelist['issues'][0]['changelog'], current_workflow);
+    current_initiative_info['Workflow'] = JSON.parse(JSON.stringify(current_workflow)); 
+    /*
+    //current_workflow = initparse.parseWorkflow(initiativelist['issues'][0]['changelog'], current_workflow);
+    initparse.parseWorkflow2(initiativelist['issues'][0]['changelog'], current_workflow).then((result) => {
+      current_workflow = result;
+      current_initiative_info['Workflow'] = JSON.parse(JSON.stringify(current_workflow)); 
+    })
+    .catch(error => { current_workflow = {}; console.log("Work Flow Error....")});
+    */
+    initiative_DB['issues'][index] = JSON.parse(JSON.stringify(current_initiative_info)) // object copy --> need deep copy
+  }).catch(error => {
+    console.log("[Catch] get_InitiativeListfromJira - exception error = ", error)
+  });
+  await makeSnapshot_EpicDetailInfofromJira(current_initiative_info['Initiative Key'], index);
+}
+
+
+async function makeSnapshot_EpicDetailInfofromJira(init_keyvalue, init_index)
+{
+  console.log("[Proimse 2] makeSnapshot_EpicInfofromJira ---- Get Epic List / Update Epic Basic Info");
+
+  await getEpicListfromJira(init_keyvalue)
+  .then((epiclist) => {
+    console.log("getEpicListfromJira ==== [I-index]:", init_index, "[I-Key]:", init_keyvalue);
+    epic_keylist = new Array();
+    let issue = 0;
+    let epic = initiative_DB['issues'][init_index]['EPIC'];
+
+    for(key in epic)
+    {
+      if(key != 'issues')
+      {
+        if(key == 'EpicTotalCnt') { epic[key] = epiclist.total; } else { epic[key] = 0; }
+        //console.log("key = ", key, "value = ", epic[key]);
+      }
+    }
+
+    for (var i = 0; i < epiclist.total; i++) 
+    {
+      var init_ReleaseSP = initiative_DB['issues'][init_index]['ReleaseSprint']['CurRelease_SP'];
+      var epic_ReleaseSP = 0;
+      var init_Status = initiative_DB['issues'][init_index]['Workflow']['Status'];
+      var epic_Status = 0;
+      issue = epiclist['issues'][i];
+      epic_keylist.push(issue['key']);
+      current_epic_info = JSON.parse(JSON.stringify(epic_info));
+      // need to be update initiative info
+      current_epic_info['Epic Key'] = initparse.getKey(issue); 
+      current_epic_info['duedate'] = initparse.getDueDate(issue);        
+      current_epic_info['Release_SP'] = epic_ReleaseSP = initparse.conversionDuedateToSprint(current_epic_info['duedate']);        
+      current_epic_info['Summary'] = initparse.getSummary(issue);         
+      current_epic_info['Assignee'] = initparse.getAssignee(issue);        
+      current_epic_info['Status'] = epic_Status = initparse.getStatus(issue);        
+      current_epic_info['CreatedDate'] = initparse.getCreatedDate(issue);         
+      current_epic_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);        
+      current_epic_info['AbnormalSprint'] = initparse.checkAbnormalSP(init_ReleaseSP, init_Status, epic_ReleaseSP, epic_Status);   
+      current_epic_info['Labels'] = initparse.getLabels(issue);     
+      current_epic_info['SDET_NeedtoCheck'] = !initparse.checkLabels(issue, 'SDET_CHECKED'); // SDET_CHECKED label이 없을 경우 True...
+      current_epic_info['SDET_NeedDevelTC'] = initparse.checkLabels(issue, '개발TC필요');
+      /*
+      current_epic_info['StoryPoint'] = story_point;  // need to be updated      
+      */
+      epic['issues'][i] = JSON.parse(JSON.stringify(current_epic_info));
+      if(current_epic_info['AbnormalSprint'] == true) { initiative_DB['issues'][init_index]['AbnormalSprint'] = true; }
+
+      // 개발TC필요 - 확인 OK, DEVEL TC 임.
+      // SDET_CHECKED LABEL 있으면 확인 OK, NonDevel
+      // 미확인 : (empty || (!개발TC필요 && !SDET_CHECKED))
+      // 연결율 -- ??
+      if(current_epic_info['Labels'].length == 0 || (current_epic_info['SDET_NeedDevelTC'] == false && current_epic_info['SDET_NeedtoCheck']))
+      {
+        // need to check 
+        epic['EpicNeedtoCheckCnt']++; 
+      }
+      else
+      {
+        // develop
+        if(current_epic_info['SDET_NeedDevelTC'] == true) { epic['EpicDevelTCCnt']++; } else { epic['EpicNonDevelTCCnt']++; }
+      }
+      
+      if(initparse.checkIsDelayed(current_epic_info['duedate']) == true && initparse.checkIsDelivered(epic_Status) == false) { epic['EpicDelayedCnt']++; }
+      if(current_epic_info['GovOrDeployment'] == true) 
+      {
+        epic['EpicGovOrDeploymentCnt']++;
+        if(initparse.checkIsDelivered(epic_Status) == true)
+        {
+          epic['EpicTotalResolutionCnt']++;
+          epic['EpicGovOrDeploymentResolutionCnt']++;
+        }
+      }
+      else
+      {
+        epic['EpicDevelCnt']++;
+        if(initparse.checkIsDelivered(epic_Status) == true)
+        {
+          epic['EpicTotalResolutionCnt']++;
+          epic['EpicDevelResolutionCnt']++;
+        }
+      }
+    }
+  }).catch(error => {
+    console.log("[Catch] getEpicListfromJira ==== [I-index]:", init_index, "[I-Key]:", init_keyvalue, " - exception error = ", error);
+    get_errors['epiclist'].push(init_keyvalue);
+  });
+  await makeSnapshot_EpicZephyrInfofromJira(init_index, epic_keylist); // initiative index, epick keylist        
+  await makeSnapshot_StoryInfofromJira(init_index, epic_keylist); // initiative index, epick keylist        
+}
+
+
+//===================================================================================================================
+// Contraints : need to avoid timeout error when request jira info with change log.
+// makeSnapshot_InitiativeInfofromJira --> makeSnapshot_EpicInfofromJira --> Story/Zephyer Detail Info..
+// Example 1: initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46093);         // webOS4.5 MR minor
+// Example 2: initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
+
 async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
 {
   let today = start = moment().locale('ko');
@@ -906,6 +1144,10 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
   }
 }
 
+
+//===================================================================================================================
+// Common Area.....
+//===================================================================================================================
 
 async function makeSnapshot_EpicZephyrInfofromJira(init_index, epickeylist)
 {
@@ -1724,6 +1966,7 @@ module.exports = {
   // function
   get_InitiativeListfromJira,  // promise
   get_InitiativeList,          // callback
-  makeSnapshot_InitiativeInfofromJira,
+  makeSnapshot_InitiativeListfromJira, // new version
+  makeSnapshot_InitiativeInfofromJira, // old version
   Test,
  };
