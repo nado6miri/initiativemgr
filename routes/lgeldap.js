@@ -12,7 +12,7 @@ function getLDAP_InfoTest(username)
     scope: 'sub',
     //attributes: []
     //attributes: [ 'dn', 'title', 'description', 'telephoneNumber', 'department', 'employeeNumber', 'name', 'sAMAccountName', 'mail', 'DepartmentCode', 'mobile', 'displayName', ]
-    attributes: [ 'department', 'displayName', ]
+    attributes: [ 'department', 'displayName', 'DepartmentCode', ]
   };
 
   var client = ldap.createClient({
@@ -74,7 +74,7 @@ function getLDAP_Info(username)
     scope: 'sub',
     //attributes: []
     //attributes: [ 'dn', 'title', 'description', 'telephoneNumber', 'department', 'employeeNumber', 'name', 'sAMAccountName', 'mail', 'DepartmentCode', 'mobile', 'displayName', ]
-    attributes: [ 'name', 'department', 'displayName', ]
+    attributes: [ 'department', 'displayName', 'DepartmentCode', ]
   };
   
   var client = ldap.createClient({
@@ -93,7 +93,7 @@ function getLDAP_Info(username)
     {
       console.log("Unassigned user..... skip"); 
       //resolve({ 'name' : 'Unassigned', 'department' : "None" }) }
-      resolve({ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)' });
+      resolve({ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)', 'DepartmentCode' : 0 });
     }
 
     client.bind('addhost', '1qaz2wsx', function (error) {
@@ -111,7 +111,7 @@ function getLDAP_Info(username)
                 }
                 else{
                   console.log("Can't find User..............")
-                  resolve({ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)' });
+                  resolve({ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)', 'DepartmentCode' : 0 });
                 }
                 client.unbind(function(error) {if(error){console.log(error.message);} else{console.log('client disconnected2');}});
               });

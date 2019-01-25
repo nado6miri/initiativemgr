@@ -18,13 +18,20 @@ const HE_SP_Schedule =
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP24', 'start' : '2018-07-23', 'end' : '2018-08-05' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP25', 'start' : '2018-08-06', 'end' : '2018-08-19' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP26', 'start' : '2018-08-20', 'end' : '2018-09-02' },
+    /*
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP27', 'start' : '2018-09-03', 'end' : '2018-09-16' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP28', 'start' : '2018-09-17', 'end' : '2018-09-30' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP29', 'start' : '2018-10-01', 'end' : '2018-10-14' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP30', 'start' : '2018-10-15', 'end' : '2018-10-28' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP31', 'start' : '2018-10-29', 'end' : '2018-11-11' },
+    { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP32', 'start' : '2018-11-12', 'end' : '2018-11-25' },
+    */
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP27/2019_SP01', 'start' : '2018-09-03', 'end' : '2018-09-16' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP28/2019_SP02', 'start' : '2018-09-17', 'end' : '2018-09-30' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP29/2019_SP03', 'start' : '2018-10-01', 'end' : '2018-10-14' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP30/2019_SP04', 'start' : '2018-10-15', 'end' : '2018-10-28' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP31/2019_SP05', 'start' : '2018-10-29', 'end' : '2018-11-11' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP32/2019_SP06', 'start' : '2018-11-12', 'end' : '2018-11-25' },
-
     // 2019
     /*
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP01', 'start' : '2018-09-03', 'end' : '2018-09-16' },
@@ -252,11 +259,12 @@ function conversionDuedateToSprint(covdate) {
 // [param] duedate : "2019_IR1SP01(3/XX~5/10)"
 // [return] Sprint str
 //===========================================================================
-function conversionReleaseSprintToSprint(ReleaseSprint) {
+function conversionReleaseSprintToSprint(ReleaseSprint) 
+{
     let bypass = false;
     let sprint = String(ReleaseSprint);
     let b = 0;
-
+    let result = '';
     if(sprint == "SP_UNDEF") { return "SP_UNDEF"; }
 
     // webOS5.0 Sprint
@@ -264,13 +272,15 @@ function conversionReleaseSprintToSprint(ReleaseSprint) {
     {
         let a = sprint.replace('2019_IR1', '');
         a = a.split('(');
-        return a[0];
+        result = "2019_" + a[0];
+        return result;
     }
     if(sprint.includes("2019_IR2"))
     {
         let a = sprint.replace('2019_IR2', '');
         a = a.split('(');
-        return a[0];
+        result = "2019_" + a[0];
+        return result;
     }
     
     // webOS4.5 Sprint
@@ -298,7 +308,8 @@ function conversionReleaseSprintToSprint(ReleaseSprint) {
         //console.log(sprint)
         return sprint;
     }
-    else {
+    else 
+    {
         b = b.replace('IR1', '');
         b = b.replace('IR2', '');
         b = b.replace('IR3', '');
@@ -306,7 +317,8 @@ function conversionReleaseSprintToSprint(ReleaseSprint) {
         //console.log(b)
         b = b.split('(');
         //console.log(b[0])
-        return b[0];
+        result = "2019_" + b[0];
+        return result;
     }
 }
 
@@ -761,34 +773,33 @@ function getZephyrExeinfo_cycleName(ZephyrIssue) {
 
 //===========================================================================
 // checkAbnormalSP : compare init vs epic/story Release SP
-// [param] initiative Release SP, epic/story Release SP
-// [param] epic Release SP, story Release SP
+// [param] initiative Release SP, initiative Status, Current (epic/story) Release SP, Current (epic/story) Status
 // [return] init >= epicstory (false) else true
 //===========================================================================
-function checkAbnormalSP(ParentSP, ParentStatus, ChildSP, ChildStatus)
+function checkAbnormalSP(Initiative_SP, Initiative_Status, CurIssue_SP, CurIssue_Status)
 {
-    var CSP = conversionReleaseSprintToSprint(ChildSP);
-    var PSP = conversionReleaseSprintToSprint(ParentSP);
+    var CurIssue_SP = conversionReleaseSprintToSprint(CurIssue_SP);
+    var Initiative_SP = conversionReleaseSprintToSprint(Initiative_SP);
     var Parent_Index = 0, Child_Index = 0;
 
     // abnormal case 1 : Parent / child duedate is Null. Can't estimate schedule. 
-    if(ParentSP == "SP_UNDEF" || ChildSP == "SP_UNDEF") 
+    if(Initiative_SP == "SP_UNDEF" || CurIssue_SP == "SP_UNDEF") 
     { 
-        console.log("[abnormal case 1] ParentSP = ", ParentSP, PSP, " ChildSP = ", ChildSP, CSP);
-        if(checkIsDelivered(ChildStatus) == true) { return false } else { return true; } 
+        console.log("[abnormal case 1] Initiative_SP = ", Initiative_SP, " CurIssue_SP = ", CurIssue_SP);
+        if(checkIsDelivered(CurIssue_Status) == true) { return false } else { return true; } 
     }
 
     // abnormal case 2 : parent is delivered but childs(current) is not delivered. 
-    if(checkIsDelivered(ParentStatus) == true && checkIsDelivered(ChildStatus) == false) 
+    if(checkIsDelivered(Initiative_Status) == true && checkIsDelivered(CurIssue_Status) == false) 
     {
-        console.log("[abnormal case 2] = ", checkIsDelivered(ParentStatus), checkIsDelivered(ChildStatus));
+        console.log("[abnormal case 2] = ", checkIsDelivered(Initiative_Status), checkIsDelivered(CurIssue_Status));
         return true; 
     }
 
     for(var i = 0; i < HE_SP_Schedule.length; i++)
     {
-        if(HE_SP_Schedule[i]['SPRINT_SHORT'] == PSP) { Parent_Index = i; }
-        if(HE_SP_Schedule[i]['SPRINT_SHORT'] == CSP) { Child_Index = i; }
+        if(HE_SP_Schedule[i]['SPRINT_SHORT'] == Initiative_SP) { Parent_Index = i; }
+        if(HE_SP_Schedule[i]['SPRINT_SHORT'] == CurIssue_SP) { Child_Index = i; }
     }
 
     // abnormal case 3 : child duedate is greater than parent duedate. 
@@ -796,7 +807,7 @@ function checkAbnormalSP(ParentSP, ParentStatus, ChildSP, ChildStatus)
     else 
     {
         console.log("[abnormal case 3] = ", Parent_Index, Child_Index);
-        if(checkIsDelivered(ChildStatus) == true) { return false } else { return true; } 
+        if(checkIsDelivered(CurIssue_Status) == true) { return false } else { return true; } 
     }
 }
 
@@ -1242,6 +1253,161 @@ function parseWorkflow2(changelog, workflow)
 }
 
 
+//===========================================================================
+// parseArchiEpicWorkflow : make the history of workflow from changelog
+// [param] changelog, workflow
+// [return] workflow
+//===========================================================================
+function parseArchEpicWorkflow(changelog, workflow)
+{
+    //console.log("parseArchEpicWorkflow function ", changelog, workflow)
+    if(workflow != null && changelog != null)
+    {
+        let log = changelog['histories'];
+        let today = moment().locale('ko');
+        today = moment(today).add(9, 'Hour');
+        let createddate = workflow['CreatedDate'].split('+');
+        let created = moment(createddate[0]).add(9, 'Hour');
+        let start = 0;
+        let end = 0;
+        let period = 0;
+        for(let i = 0; i < changelog.total; i++)
+        {
+            for(let j = 0; j < log[i]['items'].length; j++)
+            {
+                let item = log[i]['items'][j];
+                if(item['field'] == 'status') // Status - Workflow
+                {
+                    let item_created = log[i]['created'];
+                    item_created = item_created.split('+');
+                    if(start == 0) { start = created; } else { start = end; }
+                    end = moment(item_created[0]).add(9, 'Hour');
+                    period = (end - start) / (1000*60*60*24);
+     
+                    let from = item['fromString'];
+                    let to = item['toString'];
+                    console.log("From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+
+                    // normal flow
+                    if(from == 'Scoping' && to == "Review") 
+                    { 
+                        //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                        workflow['Scoping']['Duration'] += period; 
+                        workflow['Scoping']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+                    
+                    if(from == 'Review' && to == "In Progress")
+                    { 
+                        //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                        workflow['Review']['Duration'] += period; 
+                        workflow['Review']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    if(from == 'In Progress' && to == "Delivered")
+                    { 
+                        //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                        workflow['In Progress']['Duration'] += period; 
+                        workflow['In Progress']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    if(from == 'Delivered' && to == "Closed")
+                    { 
+                        //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                        workflow['Delivered']['Duration'] += period; 
+                        workflow['Delivered']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    // EXCEPTIONAL CASE
+                }
+            }
+        }
+
+        let cur_status = workflow['Status'];
+        if(end == 0) { end = created; }
+        workflow[cur_status]['Duration'] = (today - end) / (1000*60*60*24); 
+        workflow[cur_status]['History'].push({ "startdate" : end, "enddate" : today, "peroid" : workflow[cur_status]['Duration'] });
+
+        return workflow;
+    }
+    console.log("[Exception] : parseArchEpicWorkflow")
+    return null;
+}
+
+
+
+//===========================================================================
+// parseArchiStoryWorkflow : make the history of workflow from changelog
+// [param] changelog, workflow
+// [return] workflow
+//===========================================================================
+function parseArchStoryWorkflow(changelog, workflow)
+{
+    //console.log("parseArchStoryWorkflow function")
+    if(workflow != null && changelog != null)
+    {
+        let log = changelog['histories'];
+        let today = moment().locale('ko');
+        today = moment(today).add(9, 'Hour');
+        let createddate = workflow['CreatedDate'].split('+');
+        let created = moment(createddate[0]).add(9, 'Hour');
+        let start = 0;
+        let end = 0;
+        let period = 0;
+        for(let i = 0; i < changelog.total; i++)
+        {
+            for(let j = 0; j < log[i]['items'].length; j++)
+            {
+                let item = log[i]['items'][j];
+                if(item['field'] == 'status') // Status - Workflow
+                {
+                    let item_created = log[i]['created'];
+                    item_created = item_created.split('+');
+                    if(start == 0) { start = created; } else { start = end; }
+                    end = moment(item_created[0]).add(9, 'Hour');
+                    period = (end - start) / (1000*60*60*24);
+     
+                    let from = item['fromString'];
+                    let to = item['toString'];
+                    console.log("From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+
+                    // normal flow
+                    if(from == 'Screen' && to == "Analysis") 
+                    { 
+                        //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                        workflow['Screen']['Duration'] += period; 
+                        workflow['Screen']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+                    
+                    if(from == 'Analysis' && to == "Verify")
+                    { 
+                        //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                        workflow['Analysis']['Duration'] += period; 
+                        workflow['Analysis']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    if(from == 'Verify' && to == "Closed")
+                    { 
+                        //console.log("[Log]From : ", from, " ==> To : ", to, " period = ", period, "Start = ", start, " End = ", end);
+                        workflow['Verify']['Duration'] += period; 
+                        workflow['Verify']['History'].push({ "startdate" : start, "enddate" : end, "peroid" : period });
+                    }
+
+                    // EXCEPTIONAL CASE
+                }
+            }
+        }
+
+        let cur_status = workflow['Status'];
+        if(end == 0) { end = created; }
+        workflow[cur_status]['Duration'] = (today - end) / (1000*60*60*24); 
+        workflow[cur_status]['History'].push({ "startdate" : end, "enddate" : today, "peroid" : workflow[cur_status]['Duration'] });
+
+        return workflow;
+    }
+    console.log("[Exception] : parseArchStoryWorkflow")
+    return null;
+}
+
 
 //===========================================================================
 // parseReleaseSprint : make the history of Release Sprint from changelog
@@ -1250,19 +1416,6 @@ function parseWorkflow2(changelog, workflow)
 //===========================================================================
 function parseReleaseSprint(changelog, releaseSP)
 {
-    /*
-    var current_ReleaseSP = {};
-    var ReleaseSP = 
-    {
-        'OrgRelease_SP' : '',
-        'CurRelease_SP' : '',
-        'RescheduleCnt' : 0,
-        'History' :
-        [
-            // { 'ChangeSP' : 'TVSP6', 'ChangeDate' : '20190101', "ReleaseSP" : "" },  // History 상에 Ready 단계 이후 처음으로 입력된 value.
-        ],
-    }
-    */
     console.log("parseReleaseSprint function")
     if(releaseSP != null && changelog != null)
     {
@@ -1315,7 +1468,7 @@ function parseReleaseSprint(changelog, releaseSP)
 // [param] Key, LDAP-displayName
 // [return] [Name, Position, Department, email]
 //===========================================================================
-function getPersonalInfo(displayName)
+function getPersonalInfo(displayName, dpcode)
 {
     return new Promise(function (resolve, reject){
         let parse = displayName.split('/');
@@ -1325,8 +1478,8 @@ function getPersonalInfo(displayName)
         temp = temp.split('(');
         let department = temp[0];
         let email = temp[1];
-        console.log("name = ", name, " position = ", position, " department = ", department, " email = ", email);
-        resolve([ name, position, department, email ]);
+        console.log("name = ", name, " position = ", position, " department = ", department, " email = ", email, " DepartmentCode = ", dpcode);
+        resolve([ name, position, department, email, dpcode ]);
     });
 }
 
@@ -1405,6 +1558,8 @@ module.exports = {
     getElapsedDays,
     getPersonalInfo,
     parseWorkflow2, // test....
+    parseArchEpicWorkflow,
+    parseArchStoryWorkflow,
    };
   
   
