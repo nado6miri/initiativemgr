@@ -254,6 +254,28 @@ function conversionDuedateToSprint(covdate) {
 }
 
 
+
+//===========================================================================
+// convert Sprint to duedate
+// [param] SPRINT : SPRINT
+// [return] Sprint end date
+//===========================================================================
+function conversionSprintToDate(SPRINT) 
+{
+    for(var i = 0; i < HE_SP_Schedule.length; i++)
+    {
+        let start = conversionDateToDatetime(HE_SP_Schedule[i]['start']);
+        let end = conversionDateToDatetime();
+        if(HE_SP_Schedule[i]['SPRINT_SHORT'].includes(SPRINT))
+        {
+            return HE_SP_Schedule[i]['end'];
+        }
+    }
+    //console.log("conversionSprintToDate = SP_UNDEF");
+    return "SP_UNDEF";
+}
+
+
 //===========================================================================
 // convert ReleaseSprint to ShortSprint
 // [param] duedate : "2019_IR1SP01(3/XX~5/10)"
@@ -845,6 +867,25 @@ function checkIsDelayed(DueDate)
     return true; 
 }
 
+//===========================================================================
+// getRemainDays : check remain days base on specific date
+// [param] targetdate, base date (string format : "2018-04-03" or "2018-04-14T19:00:00")
+// [return] delayed or due date is null : true, not delayed : false
+//===========================================================================
+function getRemainDays(targetdate, basedate)
+{
+    let diff = 0;
+    if(targetdate == "SP_UNDEF") 
+    { 
+        console.log("[Target] = ", targetdate, " [Base] = ", basedate, " [Remain Days] = ", diff);
+        return diff; 
+    }
+    let target = moment(targetdate).add(9, 'Hour');
+    let base = moment(basedate).add(9, 'Hour');
+    diff = (target - base) / (1000*60*60*24); 
+    console.log("[Target] = ", target, " [Base] = ", base, " [Remain Days] = ", diff);
+    return diff;
+}
 
 
 //===========================================================================
@@ -1519,6 +1560,7 @@ module.exports = {
     getReleaseSprint,
     conversionDateToDatetime,
     conversionDuedateToSprint,
+    conversionSprintToDate,
     conversionReleaseSprintToSprint,
     getStatusSummary,
     getStatusColor,
@@ -1556,6 +1598,7 @@ module.exports = {
     parseWorkflow,
     parseReleaseSprint,
     getElapsedDays,
+    getRemainDays,
     getPersonalInfo,
     parseWorkflow2, // test....
     parseArchEpicWorkflow,

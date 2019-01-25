@@ -103,6 +103,9 @@ var initiative_info =
   'Status Color' : '',
   'SE_Delivery' : '',
   'SE_Quality' : '',
+  'StatusSummary' : '',
+  'DeliveryComment' : '',
+  'QualityComment' : '',
   'ScopeOfChange' : '',
   'RMS' : '',
   'Labels' : [],
@@ -310,7 +313,7 @@ var Arch_1st_workflow =
 {
   'CreatedDate' : '',
   'Status' : '',
-  'Signal' : '-',
+  'Signal' : 'YELLOW',
   "Scoping" : { "Duration" : 0, 'History' :[ ] } ,             
   "Review" : { "Duration" : 0, 'History' :[ ] } ,             
   "In Progress" : { "Duration" : 0, 'History' :[ ] } ,             
@@ -331,6 +334,7 @@ var Arch_2nd_workflow =
 
 Arch_Review = 
 {
+  'Key' : '',
   'ScopeOfChange' : '---',
   'First Review' : 
   {
@@ -405,7 +409,7 @@ function get_InitiativeListfromJira(querymode, jql)
                 "fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks", "resolution", "components", "issuetype", "customfield_15926",
                             "customfield_15710", "customfield_15711", "customfield_16988", "customfield_16984", "customfield_16983", "customfield_15228", 
                             "customfield_16986", "created", "updated", "duedate", "resolutiondate", "labels", "description", "fixVersions", "customfield_15104", 
-                            "reporter", "assignee", "customfield_10105", "customfield_16985", 
+                            "reporter", "assignee", "customfield_10105", "customfield_16985",
                           ] };
     }
     //console.log("param=", JSON.stringify(param));
@@ -817,7 +821,7 @@ async function makeSnapshot_InitiativeListfromJira(querymode, filterID)
   console.log("Key List = ", initiative_keylist);
   for(var i = 0; i < initiative_keylist.length; i++)
   {
-    await makeSnapshot_InitiativeDetailInfofromJira("keyID", initiative_keylist[i], i);
+    await makeSnapshot_InitiativeDetailInfofromJira(initiative_keylist[i], i);
   }
 
   console.log("[final] Save file = initiative_DB");
@@ -831,6 +835,7 @@ async function makeSnapshot_InitiativeListfromJira(querymode, filterID)
   await makeZephyrStatics();
   console.log("[final-Zephyr] Save file = initiative_DB");
   Save_JSON_file(initiative_DB, "./public/json/initiative_DB_"+initiative_DB['snapshotDate']+".json");
+  Save_JSON_file(initiative_DB, "./public/json/initiative_DB_"+filterID+"_Latest.json");
   console.log("[final-Zephyr] Save end : initiative_DB");
   Save_JSON_file(developerslist, "./public/json/developers.json");
 
@@ -840,7 +845,7 @@ async function makeSnapshot_InitiativeListfromJira(querymode, filterID)
 }
 
 
-async function makeSnapshot_InitiativeDetailInfofromJira(querymode, filterID, index)
+async function makeSnapshot_InitiativeDetailInfofromJira(KeyValue, index)
 {
   var get_InitiativelistfromJirafunc = null;
   if(changelog)
@@ -853,7 +858,7 @@ async function makeSnapshot_InitiativeDetailInfofromJira(querymode, filterID, in
   }
 
   // Use Promise Object
-  await get_InitiativelistfromJirafunc(querymode, filterID)
+  await get_InitiativelistfromJirafunc("keyID", KeyValue)
   .then((initiativelist) => {
     console.log("[Promise 1] Get Initiative List / Update Basic Info and Iinitiative Key List from JIRA");
     //console.log(JSON.stringify(initiativelist));
@@ -870,7 +875,10 @@ async function makeSnapshot_InitiativeDetailInfofromJira(querymode, filterID, in
     current_initiative_info['Initiative Order'] = initparse.getInitiativeOrder(issue);        
     current_initiative_info['Status Color'] = initparse.getStatusColor(issue);        
     current_initiative_info['SE_Delivery'] = initparse.getSE_Delivery(issue);        
-    current_initiative_info['SE_Quality'] = initparse.getSE_Quality(issue);       
+    current_initiative_info['SE_Quality'] = initparse.getSE_Quality(issue);    
+    current_initiative_info['StatusSummary'] = initparse.getStatusSummary(issue);    
+    current_initiative_info['DeliveryComment'] = initparse.getD_Comment(issue);    
+    current_initiative_info['QualityComment'] = initparse.getQ_Comment(issue);    
     current_initiative_info['ScopeOfChange'] = initparse.getScopeOfChange(issue);        
     current_initiative_info['RMS'] = initparse.checkRMSInitiative(issue);       
     current_initiative_info['STESDET_OnSite'] = initparse.getSTESDET_Support(issue);        
@@ -881,15 +889,9 @@ async function makeSnapshot_InitiativeDetailInfofromJira(querymode, filterID, in
     
     if((initowner in developerslist) == false)
     {
-      ldap.getLDAP_Info(initowner)
-      .then((result) => { 
+      ldap.getLDAP_Info(initowner).then((result) => { 
         initparse.getPersonalInfo(result['displayName'], result['DepartmentCode'])
-        .then((result) => 
-        { 
-          current_initiative_info['OrgInfo'] = developerslist[initowner] = result; 
-        }); 
-        console.log("name = ", developers[storyz_assignee][0], " position = ", developers[storyz_assignee][1], 
-        " department = ", developers[storyz_assignee][2], " email = ", developers[storyz_assignee][3]);
+        .then((result) => { current_initiative_info['OrgInfo'] = developerslist[initowner] = result; }); 
       })
       .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
     }
@@ -1091,7 +1093,10 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
       current_initiative_info['Initiative Order'] = initparse.getInitiativeOrder(issue);        
       current_initiative_info['Status Color'] = initparse.getStatusColor(issue);        
       current_initiative_info['SE_Delivery'] = initparse.getSE_Delivery(issue);        
-      current_initiative_info['SE_Quality'] = initparse.getSE_Quality(issue);       
+      current_initiative_info['SE_Quality'] = initparse.getSE_Quality(issue);    
+      current_initiative_info['StatusSummary'] = initparse.getStatusSummary(issue);    
+      current_initiative_info['DeliveryComment'] = initparse.getD_Comment(issue);    
+      current_initiative_info['QualityComment'] = initparse.getQ_Comment(issue);    
       current_initiative_info['ScopeOfChange'] = initparse.getScopeOfChange(issue);        
       current_initiative_info['RMS'] = initparse.checkRMSInitiative(issue);       
       current_initiative_info['STESDET_OnSite'] = initparse.getSTESDET_Support(issue);        
@@ -1271,15 +1276,56 @@ async function makeSnapshot_ArchiReviewInfofromJira(init_index, init_keyvalue, e
   await get_ChangeLogfromJira('keyID', epic_keyvalue)
   .then((epicinfo) => {
       var issue = epicinfo['issues'][0];
+      current_Arch_Review['Key'] = epic_keyvalue;
       current_Arch_Review['ScopeOfChange'] = initiative_DB['issues'][init_index]['ScopeOfChange'];
-      current_Arch_Review['First Review']['1stReviewDone'] = initparse.checkLabels(issue, "track:1st_reviewed");
-      current_Arch_Review['First Review']['Plan']['Interface Review'] = initparse.checkLabels(issue, "track:arch:interface_review");
-      current_Arch_Review['First Review']['Plan']['Sangria Review'] = initparse.checkLabels(issue, "track:arch:sangria:n/a");
-      current_Arch_Review['First Review']['Plan']['FMEA'] = initparse.checkLabels(issue, "track:arch:fmea:n/a");
+      let labelstring = initiative_DB['issues'][init_index]['Labels'].join();
+      if(labelstring.includes("1st_reviewed")) { current_Arch_Review['First Review']['1stReviewDone'] = true; }
+      if(labelstring.includes("interface_review")) { current_Arch_Review['First Review']['Plan']['Interface Review'] = true; }
+      if(labelstring.includes("sangria")) { current_Arch_Review['First Review']['Plan']['Sangria Review'] = true; }
+      if(labelstring.includes("fmea")) { current_Arch_Review['First Review']['Plan']['FMEA'] = true; }
+
       var current_Arch_1st_workflow = JSON.parse(JSON.stringify(Arch_1st_workflow));
       current_Arch_1st_workflow['CreatedDate'] = initparse.getCreatedDate(issue);
       current_Arch_1st_workflow['Status'] = initparse.getStatus(issue);
-      current_Arch_1st_workflow['Signal'] = 'RED';
+      /*
+      [RED] 
+       1. init status가 ELT가 지났는데 1stReviewDone == false 이면 위반 : o
+       2. init status가  In Progress 인데 ARCH EPIC Status가 Scoping / Review상태이면 위반 : o
+       3. init status가 Delivered/Closed상태인데 Arch Epic이 Delivered/Closed가 아닌경우  : o
+       4. Release Sprint 일정 2개 Sprint 이내에도 Arch Epic이 Closed가 안된경우 : o
+       [YELLOW]
+       1. [ARCHREVIEW]항목이 Null인경우.... 즉 Archi Epic이 없는 경우.... 1st Review 미진행 또는 진행중인 항목. : init value...
+       [GREEN]
+       1. [RED] / [YELLOW]를 제외한 Default 상태
+      */
+      let init_status = initiative_DB['issues'][init_index]['Workflow']['Status'];
+      let init_ReleaseSP = initiative_DB['issues'][init_index]['ReleaseSprint']['CurRelease_SP'];
+      let arch_epicstatus = current_Arch_1st_workflow['Status'];
+      if(init_status != 'Deferred' && init_status != 'PROPOSED TO DEFER') // Normal workflow
+      {
+        let color = 'GREEN';
+        if(init_status != 'DRAFTING' && init_status != 'PO REVIEW')
+        {
+          // RED case
+          if(labelstring.includes("1st_reviewed")) { color = 'RED'; }
+          if(init_status == "In Progress" && (arch_epicstatus == 'Scoping' || arch_epicstatus == 'Review')) { color = 'RED'; }
+          if((init_status == "Delivered" || init_status == "Closed") && (arch_epicstatus != 'Delivered' && arch_epicstatus != 'Closed')) { color = 'RED'; }
+          /*
+          let target = initparse.conversionSprintToDate(init_ReleaseSP);
+          target = moment(target).add(9, 'Hour');
+          let today = moment().locale('ko');
+          today = moment(today).add(9, 'Hour');
+          let diff = (target - today) / (1000*60*60*24); 
+          */
+          let target = initparse.conversionSprintToDate(init_ReleaseSP);
+          let today = moment().locale('ko');
+          let diff = initparse.getRemainDays(target, today);
+          if(diff <= 28 && (arch_epicstatus != 'Delivered' && arch_epicstatus != 'Closed')) { color = 'RED'; }
+          if((diff > 28 && diff <= 42) && (arch_epicstatus != 'Delivered' && arch_epicstatus != 'Closed')) { color = 'YELLOW'; }
+        }
+        current_Arch_1st_workflow['Signal'] = color;
+      }
+      current_Arch_1st_workflow['Signal'] = 'GREEN';
       current_Arch_1st_workflow = initparse.parseArchEpicWorkflow(epicinfo['issues'][0]['changelog'], current_Arch_1st_workflow);
       current_Arch_Review['First Review']['workflow'] = current_Arch_1st_workflow;
       //initiative_DB['issues'][init_index]['ARCHREVIEW'] = JSON.parse(JSON.stringify(current_Arch_Review)); 
@@ -1309,8 +1355,8 @@ async function makeSnapshot_ArchiReviewInfofromJira(init_index, init_keyvalue, e
         let reviewkey = null;
         current_Arch_2nd_workflow['CreatedDate'] = initparse.getCreatedDate(issue);
         current_Arch_2nd_workflow['Status'] = initparse.getStatus(issue);
-        current_Arch_2nd_workflow['Signal'] = "YELLOW";
-        
+        current_Arch_2nd_workflow['Signal'] = "-";
+    
         if(summary.includes("INTERFACE REVIEW")) { reviewkey = "Interface Review"; }
         else if(summary.includes("DOCUMENT REVIEW")) { reviewkey = "Document Review"; }
         else if(summary.includes("ARCHITECTURE REVIEW")) { reviewkey = "Architecture Review"; }
@@ -1318,6 +1364,38 @@ async function makeSnapshot_ArchiReviewInfofromJira(init_index, init_keyvalue, e
 
         if(reviewkey != null) 
         { 
+          current_Arch_2nd_workflow['Signal'] = "GREEN";
+          /*
+          [RED] 
+          1. Interface Review / Document Review 가 Release SP 3개 SPRINT전에 종료가 안되면.....
+          2. Release Sprint 일정 3개 Sprint 이내에도 Arch Story(Arch review / fmea review)가 Verify/Closed가 안된경우
+          3. arch epic이 Delivered/Closed상태인데 Arch Story가 Closed가 아닌경우
+          [YELLOW]
+          [GREEN]
+          1. [RED] / [YELLOW]를 제외한 Default 상태
+          */
+          let init_status = initiative_DB['issues'][init_index]['Workflow']['Status'];
+          let init_ReleaseSP = initiative_DB['issues'][init_index]['ReleaseSprint']['CurRelease_SP'];
+          let arch_epicstatus = current_Arch_Review['First Review']['workflow']['Status'];
+          let arch_curstorystatus = current_Arch_2nd_workflow['Status'];
+
+          let target = initparse.conversionSprintToDate(init_ReleaseSP);
+          let today = moment().locale('ko');
+          let diff = initparse.getRemainDays(target, today);
+          let color = 'GREEN';
+          // [RED Case]
+          if(reviewkey == "Interface Review" || reviewkey == "Document Review")
+          {
+            if(diff <= 42 && arch_curstorystatus != "Closed") { color = "RED"; } 
+          }
+          if((arch_epicstatus == "Delivered" || arch_epicstatus == 'Closed') && (arch_curstorystatus != "Closed")) { color = "RED"; }
+          if(reviewkey == "Architecture Review" || reviewkey == "FMEA Review")
+          {
+            if(diff <= 42 && (arch_curstorystatus != "Verify" && arch_curstorystatus != "Closed")) { color = "RED"; } 
+          }
+          // [YELLOW Case]
+          // ??
+
           current_Arch_Review['Second Review'][reviewkey]['output'] = true; 
           current_Arch_Review['Second Review'][reviewkey]['workflow'] = initparse.parseArchStoryWorkflow(storyinfo['issues'][0]['changelog'], current_Arch_2nd_workflow);
         }
@@ -2144,3 +2222,4 @@ module.exports = {
   makeSnapshot_InitiativeInfofromJira, // old version
   Test,
  };
+

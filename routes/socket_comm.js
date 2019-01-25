@@ -24,7 +24,7 @@ function socket_communication()
                 console.log('toclient :' + data.msg);
 
                 // Use Promise Object
-                initApi.get_InitiativeListP().then(function (data)
+                initApi.get_InitiativeListfromJira("filterID", 46093).then(function (data)
                 {
                     console.log("Initiative List gathering ok - Promise");
                     console.log(data);
@@ -46,7 +46,7 @@ function socket_communication()
             var cmd = data.msg;
             if ("all" == cmd) {
                 // Use Promise Object
-                initApi.get_InitiativeListP().then(function (data)
+                initApi.get_InitiativeListfromJira("filterID", 46093).then(function (data)
                 {
                     console.log("******Initiative List gathering ok - Promise*******");
                     console.log(JSON.stringify(data));

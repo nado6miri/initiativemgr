@@ -67,16 +67,20 @@ function periodic_DBjobs()
   //initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-11552");   // webOS4.5 MR minor // shinchiho
 
 
-  initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor
+  //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor
   //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor airplay
   //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 45400);   // webOS5.0
+  initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
 
   //initapi.Test();
   //lgldap.getLDAP_Info('stan.kim').then((result) => { console.log("Department = ", result)});  
   /*
-  lgldap.getLDAP_Info('boyoung.cho').then((result) => { result = JSON.parse(result); console.log("Department = ", result['department'])});  
+  lgldap.getLDAP_Info('sungbin.na')
+        .then((result) => { 
+          console.log(JSON.stringify(result));
+        })
+        .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
   */
- 
 }  
 
 //tmr.Timer_Setting(12, 20, 10, periodic_DBjobs);
