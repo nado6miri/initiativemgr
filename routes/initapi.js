@@ -10,7 +10,7 @@ var moment = require('moment-timezone');
 
 var async_mode = false;
 var changelog = true;
-var SDETVerifyOnly = true; // SDET이 개발필요 TC 항목으로 분류된 EPIC/STORY만 Zephyer 정보 수집을 수행한다. 
+var SDETVerifyOnly = false; // SDET이 개발필요 TC 항목으로 분류된 EPIC/STORY만 Zephyer 정보 수집을 수행한다. 
 
 // initiative filter result (json) - webOS45 webOS45MR, webOS5.0 
 var initiative_FilterResult;
@@ -592,8 +592,8 @@ function getStoryListfromJira(epicKey)
       }
     }
 
-    //let filterjql = '(issuetype = story) AND issuefunction in linkedissuesOf(\"key=' + epicKey + '\"' + ')';
-    let filterjql = 'issuefunction in linkedissuesOf(\"key=' + epicKey + '\"' + ')';
+    let filterjql = '(issuetype = story or issuetype = task) AND issuefunction in linkedissuesOf(\"key=' + epicKey + '\"' + ')';
+    //let filterjql = 'issuefunction in linkedissuesOf(\"key=' + epicKey + '\"' + ')';
     console.log("filterjql = ", filterjql);
     var searchURL = 'http://hlm.lge.com/issue/rest/api/2/search/';
     //var param = { "jql" : filterjql, "maxResults" : 1000, "startAt": 0,"fields" : [ ] };
@@ -1526,7 +1526,7 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
   let initstorysummary = initiative_DB['issues'][init_index]['STORY_SUMMARY'];
 
   for(key in initstorysummary) { initstorysummary[key] = 0; }
-
+  var storykeyverify = [];
   for(var i = 0; i < epickeylist.length; i++)
   {
     var epic_keyvalue = epickeylist[i];
@@ -1568,6 +1568,7 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
         /*  
         current_story_info['Zephyr'] = 0; // need to be updated      
         */
+       storykeyverify.push(current_story_info['Story Key']);
         // 개발항목이면..... Story list에 추가하여 zephyer까지 체크하도록....
         if(SDETVerifyOnly)
         {
@@ -1579,8 +1580,10 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
         if(current_story_info['AbnormalSprint'] == true) { initiative_DB['issues'][init_index]['AbnormalSprint'] = true; }
 
         if(current_story_info['Labels'].length == 0 || current_story_info['SDET_NeedtoCheck'] == true) { epicstorysummary['StoryNeedtoCheckCnt']++; }
-        if(current_story_info['SDET_NeedDevelTC'] == true) { epicstorysummary['StoryDevelTCCnt']++; } else { epicstorysummary['StoryNonDevelTCCnt']++; }
-
+        else
+        {
+          if(current_story_info['SDET_NeedDevelTC'] == true) { epicstorysummary['StoryDevelTCCnt']++; } else { epicstorysummary['StoryNonDevelTCCnt']++; }
+        }
 
         if(initparse.checkIsDelivered(story_Status) == false)
         {
@@ -1619,6 +1622,9 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
     });
     await makeSnapshot_StoryZephyrInfofromJira(init_index, i, story_keylist);     
   }
+  console.log("[[Storykeylist]] = ", storykeyverify.join());
+  Save_JSON_file(storykeyverify, "./public/json/storylist.json");
+
 }
 
 
@@ -1994,7 +2000,10 @@ async function makeZephyrStatics()
         if((storyowner in storyz_devel) == false) { storyz_devel[storyowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
         if(story[k]['Labels'].length == 0 || story[k]['SDET_NeedtoCheck'] == true) { storyz_devel[storyowner]['StoryNeedtoCheckCnt']++; }
-        if(story[k]['SDET_NeedDevelTC'] == true) { storyz_devel[storyowner]['StoryDevelTCCnt']++; } else { storyz_devel[storyowner]['StoryNonDevelTCCnt']++; }
+        else
+        {
+          if(story[k]['SDET_NeedDevelTC'] == true) { storyz_devel[storyowner]['StoryDevelTCCnt']++; } else { storyz_devel[storyowner]['StoryNonDevelTCCnt']++; }
+        }
 
         storyz_devel[storyowner]['StoryTotalCnt']++;
         
