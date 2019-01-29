@@ -103,7 +103,7 @@ var initiative_info =
   'Status Color' : '',
   'SE_Delivery' : '',
   'SE_Quality' : '',
-  'StatusSummary' : '',
+  'StatusSummary' : { 'UpdateDate' : 'None', count : 0, 'Description' : "" },
   'DeliveryComment' : '',
   'QualityComment' : '',
   'ScopeOfChange' : '',
@@ -211,6 +211,8 @@ var workflow =
 {   
   'CreatedDate' : '',
   'Status' : '',
+  'totalDevelDays' : 0,
+  'RemainDays' : 0,
   "DRAFTING" : { "Duration" : 0, 'History' :[ ] } ,             
   "PO REVIEW" : { "Duration" : 0, 'History' :[ ] } ,             
   "ELT REVIEW" : { "Duration" : 0, 'History' :[ ] } ,             
@@ -800,7 +802,12 @@ async function makeSnapshot_InitiativeListfromJira(querymode, filterID)
   snapshot = snapshot[0].replace(':', '-');
   snapshot = snapshot.replace(':', '-');
   snapshot = querymode+"_"+filterID+"_"+snapshot;
+  // init global variables.
   initiative_DB['snapshotDate'] = snapshot;
+  initiative_DB['total'] = 0;
+  initiative_DB['issues'] = [];
+  initiative_DB['developers'] = {};
+  initiative_keylist = [];
 
   load_DevelopersDB('./public/json/developers.json').then((result) => {
     console.log("[TEST] Read developers DB = ", JSON.stringify(developerslist));
@@ -876,7 +883,7 @@ async function makeSnapshot_InitiativeDetailInfofromJira(KeyValue, index)
     current_initiative_info['Status Color'] = initparse.getStatusColor(issue);        
     current_initiative_info['SE_Delivery'] = initparse.getSE_Delivery(issue);        
     current_initiative_info['SE_Quality'] = initparse.getSE_Quality(issue);    
-    current_initiative_info['StatusSummary'] = initparse.getStatusSummary(issue);    
+    //current_initiative_info['StatusSummary'] = initparse.getStatusSummary(issue);    
     current_initiative_info['DeliveryComment'] = initparse.getD_Comment(issue);    
     current_initiative_info['QualityComment'] = initparse.getQ_Comment(issue);    
     current_initiative_info['ScopeOfChange'] = initparse.getScopeOfChange(issue);        
@@ -900,19 +907,28 @@ async function makeSnapshot_InitiativeDetailInfofromJira(KeyValue, index)
       current_initiative_info['OrgInfo'] = developerslist[initowner];
     }
 
+    let changelog = initiativelist['issues'][0]['changelog'];
     // Release Sprint
     current_ReleaseSP = JSON.parse(JSON.stringify(ReleaseSP)); // initialize...
     current_ReleaseSP['CurRelease_SP'] = initparse.conversionReleaseSprintToSprint(initparse.getReleaseSprint(issue));
-    current_ReleaseSP = initparse.parseReleaseSprint(initiativelist['issues'][0]['changelog'], current_ReleaseSP);
+    current_ReleaseSP = initparse.parseReleaseSprint(changelog, current_ReleaseSP);
     current_initiative_info['ReleaseSprint'] = JSON.parse(JSON.stringify(current_ReleaseSP)); 
     if(current_ReleaseSP['CurRelease_SP'] == 'SP_UNDEF') { current_initiative_info['AbnormalSprint'] = true; } else { current_initiative_info['AbnormalSprint'] = false; }
 
     // workflow
+    let target = initparse.conversionSprintToDate(current_ReleaseSP['CurRelease_SP']);
+    let today = moment().locale('ko');
     current_workflow = JSON.parse(JSON.stringify(workflow)); // initialize...
     current_workflow['CreatedDate'] = initparse.getCreatedDate(issue);
     current_workflow['Status'] = initparse.getStatus(issue);
-    current_workflow = initparse.parseWorkflow(initiativelist['issues'][0]['changelog'], current_workflow);
+    current_workflow['totalDevelDays'] = initparse.getElapsedDays(current_workflow['CreatedDate'], target);
+    current_workflow['RemainDays'] = initparse.getRemainDays(target, today);
+    current_workflow = initparse.parseWorkflow(changelog, current_workflow);
     current_initiative_info['Workflow'] = JSON.parse(JSON.stringify(current_workflow)); 
+
+    // Status Summary { 'UpdateDate' : 'None', count : 0, 'Description' : "" }
+    current_initiative_info['StatusSummary'] = initparse.parseStatusSummary(changelog);
+
     /*
     //current_workflow = initparse.parseWorkflow(initiativelist['issues'][0]['changelog'], current_workflow);
     initparse.parseWorkflow2(initiativelist['issues'][0]['changelog'], current_workflow).then((result) => {
@@ -1052,7 +1068,12 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
   snapshot = snapshot[0].replace(':', '-');
   snapshot = snapshot.replace(':', '-');
   snapshot = querymode+"_"+filterID+"_"+snapshot;
+  // init global variables.
   initiative_DB['snapshotDate'] = snapshot;
+  initiative_DB['total'] = 0;
+  initiative_DB['issues'] = [];
+  initiative_DB['developers'] = {};
+  initiative_keylist = [];
 
   load_DevelopersDB('./public/json/developers.json').then((result) => {
     console.log("[TEST] Read developers DB = ", JSON.stringify(developerslist));
@@ -1113,12 +1134,16 @@ async function makeSnapshot_InitiativeInfofromJira(querymode, filterID)
       if(current_ReleaseSP['CurRelease_SP'] == 'SP_UNDEF') { current_initiative_info['AbnormalSprint'] = true; } else { current_initiative_info['AbnormalSprint'] = false; }
 
       // workflow
+      let target = initparse.conversionSprintToDate(current_ReleaseSP['CurRelease_SP']);
+      let today = moment().locale('ko');
       current_workflow = JSON.parse(JSON.stringify(workflow)); // initialize...
       current_workflow['CreatedDate'] = initparse.getCreatedDate(issue);
       current_workflow['Status'] = initparse.getStatus(issue);
+      current_workflow['totalDevelDays'] = initparse.getElapsedDays(current_workflow['CreatedDate'], target);
+      current_workflow['RemainDays'] = initparse.getRemainDays(target, today);
       current_workflow = initparse.parseWorkflow(initiativelist['issues'][i]['changelog'], current_workflow);
       current_initiative_info['Workflow'] = JSON.parse(JSON.stringify(current_workflow)); 
-    
+
       // Arch Review
       current_initiative_info['ARCHREVIEW'] = { };   
 

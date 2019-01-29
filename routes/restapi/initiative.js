@@ -29,7 +29,6 @@ router.get('/', function(req, res, next) {
 
 /* GET users listing. */
 router.get('/:id', function(req, res, next) {
-  socketcomm.socket_communication();
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8'}); // header 설정
   data = "FEEDBACK ID = " + String(req.params.id);
   console.log("data = ", data);
@@ -39,10 +38,12 @@ router.get('/:id', function(req, res, next) {
 
 /* GET users listing. */
 router.get('/update/:id', function(req, res, next) {
-  console.log("Initiative ", req.params.id);
   if(req.params.id == "webOS4.5_MR_Minor")
   {
+    console.log("req.params.id == webOS4.5_MR_Minor");
     initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor
+    res.header("Content-Type", "text/html; charset=utf-8"); // header 설정
+    res.send("Trigger OK!!!"); // 브라우저로 전송   
   }
 });
 

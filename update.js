@@ -25,6 +25,7 @@ function periodic_DBjobs()
   //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor airplay
   //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 45400);   // webOS5.0
   //initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
+  //initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-23900");   // webOS4.5 MR minor airplay
 
   //initapi.Test();
   //lgldap.getLDAP_Info('stan.kim').then((result) => { console.log("Department = ", result)});  

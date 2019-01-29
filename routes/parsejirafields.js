@@ -867,26 +867,6 @@ function checkIsDelayed(DueDate)
     return true; 
 }
 
-//===========================================================================
-// getRemainDays : check remain days base on specific date
-// [param] targetdate, base date (string format : "2018-04-03" or "2018-04-14T19:00:00")
-// [return] delayed or due date is null : true, not delayed : false
-//===========================================================================
-function getRemainDays(targetdate, basedate)
-{
-    let diff = 0;
-    if(targetdate == "SP_UNDEF") 
-    { 
-        console.log("[Target] = ", targetdate, " [Base] = ", basedate, " [Remain Days] = ", diff);
-        return diff; 
-    }
-    let target = moment(targetdate).add(9, 'Hour');
-    let base = moment(basedate).add(9, 'Hour');
-    diff = (target - base) / (1000*60*60*24); 
-    console.log("[Target] = ", target, " [Base] = ", base, " [Remain Days] = ", diff);
-    return diff;
-}
-
 
 //===========================================================================
 // parseWorkflow : make the history of workflow from changelog
@@ -1503,6 +1483,57 @@ function parseReleaseSprint(changelog, releaseSP)
 }
 
 
+//===========================================================================
+// parseStatusSummary : check statsummary contents from changelog
+// [param] changelog, 
+// [return] the last of status summary contents from changelog [created date, count, contents]
+//===========================================================================
+function parseStatusSummary(changelog)
+{
+    console.log("parseStatusSummary function")
+    if(changelog != null)
+    {
+        let isfound = false;
+        let from = 0, to = "None";
+        let item_created = null;
+        let log = changelog['histories'];
+        let today = moment().locale('ko');
+        today = moment(today).add(9, 'Hour');
+        for(let i = 0; i < changelog.total; i++)
+        {
+            for(let j = 0; j < log[i]['items'].length; j++)
+            {
+                let item = log[i]['items'][j];
+                if(item['field'] == 'Status Summary') // Status Summary
+                {
+                    isfound = true;
+                    item_created = log[i]['created'];
+                    item_created = item_created.split('+');
+                    //item_created = moment(item_created[0]).add(9, 'Hour');                    
+        
+                    from = item['fromString'];
+                    to = item['toString'];
+                    //console.log("[Status Summary] Changed Date : ", item_created, "From : ", from, " ==> To : ", to);
+                }
+            }
+        }
+        if(isfound)
+        {
+            to = "[" + String(item_created[0]) + "]\n" + to;
+            let count = 0;
+            let update_elapsed = 0;
+            update_elapsed = getElapsedDays(item_created[0], today);
+            count = (update_elapsed / 7); 
+            console.log("[Status Summary] Changed Date : ", item_created, "누락회수 = ", count, " Status Summary : ", to);
+            let result = { 'UpdateDate' : item_created[0], 'count' : count, 'Description' : to };
+            return result;
+        }
+    }
+    console.log("[Exception] : parseStatusSummary")
+    return { 'UpdateDate' : 'None', 'count' : 'None', 'Description' : "None" };
+}
+
+
 
 //===========================================================================
 // getPersonalInfo : get Personal Info (Name, Position, Department, email)
@@ -1526,23 +1557,45 @@ function getPersonalInfo(displayName, dpcode)
 
 
 //===========================================================================
-// getElapsedDays : get elapsed days
-// [param] day1(moment), day2 (moment)
-// [return] diff = day2 - day1
+// getRemainDays : check remain days base on specific date
+// [param] targetdate, base date (string format : "2018-04-03" or "2018-04-14T19:00:00")
+// [return] delayed or due date is null : true, not delayed : false
 //===========================================================================
-function getElapsedDays(date1, date2)
+function getRemainDays(targetdate, basedate)
 {
-    /*
-    console("cur time = ", moment().format("YYYY-MM-DDTHH:MM:SS"));
-    created = new Date("2018-12-06T11:46:34.000+0900");
-    current = moment();
-    diff = current - created;
-    console.log("day = ", diff/(1000*60*60*24));
-    */
-    let date1 = moment(date1);
-    let date2 = moment(date2);
-    let diffday = (date2 - date1)/(1000*60*60*24);
-    console.log("Dff Day = ", diffday);
+    let diff = 0;
+    if(targetdate == "SP_UNDEF") 
+    { 
+        console.log("[Target] = ", targetdate, " [Base] = ", basedate, " [Remain Days] = ", diff);
+        return diff; 
+    }
+    let target = moment(targetdate).add(9, 'Hour');
+    let base = moment(basedate).add(9, 'Hour');
+    diff = (target - base) / (1000*60*60*24); 
+    console.log("getRemainDays : [Target] = ", target, " [Base] = ", base, " [Remain Days] = ", diff);
+    return diff;
+}
+
+
+//===========================================================================
+// getElapsedDays : get elapsed days
+// [param] start(moment), end (moment)
+// [return] diff = end - start
+//===========================================================================
+function getElapsedDays(start, end)
+{
+    let diff = 0;
+    if(end == 'SP_UNDEF')
+    { 
+        console.log("getElapsedDays : [start] = ", start, " [end] = ", end, " [Elapsed Days] = ", diff);
+        return diff; 
+    }
+
+    start = moment(start);
+    end = moment(end);
+    diff = (end - start)/(1000*60*60*24);
+    console.log("getElapsedDays : [Start] = ", start, " [End] = ", end, " [Elapsed Days] = ", diff);
+    return diff;
 }
 
 
@@ -1597,6 +1650,7 @@ module.exports = {
     checkIsDelayed,
     parseWorkflow,
     parseReleaseSprint,
+    parseStatusSummary,
     getElapsedDays,
     getRemainDays,
     getPersonalInfo,
