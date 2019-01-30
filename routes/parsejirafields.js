@@ -864,7 +864,7 @@ function checkIsDelayed(DueDate)
         var today = new Date();
         if(duedate < today) { return true; }
     }
-    return true; 
+    return false; 
 }
 
 
@@ -1544,12 +1544,36 @@ function getPersonalInfo(displayName, dpcode)
 {
     return new Promise(function (resolve, reject){
         let parse = displayName.split('/');
-        let name = parse[0];
-        let position = parse[1];
-        let temp = parse[2].replace(')', '');
-        temp = temp.split('(');
-        let department = temp[0];
-        let email = temp[1];
+        let name = "----";
+        let position = "----";
+        let temp = 0; 
+        let department = "----";
+        let email = "----";
+
+        switch(parse.length)
+        {
+            case 0: 
+                break;
+            case 1:
+                name = parse[0];
+                break;
+            case 2: 
+                name = parse[0];
+                position = "----";
+                temp = parse[1].replace(')', '');
+                temp = temp.split('(');
+                department = temp[0];
+                email = temp[1];
+                break;
+            case 3:
+                name = parse[0];
+                position = parse[1];
+                temp = parse[2].replace(')', '');
+                temp = temp.split('(');
+                department = temp[0];
+                email = temp[1];
+                break;
+        }
         console.log("name = ", name, " position = ", position, " department = ", department, " email = ", email, " DepartmentCode = ", dpcode);
         resolve([ name, position, department, email, dpcode ]);
     });

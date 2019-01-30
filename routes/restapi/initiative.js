@@ -11,9 +11,6 @@ var XMLHttpRequest = require('xmlhttprequest-ssl').XMLHttpRequest;
 var socketcomm = require('../socket_comm');
 var initapi = require('../initapi');
 
-//const cors = require('cors');
-//router.use(cors({origin : 'http://collab.lge.com', optionsSuccessStatus : 200 })); // cors settings..
-
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.header("Content-Type", "text/html; charset=utf-8"); // header 설정
@@ -38,13 +35,40 @@ router.get('/:id', function(req, res, next) {
 
 /* GET users listing. */
 router.get('/update/:id', function(req, res, next) {
-  if(req.params.id == "webOS4.5_MR_Minor")
+  let filterID = 0;
+  let msg = "None"
+  switch(req.params.id)
   {
-    console.log("req.params.id == webOS4.5_MR_Minor");
-    initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor
-    res.header("Content-Type", "text/html; charset=utf-8"); // header 설정
-    res.send("Trigger OK!!!"); // 브라우저로 전송   
+    case "webOS4.5_Initial" :
+      console.log("req.params.id == webOS4.0_Initial");
+      filterID = 39490;
+      break;
+    case "webOS4.5_MR_Minor" :
+      console.log("req.params.id == webOS4.5_MR_Minor");
+      filterID = 46093;
+      break;
+    case "webOS4.5_MR_Major" :
+      console.log("req.params.id == webOS4.5_MR_Major");
+      filterID = 46117;
+      break;
+    case "webOS5.0_Initial" :
+      console.log("req.params.id == webOS5.0_Initial");
+      filterID = 45402;
+      break;
+    case "SEETV" :
+      console.log("req.params.id == SEETV");
+      filterID = 45938;
+      break;
+    case "webOS5.0_Initial(SEETV)" :
+      console.log("req.params.id == SEETV");
+      filterID = 45400;
+      break;
   }
+  //initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
+  initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", filterID);   
+  res.header("Content-Type", "text/html; charset=utf-8"); // header 설정
+  msg = "Trigger OK!!! " + "[Platform] = " + req.params.id + " FIlter ID = " + String(filterID) +" http://hlm.lge.com/issue/issues/?filter="+String(filterID)
+  res.send(msg); // 브라우저로 전송   
 });
 
 

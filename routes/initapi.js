@@ -154,6 +154,7 @@ var initiative_info =
     'issues' : [],    
   },
   'STATICS' : { },
+  'URL' : { },
   'developers' : { },
 };
 
@@ -334,7 +335,7 @@ var Arch_2nd_workflow =
   "Closed" : { "Duration" : 0, 'History' :[ ] }  ,            
 };
 
-Arch_Review = 
+var Arch_Review = 
 {
   'Key' : '',
   'ScopeOfChange' : '---',
@@ -352,6 +353,75 @@ Arch_Review =
     'FMEA Review' : { 'output' : false, 'workflow' : {}, }, 
   },
 }
+
+
+const common_url = 'http://hlm.lge.com/issue/issues/?jql=';
+
+const total_link_key = 
+{
+  'Total' : { 'link' : '', 'keys' : [] },
+  'DevelTC' : { 'link' : '', 'keys' : [] },
+  'NonDevelTC' : { 'link' : '', 'keys' : [] },
+  'NeedtoCheck' : { 'link' : '', 'keys' : [] },
+  'ZephyrTotal' : { 'link' : '', 'keys' : [] },
+  'Zephyr_DRAFT' : { 'link' : '', 'keys' : [] },
+  'Zephyr_REVIEW' : { 'link' : '', 'keys' : [] },
+  'Zephyr_UPDATE' : { 'link' : '', 'keys' : [] },
+  'Zephyr_ACTIVE' : { 'link' : '', 'keys' : [] },
+  'Zephyr_PASS' : { 'link' : '', 'keys' : [] },
+  'Zephyr_FAIL' : { 'link' : '', 'keys' : [] },
+}
+
+const OrgDevel_link_key = 
+{
+  'Total' : '',
+  'DevelTC' : '',
+  'NonDevelTC' : '',
+  'NeedtoCheck' : '',
+  'ZephyrTotal' : '',
+  'Zephyr_DRAFT' : '',
+  'Zephyr_REVIEW' : '',
+  'Zephyr_UPDATE' : '',
+  'Zephyr_ACTIVE' : '',
+  'Zephyr_PASS' : '',
+  'Zephyr_FAIL' : '',
+};
+
+var current_urlinfo = { }; 
+const urlinfo = 
+{
+  'COMMON' :
+  {
+    'EPIC_TOTAL' : '',
+    'EPIC_Duedate_Null' : '',
+    'EPIC_Duedate_Delayed' : '',
+    'EPIC_AbnormalSP' : '',
+    'STORY_TOTAL' : '',
+    'STORY_Duedate_Null' : '',
+    'STORY_Duedate_Delayed' : '',
+    'STORY_AbnormalSP' : '',
+    'AbnormalSPList' : [],
+  },
+  'EPIC+STORY_LINK' : 
+  {
+      'TOTAL' : { },
+      'ORGANIZATION' : { },
+      'DEVELOPER' :  { },
+  },    
+  'EPIC_LINK' : 
+  {
+      'TOTAL' : { },
+      'ORGANIZATION' : { },
+      'DEVELOPER' : { },
+  },
+  'STORY_LINK' : 
+  {
+      'TOTAL' : { },
+      'ORGANIZATION' : { },
+      'DEVELOPER' : { },
+  },
+}
+
 
 var developerslist = {};
 var developers = {};
@@ -728,6 +798,28 @@ function load_DevelopersDB(filename)
 }
 
 
+function load_InitiativeDB(filename)
+{
+  return new Promise(function (resolve, reject) {
+    fs.exists(filename, (exist) => {
+      if(exist)
+      {
+       console.log("file is exist");
+       let data = fs.readFileSync(filename, 'utf8');
+       initiative_DB = JSON.parse(data); 
+      }
+      else
+      {
+        console.log('Not Found!');
+        initiative_DB = {};   
+        //reject(initiative_DB);
+      }
+      resolve(initiative_DB);
+    });      
+  });
+}
+
+
 function get_InitiativeList(res, res, next)
 {
 	var xhttp = new XMLHttpRequest();
@@ -840,6 +932,7 @@ async function makeSnapshot_InitiativeListfromJira(querymode, filterID)
   console.log("Error List - Save end : initiative_DB");
 
   await makeZephyrStatics();
+  make_URLinfo();
   console.log("[final-Zephyr] Save file = initiative_DB");
   Save_JSON_file(initiative_DB, "./public/json/initiative_DB_"+initiative_DB['snapshotDate']+".json");
   Save_JSON_file(initiative_DB, "./public/json/initiative_DB_"+filterID+"_Latest.json");
@@ -1010,11 +1103,9 @@ async function makeSnapshot_EpicDetailInfofromJira(init_keyvalue, init_index)
       if(current_epic_info['Labels'].length == 0 || current_epic_info['SDET_NeedtoCheck'] == true) { epic['EpicNeedtoCheckCnt']++; }
       if(current_epic_info['SDET_NeedDevelTC'] == true) { epic['EpicDevelTCCnt']++; } else { epic['EpicNonDevelTCCnt']++; }
       
-      //if(initparse.checkIsDelayed(current_epic_info['duedate']) == true && initparse.checkIsDelivered(epic_Status) == false) { epic['EpicDelayedCnt']++; }
-
       if(initparse.checkIsDelivered(current_epic_info['Status']) == false)
       {
-        if(initparse.checkIsDelayed(current_epic_info['duedate'] == true)) { epic['EpicDelayedCnt']++; }
+        if(initparse.checkIsDelayed(current_epic_info['duedate']) == true) { epic['EpicDelayedCnt']++; }
         if(current_epic_info['duedate'] == null) { epic['EpicDuedateNullCnt']++; }
         if(current_epic_info['AbnormalSprint'] == true) { epic['EpicAbnormalSPCnt']++; }
       }  
@@ -1255,7 +1346,7 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
         //if(initparse.checkIsDelayed(current_epic_info['duedate']) == true && initparse.checkIsDelivered(epic_Status) == false) { epic['EpicDelayedCnt']++; }
         if(initparse.checkIsDelivered(current_epic_info['Status']) == false)
         {
-          if(initparse.checkIsDelayed(current_epic_info['duedate'] == true)) { epic['EpicDelayedCnt']++; }
+          if(initparse.checkIsDelayed(current_epic_info['duedate']) == true) { epic['EpicDelayedCnt']++; }
           if(current_epic_info['duedate'] == null) { epic['EpicDuedateNullCnt']++; }
           if(current_epic_info['AbnormalSprint'] == true) { epic['EpicAbnormalSPCnt']++; }
         }  
@@ -1612,7 +1703,7 @@ async function makeSnapshot_StoryInfofromJira(init_index, epickeylist)
 
         if(initparse.checkIsDelivered(story_Status) == false)
         {
-          if(initparse.checkIsDelayed(current_story_info['duedate'] == true)) { epicstorysummary['StoryDelayedCnt']++; }
+          if(initparse.checkIsDelayed(current_story_info['duedate']) == true) { epicstorysummary['StoryDelayedCnt']++; }
           if(current_story_info['duedate'] == null) { epicstorysummary['StoryDuedateNullCnt']++; }
           if(current_story_info['AbnormalSprint'] == true) { epicstorysummary['StoryAbnormalSPCnt']++; }
         }
@@ -1871,7 +1962,7 @@ async function makeZephyrStatics()
 
       if(initparse.checkIsDelivered(epic[j]['Status']) == false)
       {
-        if(initparse.checkIsDelayed(epic[j]['duedate'] == true)) { epicz_devel[epicowner]['EpicDelayedCnt']++; }
+        if(initparse.checkIsDelayed(epic[j]['duedate']) == true) { epicz_devel[epicowner]['EpicDelayedCnt']++; }
         if(epic[j]['duedate'] == null) { epicz_devel[epicowner]['EpicDuedateNullCnt']++; }
         if(epic[j]['AbnormalSprint'] == true) { epicz_devel[epicowner]['EpicAbnormalSPCnt']++; }
       }      
@@ -2025,17 +2116,14 @@ async function makeZephyrStatics()
         if((storyowner in storyz_devel) == false) { storyz_devel[storyowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
         if(story[k]['Labels'].length == 0 || story[k]['SDET_NeedtoCheck'] == true) { storyz_devel[storyowner]['StoryNeedtoCheckCnt']++; }
-        else
-        {
-          if(story[k]['SDET_NeedDevelTC'] == true) { storyz_devel[storyowner]['StoryDevelTCCnt']++; } else { storyz_devel[storyowner]['StoryNonDevelTCCnt']++; }
-        }
+        if(story[k]['SDET_NeedDevelTC'] == true) { storyz_devel[storyowner]['StoryDevelTCCnt']++; } else { storyz_devel[storyowner]['StoryNonDevelTCCnt']++; }
 
         storyz_devel[storyowner]['StoryTotalCnt']++;
         
         //if(initparse.checkIsDelayed(story[k]['duedate']) == true && initparse.checkIsDelivered(story[k]['Status']) == false) { storyz_devel[storyowner]['StoryDelayedCnt']++; }
         if(initparse.checkIsDelivered(story[k]['Status']) == false)
         {
-          if(initparse.checkIsDelayed(story[k]['duedate'] == true)) { storyz_devel[storyowner]['StoryDelayedCnt']++; }
+          if(initparse.checkIsDelayed(story[k]['duedate']) == true) { storyz_devel[storyowner]['StoryDelayedCnt']++; }
           if(story[k]['duedate'] == null) { storyz_devel[storyowner]['StoryDuedateNullCnt']++; }
           if(story[k]['AbnormalSprint'] == true) { storyz_devel[storyowner]['StoryAbnormalSPCnt']++; }
         }      
@@ -2210,14 +2298,237 @@ async function makeZephyrStatics()
 
 //===========================
 
+async function make_URLinfo()
+{
+  console.log("[Proimse 1] make_URLinfo ---- make URL of JIRA Info");
+  /*
+  load_InitiativeDB('./public/json/initiative_DB_46093_Latest.json').then((result) => {
+    console.log("[TEST] Read Initiative DB = ", JSON.stringify(initiative_DB));
+  */
+  var initiative = initiative_DB['issues'];  
+
+  // [INITIATIVE LOOP]
+  for(var i = 0; i < initiative.length; i++)
+  {
+    console.log("[Initiative] i = ", i, "#######################");
+    let orgcode = initiative_DB['issues'][i]['OrgInfo'][4];  
+
+    current_urlinfo = JSON.parse(JSON.stringify(urlinfo));
+    current_urlinfo['EPIC+STORY_LINK']['TOTAL'] = JSON.parse(JSON.stringify(total_link_key));
+    current_urlinfo['EPIC_LINK']['TOTAL'] = JSON.parse(JSON.stringify(total_link_key));
+    current_urlinfo['STORY_LINK']['TOTAL'] = JSON.parse(JSON.stringify(total_link_key));
+
+    // [EPIC LOOP]
+    let epic = initiative_DB['issues'][i]['EPIC']['issues'];
+    for(var j = 0; j < epic.length; j++)
+    {
+      current_urlinfo['EPIC_LINK']['TOTAL']['Total']['keys'].push(epic[j]['Epic Key']);
+
+      if(epic[j]['Labels'].length == 0 || epic[j]['SDET_NeedtoCheck'] == true) { current_urlinfo['EPIC_LINK']['TOTAL']['NeedtoCheck']['keys'].push(epic[j]['Epic Key']); }
+      
+      if(epic[j]['SDET_NeedDevelTC'] == true) { current_urlinfo['EPIC_LINK']['TOTAL']['DevelTC']['keys'].push(epic[j]['Epic Key']); } 
+      else { current_urlinfo['EPIC_LINK']['TOTAL']['NonDevelTC']['keys'].push(epic[j]['Epic Key']); }
+    
+      if(initparse.checkIsDelivered(epic[j]['Status']) == false)
+      {
+        if(epic[j]['AbnormalSprint'] == true) { current_urlinfo['COMMON']['AbnormalSPList'].push(epic[j]['Epic Key']); }
+      }      
+
+      // [EPIC ZEPHYR LOOP]
+      let epic_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['Zephyr']['ZephyrTC'];
+      for(var k = 0; k < epic_zephyr.length; k++)
+      {
+        if(initiative_DB['issues'][i]['EPIC']['issues'][j]['SDET_NeedDevelTC'] == true)
+        {
+          console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
+          let epicz_assignee = epic_zephyr[k]['Assignee'];
+          if(epic_zephyr[k]['Status'] == "Review" || epic_zephyr[k]['Status'] == "Update" || epic_zephyr[k]['Status'] == "Active" || epic_zephyr[k]['Status'] == "Approval")
+          { 
+            current_urlinfo['EPIC_LINK']['TOTAL']['ZephyrTotal']['keys'].push(epic[j]['Epic Key']); 
+            console.log("push epic key = ", epic[j]['Epic Key']);
+          }
+
+          if(epic_zephyr[k]['Status'] == "Draft") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_DRAFT']['keys'].push(epic[j]['Epic Key']); }
+          else if(epic_zephyr[k]['Status'] == "Review") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_REVIEW']['keys'].push(epic[j]['Epic Key']); }
+          else if(epic_zephyr[k]['Status'] == "Update") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_UPDATE']['keys'].push(epic[j]['Epic Key']); }
+          else if(epic_zephyr[k]['Status'] == "Active") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(epic[j]['Epic Key']); }
+          else if(epic_zephyr[k]['Status'] == "Approval") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(epic[j]['Epic Key']); }
+          else if(epic_zephyr[k]['Status'] == "Archived") {  }
+          else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); }
+
+          // [EPIC ZEPHYR EXECUTION LOOP]
+          for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
+          {
+            console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
+            let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
+            let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
+            // check the result of last test status.
+            if(l == (epic_zephyr[k]['Executions'].length -1) && status == "1") 
+            {
+              current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(epic[j]['Epic Key']);
+            }
+            else
+            {
+              current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(epic[j]['Epic Key']);
+            }
+          }       
+        }
+      }
+
+      // [STORY LOOP]
+      let story = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'];
+      for(var k = 0; k < story.length; k++)
+      {
+        var storyowner = story[k]['Assignee'];
+        if(story[k]['Labels'].length == 0 || story[k]['SDET_NeedtoCheck'] == true) { current_urlinfo['STORY_LINK']['TOTAL']['NeedtoCheck']['keys'].push(story[k]['Story Key']); }
+
+        if(story[k]['SDET_NeedDevelTC'] == true) { current_urlinfo['STORY_LINK']['TOTAL']['DevelTC']['keys'].push(story[k]['Story Key']); } 
+        else { current_urlinfo['STORY_LINK']['TOTAL']['NonDevelTC']['keys'].push(story[k]['Story Key']); }
+
+        current_urlinfo['STORY_LINK']['TOTAL']['Total']['keys'].push(story[k]['Story Key']);
+        
+        if(initparse.checkIsDelivered(story[k]['Status']) == false)
+        {
+          if(story[k]['AbnormalSprint'] == true) { current_urlinfo['COMMON']['AbnormalSPList'].push(story[k]['Story Key']); }
+        }      
+
+        // [STORY ZEPHYR LOOP]
+        let story_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Zephyr']['ZephyrTC'];
+        for(var l = 0; l < story_zephyr.length; l++)
+        {
+          if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
+          {
+            let storyz_assignee = story_zephyr[l]['Assignee'];
+            if(story_zephyr[l]['Status'] == "Review" || story_zephyr[l]['Status'] == "Update" || story_zephyr[l]['Status'] == "Active" || story_zephyr[l]['Status'] == "Approval")
+            { 
+              current_urlinfo['STORY_LINK']['TOTAL']['ZephyrTotal']['keys'].push(story[k]['Story Key']);
+              console.log("push Story key = ", story[k]['Story Key']);
+            }
+  
+            if(story_zephyr[l]['Status'] == "Draft") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_DRAFT']['keys'].push(story[k]['Story Key']); }
+            else if(story_zephyr[l]['Status'] == "Review") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_REVIEW']['keys'].push(story[k]['Story Key']); }
+            else if(story_zephyr[l]['Status'] == "Update") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_UPDATE']['keys'].push(story[k]['Story Key']); }
+            else if(story_zephyr[l]['Status'] == "Active") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(story[k]['Story Key']); }
+            else if(story_zephyr[l]['Status'] == "Approval") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(story[k]['Story Key']); }
+            else if(story_zephyr[l]['Status'] == "Archived") { }
+            else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); }
+        
+            // [STORY ZEPHYR EXECUTION LOOP]
+            console.log("[SZ] i = ", i, " j = ", j, " k = ", k, " l = ", l);
+            for(var m = 0; m < story_zephyr[l]['Executions'].length; m++)
+            {
+              let storyze_assignee = story_zephyr[l]['Executions'][m]['executedBy'];
+              console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
+              let status = story_zephyr[l]['Executions'][m]['executionStatus'];
+              // check the result of last test status.
+              if(m == (story_zephyr[l]['Executions'].length -1) && status == "1") 
+              {
+                current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(story[k]['Story Key']);
+              }
+              else
+              {
+                current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(story[k]['Story Key']);
+              }
+            }
+          }
+        }      
+      } // story
+    } // epic
+
+    // COMMON
+    current_urlinfo['COMMON']['EPIC_TOTAL'] = common_url + '(issuetype = epic) AND issuefunction in linkedissuesOf("key in (' + initiative[i]['Initiative Key'] + ')")';
+    current_urlinfo['COMMON']['EPIC_Duedate_Null'] = current_urlinfo['COMMON']['EPIC_TOTAL'] + " AND (duedate = null AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn)";
+    current_urlinfo['COMMON']['EPIC_Duedate_Delayed'] = current_urlinfo['COMMON']['EPIC_TOTAL'] + " AND (duedate < now() AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn)";
+    current_urlinfo['COMMON']['EPIC_AbnormalSP'] = common_url + "(issuetype = epic) AND key in (" + current_urlinfo['COMMON']['AbnormalSPList'].join() + ")";
+    current_urlinfo['COMMON']['STORY_TOTAL'] = common_url + '(issuetype = story OR issuetype = task) AND issuefunction in linkedissuesOf("key in (' + current_urlinfo['STORY_LINK']['TOTAL']['Total']['keys'].join() + '")';
+    current_urlinfo['COMMON']['STORY_Duedate_Null'] = current_urlinfo['COMMON']['STORY_TOTAL'] + 'AND (duedate = null AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn)';
+    current_urlinfo['COMMON']['STORY_Duedate_Delayed'] = current_urlinfo['COMMON']['STORY_TOTAL'] + 'AND (duedate < now() AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn)';
+    current_urlinfo['COMMON']['STORY_AbnormalSP'] = common_url + "(issuetype = story OR issuetype = task) AND key in (" + current_urlinfo['COMMON']['AbnormalSPList'].join() + ")";
+
+    // Epic
+    for(let key in current_urlinfo['EPIC_LINK']['TOTAL'])
+    { 
+      console.log("epic key = ", key, " ", current_urlinfo['EPIC_LINK']['TOTAL'][key]['keys'].join());
+      current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'] = common_url + "key in ("+current_urlinfo['EPIC_LINK']['TOTAL'][key]['keys'].join() + ")";
+    }
+
+    // Story
+    for(let key in current_urlinfo['STORY_LINK']['TOTAL'])
+    {
+      console.log("story key = ", key, " ", current_urlinfo['STORY_LINK']['TOTAL'][key]['keys'].join());
+      current_urlinfo['STORY_LINK']['TOTAL'][key]['link'] = common_url + "key in ("+current_urlinfo['STORY_LINK']['TOTAL'][key]['keys'].join() + ")";
+    }
+    // epic + story
+    for(let key in current_urlinfo['EPIC+STORY_LINK']['TOTAL'])
+    {
+      current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['keys'] = current_urlinfo['EPIC_LINK']['TOTAL'][key]['keys'].concat(current_urlinfo['STORY_LINK']['TOTAL'][key]['keys']);
+      current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'] = common_url + "key in ("+current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['keys'].join() + ")";
+    }
+
+    // ORGANIZATION
+    for(var orgname in initiative[i]['STATICS']['EPIC+STORY_STATICS']['ORGANIZATION'])
+    { // EPIC
+      current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname] = JSON.parse(JSON.stringify(OrgDevel_link_key));
+      console.log("orgname = ", orgname);
+      console.log("object = ", JSON.stringify(current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname]));
+      for(let key in current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname])
+      {
+        current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname][key] = current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'] + " AND Aassignee is membersOf(" + orgname + "("+ String(orgcode) + "_grp)";
+      }
+      // STORY
+      current_urlinfo['STORY_LINK']['ORGANIZATION'][orgname] = JSON.parse(JSON.stringify(OrgDevel_link_key));
+      for(let key in current_urlinfo['STORY_LINK']['ORGANIZATION'][orgname])
+      {
+        current_urlinfo['STORY_LINK']['ORGANIZATION'][orgname][key] = current_urlinfo['STORY_LINK']['TOTAL'][key]['link'] + " AND Aassignee is membersOf(" + orgname + "("+ String(orgcode) + "_grp)";
+      }
+      // EPIC + STORY
+      current_urlinfo['EPIC+STORY_LINK']['ORGANIZATION'][orgname]=JSON.parse(JSON.stringify(OrgDevel_link_key));
+      for(let key in current_urlinfo['EPIC+STORY_LINK']['ORGANIZATION'][orgname])
+      {
+        current_urlinfo['EPIC+STORY_LINK']['ORGANIZATION'][orgname][key] = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'] + " AND Aassignee is membersOf(" + orgname + "("+ String(orgcode) + "_grp)";
+      }
+    }
+    
+    // DEVELOPER
+    for(var assignee in initiative[i]['STATICS']['EPIC+STORY_STATICS']['DEVELOPER'])
+    { // EPIC
+      current_urlinfo['EPIC_LINK']['DEVELOPER'][assignee] = JSON.parse(JSON.stringify(OrgDevel_link_key));
+      for(let key in current_urlinfo['EPIC_LINK']['DEVELOPER'][assignee])
+      {
+        current_urlinfo['EPIC_LINK']['DEVELOPER'][assignee][key] = current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'] + " AND Aassignee in (" + assignee + ")";
+      }
+      // STORY
+      current_urlinfo['STORY_LINK']['DEVELOPER'][assignee] = JSON.parse(JSON.stringify(OrgDevel_link_key));
+      for(let key in current_urlinfo['STORY_LINK']['DEVELOPER'][assignee])
+      {
+        current_urlinfo['STORY_LINK']['DEVELOPER'][assignee][key] = current_urlinfo['STORY_LINK']['TOTAL'][key]['link'] + " AND Aassignee in (" + assignee + ")";
+      }
+      // EPIC + STORY
+      current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee] = JSON.parse(JSON.stringify(OrgDevel_link_key));
+      for(let key in current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee])
+      {
+        current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee][key] = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'] + ")" + " AND Aassignee in (" + assignee + ")";
+      }
+    }
+
+    initiative_DB['issues'][i]['URL'] = current_urlinfo;
+  } // initiative
+}
+
 
 //===========================
 
 async function Test()
 {
-  load_DevelopersDB('./public/json/developers.json').then((result) => {
-    console.log("[TEST] Read developers DB = ", JSON.stringify(developerslist));
+  load_InitiativeDB('./public/json/initiative_DB_46093_Latest.json').then((result) => {
+    console.log("[TEST] Read Initiative DB = ", JSON.stringify(initiative_DB));
   });
+
+  make_URLinfo();
+
+  console.log("[final-make_URLinfo] Save file = initiative_DB_URL");
+  Save_JSON_file(initiative_DB, "./public/json/initiative_DB_URL_Latest.json");
+  console.log("[final-make_URLinfo] Save end : initiative_DB_URL");
 }
 
 

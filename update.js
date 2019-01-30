@@ -2,6 +2,7 @@ var tmr = require('./routes/mytimer');
 var initapi = require('./routes/initapi');
 var lgldap = require('./routes/lgeldap');
 var moment = require('moment-timezone')
+var initparse = require('./routes/parsejirafields');
 
 moment.tz.setDefault("Asiz/Seoul");
 
@@ -21,8 +22,7 @@ function periodic_DBjobs()
   //initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-11552");   // webOS4.5 MR minor // shinchiho
 
 
-  initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor
-  //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor airplay
+  //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor
   //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 45400);   // webOS5.0
   //initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
   //initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-23900");   // webOS4.5 MR minor airplay
@@ -30,12 +30,19 @@ function periodic_DBjobs()
   //initapi.Test();
   //lgldap.getLDAP_Info('stan.kim').then((result) => { console.log("Department = ", result)});  
   /*
+  lgldap.getLDAP_Info('wl.gui')
+        .then((result) => { 
+          console.log(JSON.stringify(result));
+        })
+        .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
   lgldap.getLDAP_Info('sungbin.na')
         .then((result) => { 
           console.log(JSON.stringify(result));
         })
         .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
+  initparse.getPersonalInfo("weili gui/LGECH China TV Lab Development Team(wl.gui@lge.com)", 0000).then(((result) => { console.log(result); }))
   */
+ initapi.Test();
 }  
 
 //tmr.Timer_Setting(12, 20, 10, periodic_DBjobs);
