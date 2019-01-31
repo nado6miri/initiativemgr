@@ -2344,15 +2344,15 @@ async function make_URLinfo()
           let epicz_assignee = epic_zephyr[k]['Assignee'];
           if(epic_zephyr[k]['Status'] == "Review" || epic_zephyr[k]['Status'] == "Update" || epic_zephyr[k]['Status'] == "Active" || epic_zephyr[k]['Status'] == "Approval")
           { 
-            current_urlinfo['EPIC_LINK']['TOTAL']['ZephyrTotal']['keys'].push(epic[j]['Epic Key']); 
-            console.log("push epic key = ", epic[j]['Epic Key']);
+            current_urlinfo['EPIC_LINK']['TOTAL']['ZephyrTotal']['keys'].push(epic_zephyr[k]['Zephyr Key']); 
+            console.log("push epic zephyr key = ", epic_zephyr[k]['Zephyr Key']);
           }
 
-          if(epic_zephyr[k]['Status'] == "Draft") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_DRAFT']['keys'].push(epic[j]['Epic Key']); }
-          else if(epic_zephyr[k]['Status'] == "Review") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_REVIEW']['keys'].push(epic[j]['Epic Key']); }
-          else if(epic_zephyr[k]['Status'] == "Update") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_UPDATE']['keys'].push(epic[j]['Epic Key']); }
-          else if(epic_zephyr[k]['Status'] == "Active") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(epic[j]['Epic Key']); }
-          else if(epic_zephyr[k]['Status'] == "Approval") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(epic[j]['Epic Key']); }
+          if(epic_zephyr[k]['Status'] == "Draft") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_DRAFT']['keys'].push(epic_zephyr[k]['Zephyr Key']); }
+          else if(epic_zephyr[k]['Status'] == "Review") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_REVIEW']['keys'].push(epic_zephyr[k]['Zephyr Key']); }
+          else if(epic_zephyr[k]['Status'] == "Update") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_UPDATE']['keys'].push(epic_zephyr[k]['Zephyr Key']); }
+          else if(epic_zephyr[k]['Status'] == "Active") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(epic_zephyr[k]['Zephyr Key']); }
+          else if(epic_zephyr[k]['Status'] == "Approval") { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(epic_zephyr[k]['Zephyr Key']); }
           else if(epic_zephyr[k]['Status'] == "Archived") {  }
           else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); }
 
@@ -2365,11 +2365,11 @@ async function make_URLinfo()
             // check the result of last test status.
             if(l == (epic_zephyr[k]['Executions'].length -1) && status == "1") 
             {
-              current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(epic[j]['Epic Key']);
+              current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(epic_zephyr[k]['Zephyr Key']);
             }
             else
             {
-              current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(epic[j]['Epic Key']);
+              current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(epic_zephyr[k]['Zephyr Key']);
             }
           }       
         }
@@ -2401,15 +2401,15 @@ async function make_URLinfo()
             let storyz_assignee = story_zephyr[l]['Assignee'];
             if(story_zephyr[l]['Status'] == "Review" || story_zephyr[l]['Status'] == "Update" || story_zephyr[l]['Status'] == "Active" || story_zephyr[l]['Status'] == "Approval")
             { 
-              current_urlinfo['STORY_LINK']['TOTAL']['ZephyrTotal']['keys'].push(story[k]['Story Key']);
-              console.log("push Story key = ", story[k]['Story Key']);
+              current_urlinfo['STORY_LINK']['TOTAL']['ZephyrTotal']['keys'].push(story_zephyr[l]['Zephyr Key']);
+              console.log("push Story zephyr key = ", story_zephyr[l]['Zephyr Key']);
             }
   
-            if(story_zephyr[l]['Status'] == "Draft") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_DRAFT']['keys'].push(story[k]['Story Key']); }
-            else if(story_zephyr[l]['Status'] == "Review") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_REVIEW']['keys'].push(story[k]['Story Key']); }
-            else if(story_zephyr[l]['Status'] == "Update") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_UPDATE']['keys'].push(story[k]['Story Key']); }
-            else if(story_zephyr[l]['Status'] == "Active") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(story[k]['Story Key']); }
-            else if(story_zephyr[l]['Status'] == "Approval") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(story[k]['Story Key']); }
+            if(story_zephyr[l]['Status'] == "Draft") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_DRAFT']['keys'].push(story_zephyr[l]['Zephyr Key']); }
+            else if(story_zephyr[l]['Status'] == "Review") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_REVIEW']['keys'].push(story_zephyr[l]['Zephyr Key']); }
+            else if(story_zephyr[l]['Status'] == "Update") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_UPDATE']['keys'].push(story_zephyr[l]['Zephyr Key']); }
+            else if(story_zephyr[l]['Status'] == "Active") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(story_zephyr[l]['Zephyr Key']); }
+            else if(story_zephyr[l]['Status'] == "Approval") { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_ACTIVE']['keys'].push(story_zephyr[l]['Zephyr Key']); }
             else if(story_zephyr[l]['Status'] == "Archived") { }
             else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); }
         
@@ -2423,11 +2423,11 @@ async function make_URLinfo()
               // check the result of last test status.
               if(m == (story_zephyr[l]['Executions'].length -1) && status == "1") 
               {
-                current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(story[k]['Story Key']);
+                current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(story_zephyr[l]['Zephyr Key']);
               }
               else
               {
-                current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(story[k]['Story Key']);
+                current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(story_zephyr[l]['Zephyr Key']);
               }
             }
           }
@@ -2437,32 +2437,43 @@ async function make_URLinfo()
 
     // COMMON
     current_urlinfo['COMMON']['EPIC_TOTAL'] = common_url + '(issuetype = epic) AND issuefunction in linkedissuesOf("key in (' + initiative[i]['Initiative Key'] + ')")';
-    current_urlinfo['COMMON']['EPIC_Duedate_Null'] = current_urlinfo['COMMON']['EPIC_TOTAL'] + " AND (duedate = null AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn)";
-    current_urlinfo['COMMON']['EPIC_Duedate_Delayed'] = current_urlinfo['COMMON']['EPIC_TOTAL'] + " AND (duedate < now() AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn)";
+    current_urlinfo['COMMON']['EPIC_Duedate_Null'] = current_urlinfo['COMMON']['EPIC_TOTAL'] + " AND (duedate = null AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn))";
+    current_urlinfo['COMMON']['EPIC_Duedate_Delayed'] = current_urlinfo['COMMON']['EPIC_TOTAL'] + " AND (duedate < now() AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn))";
     current_urlinfo['COMMON']['EPIC_AbnormalSP'] = common_url + "(issuetype = epic) AND key in (" + current_urlinfo['COMMON']['AbnormalSPList'].join() + ")";
-    current_urlinfo['COMMON']['STORY_TOTAL'] = common_url + '(issuetype = story OR issuetype = task) AND issuefunction in linkedissuesOf("key in (' + current_urlinfo['STORY_LINK']['TOTAL']['Total']['keys'].join() + '")';
-    current_urlinfo['COMMON']['STORY_Duedate_Null'] = current_urlinfo['COMMON']['STORY_TOTAL'] + 'AND (duedate = null AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn)';
-    current_urlinfo['COMMON']['STORY_Duedate_Delayed'] = current_urlinfo['COMMON']['STORY_TOTAL'] + 'AND (duedate < now() AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn)';
+    current_urlinfo['COMMON']['STORY_TOTAL'] = common_url + '(issuetype = story OR issuetype = task) AND key in (' + current_urlinfo['STORY_LINK']['TOTAL']['Total']['keys'].join() + ')';
+    current_urlinfo['COMMON']['STORY_Duedate_Null'] = current_urlinfo['COMMON']['STORY_TOTAL'] + 'AND (duedate = null AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn))';
+    current_urlinfo['COMMON']['STORY_Duedate_Delayed'] = current_urlinfo['COMMON']['STORY_TOTAL'] + 'AND (duedate < now() AND Status not in (Closed, Deferred, Delivered, Verify, Resolved, Withdrawn))';
     current_urlinfo['COMMON']['STORY_AbnormalSP'] = common_url + "(issuetype = story OR issuetype = task) AND key in (" + current_urlinfo['COMMON']['AbnormalSPList'].join() + ")";
 
     // Epic
+    let linkstr = null;
+    let keystr = [];
     for(let key in current_urlinfo['EPIC_LINK']['TOTAL'])
     { 
+      linkstr = null, keystr = [];
       console.log("epic key = ", key, " ", current_urlinfo['EPIC_LINK']['TOTAL'][key]['keys'].join());
-      current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'] = common_url + "key in ("+current_urlinfo['EPIC_LINK']['TOTAL'][key]['keys'].join() + ")";
+      keystr = current_urlinfo['EPIC_LINK']['TOTAL'][key]['keys'].join();
+      if(keystr.length > 0) { linkstr = common_url + "key in ("+ keystr + ")"; }
+      current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'] = linkstr;
     }
 
     // Story
     for(let key in current_urlinfo['STORY_LINK']['TOTAL'])
     {
+      linkstr = null, keystr = [];
       console.log("story key = ", key, " ", current_urlinfo['STORY_LINK']['TOTAL'][key]['keys'].join());
-      current_urlinfo['STORY_LINK']['TOTAL'][key]['link'] = common_url + "key in ("+current_urlinfo['STORY_LINK']['TOTAL'][key]['keys'].join() + ")";
+      keystr = current_urlinfo['STORY_LINK']['TOTAL'][key]['keys'].join();
+      if(keystr.length > 0) { linkstr = common_url + "key in ("+ keystr + ")"; }
+      current_urlinfo['STORY_LINK']['TOTAL'][key]['link'] = linkstr;
     }
     // epic + story
     for(let key in current_urlinfo['EPIC+STORY_LINK']['TOTAL'])
     {
+      linkstr = null, keystr = [];
       current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['keys'] = current_urlinfo['EPIC_LINK']['TOTAL'][key]['keys'].concat(current_urlinfo['STORY_LINK']['TOTAL'][key]['keys']);
-      current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'] = common_url + "key in ("+current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['keys'].join() + ")";
+      keystr = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['keys'].join();
+      if(keystr.length > 0) { linkstr = common_url + "key in ("+current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['keys'].join() + ")"; }
+      current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'] = linkstr;
     }
 
     // ORGANIZATION
@@ -2470,22 +2481,34 @@ async function make_URLinfo()
     { // EPIC
       current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname] = JSON.parse(JSON.stringify(OrgDevel_link_key));
       console.log("orgname = ", orgname);
-      console.log("object = ", JSON.stringify(current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname]));
       for(let key in current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname])
       {
-        current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname][key] = current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'] + " AND Aassignee is membersOf(" + orgname + "("+ String(orgcode) + "_grp)";
+        linkstr = current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'];
+        if(linkstr != null)
+        {
+          current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname][key] = linkstr + " AND Assignee in membersOf(" + '\"' + orgname + "(" + String(orgcode) + ")_grp" + '\")';
+        }
+        console.log("url = ", current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname][key]);
       }
       // STORY
       current_urlinfo['STORY_LINK']['ORGANIZATION'][orgname] = JSON.parse(JSON.stringify(OrgDevel_link_key));
       for(let key in current_urlinfo['STORY_LINK']['ORGANIZATION'][orgname])
       {
-        current_urlinfo['STORY_LINK']['ORGANIZATION'][orgname][key] = current_urlinfo['STORY_LINK']['TOTAL'][key]['link'] + " AND Aassignee is membersOf(" + orgname + "("+ String(orgcode) + "_grp)";
+        linkstr = current_urlinfo['STORY_LINK']['TOTAL'][key]['link'];
+        if(linkstr != null)
+        {
+          current_urlinfo['STORY_LINK']['ORGANIZATION'][orgname][key] = linkstr + " AND Assignee in membersOf(" + '\"' + orgname + "("+ String(orgcode) + ")_grp" + '\")';
+        }
       }
       // EPIC + STORY
       current_urlinfo['EPIC+STORY_LINK']['ORGANIZATION'][orgname]=JSON.parse(JSON.stringify(OrgDevel_link_key));
       for(let key in current_urlinfo['EPIC+STORY_LINK']['ORGANIZATION'][orgname])
       {
-        current_urlinfo['EPIC+STORY_LINK']['ORGANIZATION'][orgname][key] = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'] + " AND Aassignee is membersOf(" + orgname + "("+ String(orgcode) + "_grp)";
+        linkstr = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'];
+        if(linkstr != null)
+        {
+          current_urlinfo['EPIC+STORY_LINK']['ORGANIZATION'][orgname][key] = linkstr + " AND Assignee in membersOf(" + '\"' + orgname + "("+ String(orgcode) + ")_grp" + '\")';
+        }
       }
     }
     
@@ -2495,19 +2518,31 @@ async function make_URLinfo()
       current_urlinfo['EPIC_LINK']['DEVELOPER'][assignee] = JSON.parse(JSON.stringify(OrgDevel_link_key));
       for(let key in current_urlinfo['EPIC_LINK']['DEVELOPER'][assignee])
       {
-        current_urlinfo['EPIC_LINK']['DEVELOPER'][assignee][key] = current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'] + " AND Aassignee in (" + assignee + ")";
+        linkstr = current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'];
+        if(linkstr != null)
+        {
+          current_urlinfo['EPIC_LINK']['DEVELOPER'][assignee][key] = linkstr + " AND Assignee in (" + assignee + ")";
+        }
       }
       // STORY
       current_urlinfo['STORY_LINK']['DEVELOPER'][assignee] = JSON.parse(JSON.stringify(OrgDevel_link_key));
       for(let key in current_urlinfo['STORY_LINK']['DEVELOPER'][assignee])
       {
-        current_urlinfo['STORY_LINK']['DEVELOPER'][assignee][key] = current_urlinfo['STORY_LINK']['TOTAL'][key]['link'] + " AND Aassignee in (" + assignee + ")";
+        linkstr = current_urlinfo['STORY_LINK']['TOTAL'][key]['link'];
+        if(linkstr != null)
+        {
+          current_urlinfo['STORY_LINK']['DEVELOPER'][assignee][key] = linkstr + " AND Assignee in (" + assignee + ")";
+        }
       }
       // EPIC + STORY
       current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee] = JSON.parse(JSON.stringify(OrgDevel_link_key));
       for(let key in current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee])
       {
-        current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee][key] = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'] + ")" + " AND Aassignee in (" + assignee + ")";
+        linkstr = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'];
+        if(linkstr != null)
+        {
+          current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee][key] = linkstr + ")" + " AND Assignee in (" + assignee + ")";
+        }
       }
     }
 
@@ -2522,9 +2557,9 @@ async function Test()
 {
   load_InitiativeDB('./public/json/initiative_DB_46093_Latest.json').then((result) => {
     console.log("[TEST] Read Initiative DB = ", JSON.stringify(initiative_DB));
+    make_URLinfo();
   });
 
-  make_URLinfo();
 
   console.log("[final-make_URLinfo] Save file = initiative_DB_URL");
   Save_JSON_file(initiative_DB, "./public/json/initiative_DB_URL_Latest.json");
