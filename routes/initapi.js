@@ -2603,3 +2603,20 @@ module.exports = {
   Test,
  };
 
+
+
+function getGroupCode(OrgName)
+{
+    //{ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)', 'DepartmentCode' : 0 }
+    for (var orgname in initiative[i]['STATICS']['EPIC+STORY_STATICS']['ORGANIZATION'])
+    {
+        for (developer in developers)
+        {
+            if (ogrname == developers[developer]['department'])
+            {
+                return develper[developer]['DepartmentCode'];
+            }
+        }
+    }
+    return 0;
+}
