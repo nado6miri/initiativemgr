@@ -2035,7 +2035,7 @@ async function makeZephyrStatics()
           else if(epic_zephyr[k]['Status'] == "Active") { epicz_devel[epicz_assignee]['Zephyr_S_Active']++; }
           else if(epic_zephyr[k]['Status'] == "Approval") { /*epicz_devel[epicz_assignee]['Zephyr_S_Approval']++;*/ epicz_devel[epicz_assignee]['Zephyr_S_Active']++; }
           else if(epic_zephyr[k]['Status'] == "Archived") { epicz_devel[epicz_assignee]['Zephyr_S_Archived']++; epicz_devel[epicz_assignee]['ZephyrCnt']--; }
-          else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); }
+          else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); epicz_devel[epicz_assignee]['ZephyrCnt']--; }
 
           // [EPIC ZEPHYR EXECUTION LOOP]
           for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
@@ -2194,7 +2194,7 @@ async function makeZephyrStatics()
             else if(story_zephyr[l]['Status'] == "Active") { storyz_devel[storyz_assignee]['Zephyr_S_Active']++; }
             else if(story_zephyr[l]['Status'] == "Approval") { /*storyz_devel[storyz_assignee]['Zephyr_S_Approval']++;*/ storyz_devel[storyz_assignee]['Zephyr_S_Active']++; }
             else if(story_zephyr[l]['Status'] == "Archived") { storyz_devel[storyz_assignee]['Zephyr_S_Archived']++; storyz_devel[storyz_assignee]['ZephyrCnt']--; }
-            else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); }
+            else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); storyz_devel[storyz_assignee]['ZephyrCnt']--; }
         
             // [STORY ZEPHYR EXECUTION LOOP]
             console.log("[SZ] i = ", i, " j = ", j, " k = ", k, " l = ", l);
@@ -2486,6 +2486,7 @@ async function make_URLinfo()
         linkstr = current_urlinfo['EPIC_LINK']['TOTAL'][key]['link'];
         if(linkstr != null)
         {
+          orgcode = getGroupCode(orgname);
           current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname][key] = linkstr + " AND Assignee in membersOf(" + '\"' + orgname + "(" + String(orgcode) + ")_grp" + '\")';
         }
         console.log("url = ", current_urlinfo['EPIC_LINK']['ORGANIZATION'][orgname][key]);
@@ -2497,6 +2498,7 @@ async function make_URLinfo()
         linkstr = current_urlinfo['STORY_LINK']['TOTAL'][key]['link'];
         if(linkstr != null)
         {
+          orgcode = getGroupCode(orgname);
           current_urlinfo['STORY_LINK']['ORGANIZATION'][orgname][key] = linkstr + " AND Assignee in membersOf(" + '\"' + orgname + "("+ String(orgcode) + ")_grp" + '\")';
         }
       }
@@ -2507,6 +2509,7 @@ async function make_URLinfo()
         linkstr = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'];
         if(linkstr != null)
         {
+          orgcode = getGroupCode(orgname);
           current_urlinfo['EPIC+STORY_LINK']['ORGANIZATION'][orgname][key] = linkstr + " AND Assignee in membersOf(" + '\"' + orgname + "("+ String(orgcode) + ")_grp" + '\")';
         }
       }
@@ -2607,16 +2610,14 @@ module.exports = {
 
 function getGroupCode(OrgName)
 {
-    //{ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)', 'DepartmentCode' : 0 }
-    for (var orgname in initiative[i]['STATICS']['EPIC+STORY_STATICS']['ORGANIZATION'])
-    {
-        for (developer in developers)
-        {
-            if (ogrname == developers[developer]['department'])
-            {
-                return develper[developer]['DepartmentCode'];
-            }
-        }
-    }
-    return 0;
+  var developers = initiative_DB['developers'];
+  for (developer in developers)
+  {
+      if (OrgName == developers[developer][2])
+      {
+        console.log("develpers[developer]['DepartmentCode'] = ", developers[developer][4]);
+        return developers[developer][4];
+      }
+  }
+  return 0;
 }

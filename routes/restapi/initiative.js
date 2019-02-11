@@ -12,12 +12,46 @@ var socketcomm = require('../socket_comm');
 var initapi = require('../initapi');
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/:id', function(req, res, next) {
   res.header("Content-Type", "text/html; charset=utf-8"); // header 설정
   //res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); // header 설정
-  fs.readFile(__dirname + '/../../public/json/initiative_DB_46093_Latest.json', (err, data) => { // 파일 읽는 메소드
+  var filename = "initiative_DB_46093_Latest.json";
+  switch(req.params.id)
+  {
+    case "webOS4.5_Initial" :
+      console.log("req.params.id == webOS4.0_Initial");
+      filename = "initiative_DB_39490_Latest.json"
+      break;
+    case "webOS4.5_MR_Minor" :
+      console.log("req.params.id == webOS4.5_MR_Minor");
+      filename = "initiative_DB_46093_Latest.json"
+      break;
+    case "webOS4.5_MR_Major" :
+      console.log("req.params.id == webOS4.5_MR_Major");
+      filename = "initiative_DB_46117_Latest.json"
+      break;
+    case "webOS5.0_Initial" :
+      console.log("req.params.id == webOS5.0_Initial");
+      filename = "initiative_DB_45402_Latest.json"
+      break;
+    case "SEETV" :
+      console.log("req.params.id == SEETV");
+      filename = "initiative_DB_45938_Latest.json"
+      break;
+    case "webOS5.0_Initial(SEETV)" :
+      console.log("req.params.id == webOS5.0_Initial(SEETV)");
+      filename = "initiative_DB_45400_Latest.json"
+      break;
+    default:
+      console.log("req.params.id == webOS4.5_MR_Minor");
+      filename = "initiative_DB_46093_Latest.json"
+      break;
+  }
+
+  fs.readFile(__dirname + "/../../public/json/" + filename, (err, data) => { // 파일 읽는 메소드
       if (err) {
-          return console.error(err); // 에러 발생시 에러 기록하고 종료
+        res.send({"err msg" : "Can't find raw data = " + filename}); // 브라우저로 전송   
+        return console.error(err); // 에러 발생시 에러 기록하고 종료
       }
       //res.end(data, 'utf-8'); // 브라우저로 전송   
       res.send(data); // 브라우저로 전송   
@@ -25,6 +59,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* GET users listing. */
+/*
 router.get('/:id', function(req, res, next) {
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8'}); // header 설정
   data = "FEEDBACK ID = " + String(req.params.id);
@@ -32,6 +67,7 @@ router.get('/:id', function(req, res, next) {
   console.log("params = ", req.params.id);
   res.end(data, 'utf-8'); // 브라우저로 전송   
 });
+*/
 
 /* GET users listing. */
 router.get('/update/:id', function(req, res, next) {
@@ -60,7 +96,7 @@ router.get('/update/:id', function(req, res, next) {
       filterID = 45938;
       break;
     case "webOS5.0_Initial(SEETV)" :
-      console.log("req.params.id == SEETV");
+      console.log("req.params.id == webOS5.0_Initial(SEETV)");
       filterID = 45400;
       break;
   }
