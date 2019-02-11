@@ -2342,7 +2342,7 @@ async function make_URLinfo()
         {
           console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
           let epicz_assignee = epic_zephyr[k]['Assignee'];
-          if(epic_zephyr[k]['Status'] == "Review" || epic_zephyr[k]['Status'] == "Update" || epic_zephyr[k]['Status'] == "Active" || epic_zephyr[k]['Status'] == "Approval")
+          if(epic_zephyr[k]['Status'] == "Draft" || epic_zephyr[k]['Status'] == "Review" || epic_zephyr[k]['Status'] == "Update" || epic_zephyr[k]['Status'] == "Active" || epic_zephyr[k]['Status'] == "Approval")
           { 
             current_urlinfo['EPIC_LINK']['TOTAL']['ZephyrTotal']['keys'].push(epic_zephyr[k]['Zephyr Key']); 
             console.log("push epic zephyr key = ", epic_zephyr[k]['Zephyr Key']);
@@ -2399,7 +2399,7 @@ async function make_URLinfo()
           if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
           {
             let storyz_assignee = story_zephyr[l]['Assignee'];
-            if(story_zephyr[l]['Status'] == "Review" || story_zephyr[l]['Status'] == "Update" || story_zephyr[l]['Status'] == "Active" || story_zephyr[l]['Status'] == "Approval")
+            if(story_zephyr[l]['Status'] == "Draft" || story_zephyr[l]['Status'] == "Review" || story_zephyr[l]['Status'] == "Update" || story_zephyr[l]['Status'] == "Active" || story_zephyr[l]['Status'] == "Approval")
             { 
               current_urlinfo['STORY_LINK']['TOTAL']['ZephyrTotal']['keys'].push(story_zephyr[l]['Zephyr Key']);
               console.log("push Story zephyr key = ", story_zephyr[l]['Zephyr Key']);
@@ -2541,7 +2541,7 @@ async function make_URLinfo()
         linkstr = current_urlinfo['EPIC+STORY_LINK']['TOTAL'][key]['link'];
         if(linkstr != null)
         {
-          current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee][key] = linkstr + ")" + " AND Assignee in (" + assignee + ")";
+          current_urlinfo['EPIC+STORY_LINK']['DEVELOPER'][assignee][key] = linkstr + " AND Assignee in (" + assignee + ")";
         }
       }
     }
