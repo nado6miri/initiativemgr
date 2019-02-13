@@ -8,43 +8,56 @@ moment.tz.setDefault("Asiz/Seoul");
 
 function periodic_DBjobs()
 {
-  // Use Promise Object
-  //initapi.makeSnapshot_InitiativeInfofromJira(42101); // webOS4.5
-  //initapi.makeSnapshot_InitiativeInfofromJira(46093);   // webOS4.5 MR minor
-  //console.log('curruent time = ', moment());
-  //initapi.makeSnapshot_InitiativeInfofromJira(46610);   // webOS4.5 MR minor
- 
-  //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 45400);   // webOS5.0
-
-  //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46610);   // webOS4.5 MR minor test 2ea
-  //initapi.makeSnapshot_InitiativeInfofromJira("filterID", 46093);   // webOS4.5 MR minor
-  //initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
-  //initapi.makeSnapshot_InitiativeInfofromJira("keyID", "TVPLAT-11552");   // webOS4.5 MR minor // shinchiho
-
-
-  //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093);   // webOS4.5 MR minor
-  //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 45400);   // webOS5.0
-  //initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-16376");   // webOS4.5 MR minor airplay
-  //initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-23900");   // webOS4.5 MR minor airplay
-
+  let exeflag = true;
   //initapi.Test();
-  //lgldap.getLDAP_Info('stan.kim').then((result) => { console.log("Department = ", result)});  
+
+  console.log(process.argv);
   /*
-  lgldap.getLDAP_Info('wl.gui')
-        .then((result) => { 
-          console.log(JSON.stringify(result));
-        })
-        .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
-  lgldap.getLDAP_Info('sungbin.na')
-        .then((result) => { 
-          console.log(JSON.stringify(result));
-        })
-        .catch((error) => { console.log("[ERR] ldap.getLDAP_Info = ", error)});
-  initparse.getPersonalInfo("weili gui/LGECH China TV Lab Development Team(wl.gui@lge.com)", 0000).then(((result) => { console.log(result); }))
+  process.argv.forEach(function (val, index, array) {
+    console.log(index + ': ' + val);
+  });
   */
- initapi.Test();
+
+  switch(process.argv[2])
+  {
+    case "webOS4.5_Initial" :
+      console.log("req.params.id == webOS4.0_Initial");
+      filterID = 39490;
+      break;
+    case "webOS4.5_MR_Minor" :
+      console.log("req.params.id == webOS4.5_MR_Minor");
+      filterID = 46093;
+      break;
+    case "webOS4.5_MR_Major" :
+      console.log("req.params.id == webOS4.5_MR_Major");
+      filterID = 46117;
+      break;
+    case "webOS5.0_Initial" :
+      console.log("req.params.id == webOS5.0_Initial");
+      filterID = 45402;
+      break;
+    case "SEETV" :
+      console.log("req.params.id == SEETV");
+      filterID = 45938;
+      break;
+    case "webOS5.0_Initial(SEETV)" :
+      console.log("req.params.id == webOS5.0_Initial(SEETV)");
+      filterID = 45400;
+      break;
+    default :
+      console.log("req.params.id == Error");
+      exeflag = false;
+      break;
+  }
+  if(exeflag) { initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", filterID); }
 }  
 
-//tmr.Timer_Setting(12, 20, 10, periodic_DBjobs);
 periodic_DBjobs();
 
+/*
+$ node process-2.js one two=three four
+
+process.argv.forEach(function (val, index, array) {
+  console.log(index + ': ' + val);
+});
+*/

@@ -441,6 +441,7 @@ function get_InitiativeListfromJira(querymode, jql)
           {
             var resultJSON = initiative_FilterResult = JSON.parse(xhttp.responseText);
             var json = JSON.stringify(resultJSON);
+            /*
             fse.outputFileSync("./public/json/initiative_list.json", json, 'utf-8', function(e){
               if(e){
                 console.log(e);
@@ -448,6 +449,7 @@ function get_InitiativeListfromJira(querymode, jql)
                 console.log("Download is done!");	
               }
             });
+            */
             resolve(resultJSON);
           }
           else
