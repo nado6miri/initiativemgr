@@ -26,21 +26,22 @@ const HE_SP_Schedule =
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP31', 'start' : '2018-10-29', 'end' : '2018-11-11' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP32', 'start' : '2018-11-12', 'end' : '2018-11-25' },
     */
+    /*
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP27/2019_SP01', 'start' : '2018-09-03', 'end' : '2018-09-16' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP28/2019_SP02', 'start' : '2018-09-17', 'end' : '2018-09-30' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP29/2019_SP03', 'start' : '2018-10-01', 'end' : '2018-10-14' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP30/2019_SP04', 'start' : '2018-10-15', 'end' : '2018-10-28' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP31/2019_SP05', 'start' : '2018-10-29', 'end' : '2018-11-11' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2018_SP32/2019_SP06', 'start' : '2018-11-12', 'end' : '2018-11-25' },
+    */
     // 2019
-    /*
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP01', 'start' : '2018-09-03', 'end' : '2018-09-16' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP02', 'start' : '2018-09-17', 'end' : '2018-09-30' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP03', 'start' : '2018-10-01', 'end' : '2018-10-14' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP04', 'start' : '2018-10-15', 'end' : '2018-10-28' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP05', 'start' : '2018-10-29', 'end' : '2018-11-11' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP06', 'start' : '2018-11-12', 'end' : '2018-11-25' },
-    */
+
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP07', 'start' : '2018-11-26', 'end' : '2018-12-9'  },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP08', 'start' : '2018-12-10', 'end' : '2018-12-23' },
     { 'IR' : 'IR1', 'SPRINT_SHORT' : '2019_SP09', 'start' : '2018-12-24', 'end' : '2019-01-06' },
@@ -163,22 +164,19 @@ function getComponents(jiraIssue) {
 // [return] true or false
 //===========================================================================
 function checkGovDeployComponents(jiraIssue) {
-    let value = jiraIssue['fields']['components']
+    let compval = jiraIssue['fields']['components']
     console.log("checkGovDeployComponents");
-    if(value != null) {
-        value.forEach((compval, index, array) => {
+    if(compval != null) 
+    {
+        for(var i = 0; i < compval.length; i++)
+        {
             //console.log("********* Comp = ", compval);
-            if(compval['name'].includes("Deployment(manage)") == true) {
-                console.log("[true] Governing or Deployment(manage) components = ", compval['name']);
+            if(compval[i]['name'].includes("Deployment(manage)") == true || compval[i]['name'].includes("_Governing") == true) 
+            {
+                console.log("[true] Deployment(manage) or _Governing components = ", compval[i]['name']);
                 return true;
             }
-            if(compval['name'].includes("_Governing")) {
-                console.log("[true] Governing or Deployment(manage) components = ", compval['name']);
-                return true;
-            }
-        });
-        console.log("[false] Governing or Deployment(manage) components");
-        return false;
+        }
     }
     console.log("[false] Governing or Deployment(manage) components = null");
     return false;
@@ -339,7 +337,15 @@ function conversionReleaseSprintToSprint(ReleaseSprint)
         //console.log(b)
         b = b.split('(');
         //console.log(b[0])
-        result = "2019_" + b[0];
+        if(b[0].includes('TV') == true)
+        {
+            b = b[0].replace('TV', '');
+            result = "2018_" + b;
+        }
+        else
+        {
+            result = "2019_" + b[0];
+        }
         return result;
     }
 }

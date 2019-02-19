@@ -483,7 +483,7 @@ function get_InitiativeListfromJira(querymode, jql)
                 "fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks", "resolution", "components", "issuetype", "customfield_15926",
                             "customfield_15710", "customfield_15711", "customfield_16988", "customfield_16984", "customfield_16983", "customfield_15228", 
                             "customfield_16986", "created", "updated", "duedate", "resolutiondate", "labels", "description", "fixVersions", "customfield_15104", 
-                            "reporter", "assignee", "customfield_10105", "customfield_16985",
+                            "reporter", "assignee", "customfield_10105", "customfield_16985", "customfield_16987",
                           ] };
     }
     //console.log("param=", JSON.stringify(param));
@@ -539,7 +539,7 @@ function get_InitiativeListfromJiraWithChangeLog(querymode, jql)
                   "fields" : ["summary", "key", "assignee", "due", "status", "labels", "issuelinks", "resolution", "components", "issuetype", "customfield_15926",
                               "customfield_15710", "customfield_15711", "customfield_16988", "customfield_16984", "customfield_16983", "customfield_15228", 
                               "customfield_16986", "created", "updated", "duedate", "resolutiondate", "labels", "description", "fixVersions", "customfield_15104", 
-                              "reporter", "assignee", "customfield_10105", "customfield_16985", 
+                              "reporter", "assignee", "customfield_10105", "customfield_16985", "customfield_16987",
                              ] };
 
     //console.log("param=", JSON.stringify(param));
@@ -1078,8 +1078,9 @@ async function makeSnapshot_EpicDetailInfofromJira(init_keyvalue, init_index)
       current_epic_info['Assignee'] = initparse.getAssignee(issue);        
       current_epic_info['Status'] = epic_Status = initparse.getStatus(issue);        
       current_epic_info['CreatedDate'] = initparse.getCreatedDate(issue);         
-      current_epic_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);        
-      current_epic_info['AbnormalSprint'] = initparse.checkAbnormalSP(init_ReleaseSP, init_Status, epic_ReleaseSP, epic_Status);   
+      current_epic_info['GovOrDeployment'] = initparse.checkGovDeployComponents(issue);    
+      if(current_epic_info['GovOrDeployment'] == true) { current_epic_info['AbnormalSprint'] = false; }    
+      else { current_epic_info['AbnormalSprint'] = initparse.checkAbnormalSP(init_ReleaseSP, init_Status, epic_ReleaseSP, epic_Status); }
       current_epic_info['Labels'] = initparse.getLabels(issue);     
       current_epic_info['SDET_NeedtoCheck'] = !initparse.checkLabels(issue, 'SDET_CHECKED'); // SDET_CHECKED label이 없을 경우 True...
       current_epic_info['SDET_NeedDevelTC'] = initparse.checkLabels(issue, '개발TC필요');
@@ -1088,7 +1089,7 @@ async function makeSnapshot_EpicDetailInfofromJira(init_keyvalue, init_index)
       */
 
       // Archi Review
-      if(current_epic_info['Summary'].includes("ARCH REVIEW"))
+      if(current_epic_info['Summary'].includes("ARCH REVIEW") && initiative_DB['issues'][init_index]['ScopeOfChange'] != 'N/A')
       {
         archjira = [ true, init_index, init_keyvalue, current_epic_info['Epic Key']];
       }
@@ -1138,6 +1139,29 @@ async function makeSnapshot_EpicDetailInfofromJira(init_keyvalue, init_index)
 
   // Archi Review
   if(archjira[0] == true) { await makeSnapshot_ArchiReviewInfofromJira(archjira[1], archjira[2], archjira[3]); }
+  else
+  {
+    // Processing ARCH EPIC 
+    current_Arch_Review = JSON.parse(JSON.stringify(Arch_Review)); // initialize...
+    current_Arch_Review['ScopeOfChange'] = initiative_DB['issues'][init_index]['ScopeOfChange'];
+    if(current_Arch_Review['ScopeOfChange'] == 'N/A')
+    {
+      current_Arch_Review['First Review']['Plan']['Interface Review'] = false;
+      current_Arch_Review['First Review']['Plan']['Sangria Review'] = false;
+      current_Arch_Review['First Review']['Plan']['FMEA'] = false;
+    }
+    else
+    {
+      let labelstring = initiative_DB['issues'][init_index]['Labels'].join();
+      if(labelstring.includes("1st_reviewed")) { current_Arch_Review['First Review']['1stReviewDone'] = true; }
+      if(labelstring.includes("interface_review")) { current_Arch_Review['First Review']['Plan']['Interface Review'] = true; }
+      if(labelstring.includes("sangria")) { current_Arch_Review['First Review']['Plan']['Sangria Review'] = true; }
+      if(labelstring.includes("fmea")) { current_Arch_Review['First Review']['Plan']['FMEA'] = true; }
+    }
+
+    initiative_DB['issues'][init_index]['ARCHREVIEW'] = JSON.parse(JSON.stringify(current_Arch_Review)); 
+  }
+
   // Eipc Zephyer
   await makeSnapshot_EpicZephyrInfofromJira(init_index, epic_keylist); // initiative index, epick keylist     
   // Story Info (Story List)
@@ -1422,10 +1446,11 @@ async function makeSnapshot_ArchiReviewInfofromJira(init_index, init_keyvalue, e
       if(init_status != 'Deferred' && init_status != 'PROPOSED TO DEFER') // Normal workflow
       {
         let color = 'GREEN';
+        current_Arch_1st_workflow['Signal'] = 'GREEN';
         if(init_status != 'DRAFTING' && init_status != 'PO REVIEW')
         {
           // RED case
-          if(labelstring.includes("1st_reviewed")) { color = 'RED'; }
+          if(labelstring.includes("1st_reviewed") == false) { color = 'RED'; }
           if(init_status == "In Progress" && (arch_epicstatus == 'Scoping' || arch_epicstatus == 'Review')) { color = 'RED'; }
           if((init_status == "Delivered" || init_status == "Closed") && (arch_epicstatus != 'Delivered' && arch_epicstatus != 'Closed')) { color = 'RED'; }
           /*
@@ -1443,7 +1468,6 @@ async function makeSnapshot_ArchiReviewInfofromJira(init_index, init_keyvalue, e
         }
         current_Arch_1st_workflow['Signal'] = color;
       }
-      current_Arch_1st_workflow['Signal'] = 'GREEN';
       current_Arch_1st_workflow = initparse.parseArchEpicWorkflow(epicinfo['issues'][0]['changelog'], current_Arch_1st_workflow);
       current_Arch_Review['First Review']['workflow'] = current_Arch_1st_workflow;
       //initiative_DB['issues'][init_index]['ARCHREVIEW'] = JSON.parse(JSON.stringify(current_Arch_Review)); 
@@ -1514,6 +1538,7 @@ async function makeSnapshot_ArchiReviewInfofromJira(init_index, init_keyvalue, e
           // [YELLOW Case]
           // ??
 
+          current_Arch_2nd_workflow['Signal'] = color;
           current_Arch_Review['Second Review'][reviewkey]['output'] = true; 
           current_Arch_Review['Second Review'][reviewkey]['workflow'] = initparse.parseArchStoryWorkflow(storyinfo['issues'][0]['changelog'], current_Arch_2nd_workflow);
         }
@@ -2079,7 +2104,7 @@ async function makeZephyrStatics()
             else { console.log("[EZE] executionStatus is not Defined = ", status); }
 
             // check the result of last test status.
-            if(l == (epic_zephyr[k]['Executions'].length -1) && status == "1") 
+            if(l == 0 && status == "1") 
             {
               //if(initiative_DB['issues'][i]['EPIC']['issues'][j]['SDET_NeedDevelTC'] == true)
               { 
@@ -2240,7 +2265,7 @@ async function makeZephyrStatics()
               else { console.log("[SZE] executionStatus is not Defined = ", status); }
 
               // check the result of last test status.
-              if(m == (story_zephyr[l]['Executions'].length -1) && status == "1") 
+              if(m == 0 && status == "1") 
               {
                 //if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
                 { 
@@ -2365,13 +2390,16 @@ async function make_URLinfo()
             let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
             let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
             // check the result of last test status.
-            if(l == (epic_zephyr[k]['Executions'].length -1) && status == "1") 
+            if(l == 0)
             {
-              current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(epic_zephyr[k]['Zephyr Key']);
-            }
-            else
-            {
-              current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(epic_zephyr[k]['Zephyr Key']);
+              if(status == "1")
+              {
+                current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(epic_zephyr[k]['Zephyr Key']);
+              }
+              else
+              {
+                current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(epic_zephyr[k]['Zephyr Key']);
+              }
             }
           }       
         }
@@ -2423,13 +2451,16 @@ async function make_URLinfo()
               console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
               let status = story_zephyr[l]['Executions'][m]['executionStatus'];
               // check the result of last test status.
-              if(m == (story_zephyr[l]['Executions'].length -1) && status == "1") 
+              if(m == 0)
               {
-                current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(story_zephyr[l]['Zephyr Key']);
-              }
-              else
-              {
-                current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(story_zephyr[l]['Zephyr Key']);
+                if(status == "1") 
+                {
+                  current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(story_zephyr[l]['Zephyr Key']);
+                }
+                else
+                {
+                  current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(story_zephyr[l]['Zephyr Key']);
+                }
               }
             }
           }

@@ -43,8 +43,10 @@ router.get('/:id', function(req, res, next) {
       filename = "initiative_DB_45400_Latest.json"
       break;
     default:
-      console.log("req.params.id == webOS4.5_MR_Minor");
+      console.log("req.params.id == Default - webOS4.5_MR_Minor");
       filename = "initiative_DB_46093_Latest.json"
+      console.log("[default] query = ", req.query);
+      console.log("[default] params = ", req.params);
       break;
   }
 
@@ -57,17 +59,6 @@ router.get('/:id', function(req, res, next) {
       res.send(data); // 브라우저로 전송   
   });
 });
-
-/* GET users listing. */
-/*
-router.get('/:id', function(req, res, next) {
-  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8'}); // header 설정
-  data = "FEEDBACK ID = " + String(req.params.id);
-  console.log("data = ", data);
-  console.log("params = ", req.params.id);
-  res.end(data, 'utf-8'); // 브라우저로 전송   
-});
-*/
 
 /* GET users listing. */
 router.get('/update/:id', function(req, res, next) {
@@ -105,6 +96,35 @@ router.get('/update/:id', function(req, res, next) {
   res.header("Content-Type", "text/html; charset=utf-8"); // header 설정
   msg = "Trigger OK!!! " + "[Platform] = " + req.params.id + " FIlter ID = " + String(filterID) +" http://hlm.lge.com/issue/issues/?filter="+String(filterID)
   res.send(msg); // 브라우저로 전송   
+});
+
+/* GET param parsing test */
+router.get('/getparam/:id', function(req, res, next) {
+  console.log("params(path) = ", req.params);
+  console.log("query = ", req.query);
+  data = "params = " + JSON.stringify(req.params);
+  data = data + " query = " + JSON.stringify(req.query);
+  console.log("data = ", data);
+  res.header("Content-Type", "text/html; charset=utf-8"); // header 설정
+  res.send(data); // 브라우저로 전송   
+});
+
+/* POST param parsing test */
+router.post('/postparam/:id', function(req, res, next) {
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8'}); // header 설정
+  data = "FEEDBACK ID = " + String(req.params.id);
+  console.log("data = ", data);
+  console.log("[default] query = ", req.query);
+  res.end(data, 'utf-8'); // 브라우저로 전송   
+});
+
+/* PUT param parsing test */
+router.put('/putparam/:id', function(req, res, next) {
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8'}); // header 설정
+  data = "FEEDBACK ID = " + String(req.params.id);
+  console.log("data = ", data);
+  console.log("params = ", req.params);
+  res.end(data, 'utf-8'); // 브라우저로 전송   
 });
 
 
