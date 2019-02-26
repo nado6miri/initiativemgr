@@ -63,7 +63,7 @@ function getLDAP_InfoTest(username)
   }
 }
 
-var exceptionlist = ['Unassigned', 'null', 'stan.kim', 'buyoung.yun' ];
+var exceptionlist = ['Unassigned', 'null', 'stan.kim', 'buyoung.yun', 'juneyoung.jung', 'hyokak.kim' ];
 
 
 function getLDAP_Info(username)

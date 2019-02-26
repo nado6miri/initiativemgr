@@ -10,7 +10,7 @@ var moment = require('moment-timezone');
 
 var async_mode = false;
 var changelog = true;
-var SDETVerifyOnly = false; // SDET이 개발필요 TC 항목으로 분류된 EPIC/STORY만 Zephyer 정보 수집을 수행한다. 
+var SDETVerifyOnly = false; // false(default) : all check, true : SDET이 개발필요 TC 항목으로 분류된 EPIC/STORY만 Zephyer 정보 수집을 수행한다. 
 
 // initiative filter result (json) - webOS45 webOS45MR, webOS5.0 
 var initiative_FilterResult;
@@ -201,7 +201,7 @@ var zephyr_exeinfo =
 {
   'id': 0,
   'executionStatus': '',
-  'executionOn': '',
+  'executedOn': '',
   'executedBy': '',
   'cycleId': 0,
   'cycleName': ''
@@ -743,7 +743,7 @@ function getZephyerExecutionfromJira(IssueID)
     }
 
   var searchURL = 'http://hlm.lge.com/issue/rest/zapi/latest/execution?issueId=' + IssueID;
-  var param = { 'issueId' : IssueID, "fields" : [ "id", "executionStatus", "executedBy", "cycleId", "cycleName" ] };
+  var param = { 'issueId' : IssueID, "fields" : [ "id", "executionStatus", "executedBy", "cycleId", "cycleName", 'executedOn' ] };
   xhttp.open("GET", searchURL);
   xhttp.setRequestHeader("Authorization", "Basic c3VuZ2Jpbi5uYTpTdW5nYmluQDE5MDE=");
   xhttp.setRequestHeader("Content-Type", "application/json; charset=utf-8");
@@ -1104,8 +1104,11 @@ async function makeSnapshot_EpicDetailInfofromJira(init_keyvalue, init_index)
       epic['issues'][i] = JSON.parse(JSON.stringify(current_epic_info));
 
       if(current_epic_info['Labels'].length == 0 || current_epic_info['SDET_NeedtoCheck'] == true) { epic['EpicNeedtoCheckCnt']++; }
-      if(current_epic_info['SDET_NeedDevelTC'] == true) { epic['EpicDevelTCCnt']++; } else { epic['EpicNonDevelTCCnt']++; }
-      
+      else
+      {
+        if(current_epic_info['SDET_NeedDevelTC'] == true) { epic['EpicDevelTCCnt']++; } else { epic['EpicNonDevelTCCnt']++; }
+      }
+
       if(initparse.checkIsDelivered(current_epic_info['Status']) == false)
       {
         if(initparse.checkIsDelayed(current_epic_info['duedate']) == true) { epic['EpicDelayedCnt']++; }
@@ -1367,8 +1370,11 @@ async function makeSnapshot_EpicInfofromJira(initkeylist)
         epic['issues'][j] = JSON.parse(JSON.stringify(current_epic_info));
 
         if(current_epic_info['Labels'].length == 0 || current_epic_info['SDET_NeedtoCheck'] == true) { epic['EpicNeedtoCheckCnt']++; }
-        if(current_epic_info['SDET_NeedDevelTC'] == true) { epic['EpicDevelTCCnt']++; } else { epic['EpicNonDevelTCCnt']++; }
-       
+        else
+        {
+          if(current_epic_info['SDET_NeedDevelTC'] == true) { epic['EpicDevelTCCnt']++; } else { epic['EpicNonDevelTCCnt']++; }
+        } 
+
         //if(initparse.checkIsDelayed(current_epic_info['duedate']) == true && initparse.checkIsDelivered(epic_Status) == false) { epic['EpicDelayedCnt']++; }
         if(initparse.checkIsDelivered(current_epic_info['Status']) == false)
         {
@@ -1786,7 +1792,7 @@ async function makeSnapshot_EpicZephyrExecutionInfofromJira(init_index, epic_ind
       issue = zephyrExecution['executions'][i];
       current_zephyr_exeinfo['id'] = initparse.getZephyrExeinfo_ID(issue); 
       current_zephyr_exeinfo['executionStatus'] = initparse.getZephyrExeinfo_Status(issue);
-      current_zephyr_exeinfo['executionOn'] = initparse.getZephyrExeinfo_Date(issue);
+      current_zephyr_exeinfo['executedOn'] = initparse.getZephyrExeinfo_Date(issue);
       current_zephyr_exeinfo['executedBy'] = initparse.getZephyrExeinfo_Tester(issue);
       current_zephyr_exeinfo['cycleId'] = initparse.getZephyrExeinfo_cycleId(issue);
       current_zephyr_exeinfo['cycleName'] = initparse.getZephyrExeinfo_cycleName(issue);
@@ -1823,7 +1829,7 @@ async function makeSnapshot_SyncEpicZephyrExecutionInfofromJira(init_index, epic
         issue = zephyrExecution['executions'][j];
         current_zephyr_exeinfo['id'] = initparse.getZephyrExeinfo_ID(issue); 
         current_zephyr_exeinfo['executionStatus'] = initparse.getZephyrExeinfo_Status(issue);
-        current_zephyr_exeinfo['executionOn'] = initparse.getZephyrExeinfo_Date(issue);
+        current_zephyr_exeinfo['executedOn'] = initparse.getZephyrExeinfo_Date(issue);
         current_zephyr_exeinfo['executedBy'] = initparse.getZephyrExeinfo_Tester(issue);
         current_zephyr_exeinfo['cycleId'] = initparse.getZephyrExeinfo_cycleId(issue);
         current_zephyr_exeinfo['cycleName'] = initparse.getZephyrExeinfo_cycleName(issue);
@@ -1859,7 +1865,7 @@ async function makeSnapshot_StoryZephyrExecutionInfofromJira(init_index, epic_in
       issue = zephyrExecution['executions'][i];
       current_zephyr_exeinfo['id'] = initparse.getZephyrExeinfo_ID(issue); 
       current_zephyr_exeinfo['executionStatus'] = status = initparse.getZephyrExeinfo_Status(issue);
-      current_zephyr_exeinfo['executionOn'] = initparse.getZephyrExeinfo_Date(issue);
+      current_zephyr_exeinfo['executedOn'] = initparse.getZephyrExeinfo_Date(issue);
       current_zephyr_exeinfo['executedBy'] = initparse.getZephyrExeinfo_Tester(issue);
       current_zephyr_exeinfo['cycleId'] = initparse.getZephyrExeinfo_cycleId(issue);
       current_zephyr_exeinfo['cycleName'] = initparse.getZephyrExeinfo_cycleName(issue);
@@ -1898,11 +1904,11 @@ async function makeSnapshot_SyncStoryZephyrExecutionInfofromJira(init_index, epi
         issue = zephyrExecution['executions'][j];
         current_zephyr_exeinfo['id'] = initparse.getZephyrExeinfo_ID(issue); 
         current_zephyr_exeinfo['executionStatus'] = initparse.getZephyrExeinfo_Status(issue);
-        current_zephyr_exeinfo['executionOn'] = initparse.getZephyrExeinfo_Date(issue);
+        current_zephyr_exeinfo['executedOn'] = initparse.getZephyrExeinfo_Date(issue);
         current_zephyr_exeinfo['executedBy'] = initparse.getZephyrExeinfo_Tester(issue);
         current_zephyr_exeinfo['cycleId'] = initparse.getZephyrExeinfo_cycleId(issue);
         current_zephyr_exeinfo['cycleName'] = initparse.getZephyrExeinfo_cycleName(issue);
-          //current_zephyr_exeinfo = JSON.parse(JSON.stringify(zephyr_exeinfo));
+        //current_zephyr_exeinfo = JSON.parse(JSON.stringify(zephyr_exeinfo));
         //console.log(zephyrExecution['executions'][j]);
         initiative_DB['issues'][init_index]['EPIC']['issues'][epic_index]['STORY']['issues'][story_index]['Zephyr']['ZephyrTC'][i]['Executions'][j] = JSON.parse(JSON.stringify(current_zephyr_exeinfo)); 
       }
@@ -1981,7 +1987,10 @@ async function makeZephyrStatics()
       if((epicowner in storyz_devel) == false) { storyz_devel[epicowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
       if(epic[j]['Labels'].length == 0 || epic[j]['SDET_NeedtoCheck'] == true) { epicz_devel[epicowner]['EpicNeedtoCheckCnt']++; }
-      if(epic[j]['SDET_NeedDevelTC'] == true) { epicz_devel[epicowner]['EpicDevelTCCnt']++; } else { epicz_devel[epicowner]['EpicNonDevelTCCnt']++; }
+      else
+      {
+        if(epic[j]['SDET_NeedDevelTC'] == true) { epicz_devel[epicowner]['EpicDevelTCCnt']++; } else { epicz_devel[epicowner]['EpicNonDevelTCCnt']++; }
+      }
 
       epicz_devel[epicowner]['EpicTotalCnt']++;
       
@@ -2022,12 +2031,14 @@ async function makeZephyrStatics()
         if(epic_zephyr.length > 0) { epicz_devel[epicowner]['EpicHasTCCnt']++; }
       }
 
+      let epicz_assignee = null; 
       for(var k = 0; k < epic_zephyr.length; k++)
       {
+        epicz_assignee = null; 
         if(initiative_DB['issues'][i]['EPIC']['issues'][j]['SDET_NeedDevelTC'] == true)
         {
           console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
-          let epicz_assignee = epic_zephyr[k]['Assignee'];
+          epicz_assignee = epic_zephyr[k]['Assignee'];
           //setDevelopersInformation(epicz_assignee);
           if(epicz_assignee == null) { epicz_assignee = "Unassigned"; }
           if((epicz_assignee in developers) == false) { developers[epicz_assignee] = []; }
@@ -2065,8 +2076,11 @@ async function makeZephyrStatics()
           else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); epicz_devel[epicz_assignee]['ZephyrCnt']--; }
 
           // [EPIC ZEPHYR EXECUTION LOOP]
+          let ez_last_time = 0;
+          let ez_final_status = "2";
           for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
           {
+            ez_last_time = 0, ez_final_status = "2";
             console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
             let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
             //setDevelopersInformation(epicze_assignee);
@@ -2104,14 +2118,16 @@ async function makeZephyrStatics()
             else { console.log("[EZE] executionStatus is not Defined = ", status); }
 
             // check the result of last test status.
-            if(l == 0 && status == "1") 
+            if(status == "1") 
             {
-              //if(initiative_DB['issues'][i]['EPIC']['issues'][j]['SDET_NeedDevelTC'] == true)
-              { 
-                epicz_devel[epicz_assignee]['PassEpicCnt']++; 
-              }
+              let ez_cur_time = epic_zephyr[k]['Executions'][l]['executedOn'];
+              ez_cur_time = ez_cur_time.replace('/', '-');
+              ez_cur_time = ez_cur_time.replace(' ', 'T');
+              ez_cur_time = new Date(ez_cur_time);
+              if(ez_last_time == 0 || (ez_cur_time - ez_last_time > 0)) { ez_last_time = ez_cur_time, ez_final_status = '1'; }
             }
-          }       
+          }
+          if(epicz_assignee != null && ez_final_status == '1') { epicz_devel[epicz_assignee]['PassEpicCnt']++; }
         }
       }
 
@@ -2143,7 +2159,10 @@ async function makeZephyrStatics()
         if((storyowner in storyz_devel) == false) { storyz_devel[storyowner] = JSON.parse(JSON.stringify(StaticsInfo)); }
 
         if(story[k]['Labels'].length == 0 || story[k]['SDET_NeedtoCheck'] == true) { storyz_devel[storyowner]['StoryNeedtoCheckCnt']++; }
-        if(story[k]['SDET_NeedDevelTC'] == true) { storyz_devel[storyowner]['StoryDevelTCCnt']++; } else { storyz_devel[storyowner]['StoryNonDevelTCCnt']++; }
+        else
+        {
+          if(story[k]['SDET_NeedDevelTC'] == true) { storyz_devel[storyowner]['StoryDevelTCCnt']++; } else { storyz_devel[storyowner]['StoryNonDevelTCCnt']++; }
+        }
 
         storyz_devel[storyowner]['StoryTotalCnt']++;
         
@@ -2183,11 +2202,13 @@ async function makeZephyrStatics()
           if(story_zephyr.length > 0) { storyz_devel[storyowner]['StoryHasTCCnt']++; }
         }
 
+        let storyz_assignee = null;
         for(var l = 0; l < story_zephyr.length; l++)
         {
+          storyz_assignee = null;
           if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
           {
-            let storyz_assignee = story_zephyr[l]['Assignee'];
+            storyz_assignee = story_zephyr[l]['Assignee'];
             //setDevelopersInformation(storyz_assignee);
             if(storyz_assignee == null) { storyz_assignee = "Unassigned"; }
             if((storyz_assignee in developers) == false) { developers[storyz_assignee] = []; }
@@ -2224,9 +2245,12 @@ async function makeZephyrStatics()
             else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); storyz_devel[storyz_assignee]['ZephyrCnt']--; }
         
             // [STORY ZEPHYR EXECUTION LOOP]
+            let sz_last_time = 0;
+            let sz_final_status = "2";
             console.log("[SZ] i = ", i, " j = ", j, " k = ", k, " l = ", l);
             for(var m = 0; m < story_zephyr[l]['Executions'].length; m++)
             {
+              sz_last_time = 0, sz_final_status = "2";
               let storyze_assignee = story_zephyr[l]['Executions'][m]['executedBy'];
               //setDevelopersInformation(storyze_assignee);
               if(storyze_assignee == null) { storyze_assignee = "Unassigned"; }
@@ -2265,14 +2289,16 @@ async function makeZephyrStatics()
               else { console.log("[SZE] executionStatus is not Defined = ", status); }
 
               // check the result of last test status.
-              if(m == 0 && status == "1") 
+              if(status == "1") 
               {
-                //if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
-                { 
-                  storyz_devel[storyz_assignee]['PassStoryCnt']++; 
-                }
+                let sz_cur_time = story_zephyr[l]['Executions'][m]['executedOn'];
+                sz_cur_time = sz_cur_time.replace('/', '-');
+                sz_cur_time = sz_cur_time.replace(' ', 'T');
+                sz_cur_time = new Date(sz_cur_time);
+                if(sz_last_time == 0 || (sz_cur_time - sz_last_time > 0)) { sz_last_time = sz_cur_time, sz_final_status = '1'; }
               }
             }
+            if(storyz_assignee != null && sz_final_status == '1') { storyz_devel[storyz_assignee]['PassStoryCnt']++; }
           }
         }       
       }
@@ -2352,10 +2378,12 @@ async function make_URLinfo()
       current_urlinfo['EPIC_LINK']['TOTAL']['Total']['keys'].push(epic[j]['Epic Key']);
 
       if(epic[j]['Labels'].length == 0 || epic[j]['SDET_NeedtoCheck'] == true) { current_urlinfo['EPIC_LINK']['TOTAL']['NeedtoCheck']['keys'].push(epic[j]['Epic Key']); }
-      
-      if(epic[j]['SDET_NeedDevelTC'] == true) { current_urlinfo['EPIC_LINK']['TOTAL']['DevelTC']['keys'].push(epic[j]['Epic Key']); } 
-      else { current_urlinfo['EPIC_LINK']['TOTAL']['NonDevelTC']['keys'].push(epic[j]['Epic Key']); }
-    
+      else
+      {
+        if(epic[j]['SDET_NeedDevelTC'] == true) { current_urlinfo['EPIC_LINK']['TOTAL']['DevelTC']['keys'].push(epic[j]['Epic Key']); } 
+        else { current_urlinfo['EPIC_LINK']['TOTAL']['NonDevelTC']['keys'].push(epic[j]['Epic Key']); }
+      }
+
       if(initparse.checkIsDelivered(epic[j]['Status']) == false)
       {
         if(epic[j]['AbnormalSprint'] == true) { current_urlinfo['COMMON']['AbnormalSPList'].push(epic[j]['Epic Key']); }
@@ -2411,9 +2439,11 @@ async function make_URLinfo()
       {
         var storyowner = story[k]['Assignee'];
         if(story[k]['Labels'].length == 0 || story[k]['SDET_NeedtoCheck'] == true) { current_urlinfo['STORY_LINK']['TOTAL']['NeedtoCheck']['keys'].push(story[k]['Story Key']); }
-
-        if(story[k]['SDET_NeedDevelTC'] == true) { current_urlinfo['STORY_LINK']['TOTAL']['DevelTC']['keys'].push(story[k]['Story Key']); } 
-        else { current_urlinfo['STORY_LINK']['TOTAL']['NonDevelTC']['keys'].push(story[k]['Story Key']); }
+        else
+        {
+          if(story[k]['SDET_NeedDevelTC'] == true) { current_urlinfo['STORY_LINK']['TOTAL']['DevelTC']['keys'].push(story[k]['Story Key']); } 
+          else { current_urlinfo['STORY_LINK']['TOTAL']['NonDevelTC']['keys'].push(story[k]['Story Key']); }
+        }
 
         current_urlinfo['STORY_LINK']['TOTAL']['Total']['keys'].push(story[k]['Story Key']);
         

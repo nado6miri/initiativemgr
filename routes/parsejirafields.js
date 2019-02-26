@@ -744,14 +744,14 @@ function getZephyrExeinfo_Status(ZephyrIssue) {
 }
 
 //===========================================================================
-// Get Exeinfo executionOn of zephyr
+// Get Exeinfo executedOn of zephyr
 // [param] jiraIssue : json object of jira
-// [return] str (executionOn - Date Info)
+// [return] str (executedOn - Date Info)
 //===========================================================================
 function getZephyrExeinfo_Date(ZephyrIssue) {
-    if(ZephyrIssue['executionOn'] != null) 
+    if(ZephyrIssue['executedOn'] != null) 
     {
-        return ZephyrIssue['executionOn'];
+        return ZephyrIssue['executedOn'];
     }
     return null;
 }
