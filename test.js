@@ -9,7 +9,7 @@ moment.tz.setDefault("Asiz/Seoul");
 function periodic_DBjobs()
 {
   let exeflag = true;
-  initapi.Test();
+  //initapi.Test();
 
   console.log(process.argv);
   /*
@@ -17,7 +17,10 @@ function periodic_DBjobs()
     console.log(index + ': ' + val);
   });
   */
-  //initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-16376");
+  //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093, true);   // webOS4.5 MR minor airplay
+
+  initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-23900", true);   // test KEY
+
 }  
 
 periodic_DBjobs();

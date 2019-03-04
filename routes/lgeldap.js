@@ -63,7 +63,7 @@ function getLDAP_InfoTest(username)
   }
 }
 
-var exceptionlist = ['Unassigned', 'null', 'stan.kim', 'buyoung.yun', 'juneyoung.jung', 'hyokak.kim' ];
+var exceptionlist = ['Unassigned', 'null', 'stan.kim', 'buyoung.yun', 'juneyoung.jung', 'hyokak.kim', 's2.kim', 'heekyoung.seo' ];
 
 
 function getLDAP_Info(username)
@@ -93,7 +93,7 @@ function getLDAP_Info(username)
     {
       console.log("Unassigned user..... skip"); 
       //resolve({ 'name' : 'Unassigned', 'department' : "None" }) }
-      resolve({ 'name' : 'Unassigned', 'department' : "None", 'displayName' : 'Unassigned/None/None(None)', 'DepartmentCode' : 0 });
+      resolve({ 'name' : username, 'department' : "None", 'displayName' : username+'/None/None(None)', 'DepartmentCode' : 0 });
     }
 
     client.bind('addhost', '1qaz2wsx', function (error) {

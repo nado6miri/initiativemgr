@@ -2076,11 +2076,9 @@ async function makeZephyrStatics()
           else { console.log("[EZ] Status is not Defined = ", epicz_devel[k]['Status']); epicz_devel[epicz_assignee]['ZephyrCnt']--; }
 
           // [EPIC ZEPHYR EXECUTION LOOP]
-          let ez_last_time = 0;
-          let ez_final_status = "2";
+          let ez_last_time = 0, ez_final_status = "2";
           for(var l = 0; l < epic_zephyr[k]['Executions'].length; l++)
           {
-            ez_last_time = 0, ez_final_status = "2";
             console.log("[EZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l);
             let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
             //setDevelopersInformation(epicze_assignee);
@@ -2245,12 +2243,10 @@ async function makeZephyrStatics()
             else { console.log("[SZ] Status is not Defined = ", story_zephyr[l]['Status']); storyz_devel[storyz_assignee]['ZephyrCnt']--; }
         
             // [STORY ZEPHYR EXECUTION LOOP]
-            let sz_last_time = 0;
-            let sz_final_status = "2";
+            let sz_last_time = 0, sz_final_status = "2";
             console.log("[SZ] i = ", i, " j = ", j, " k = ", k, " l = ", l);
             for(var m = 0; m < story_zephyr[l]['Executions'].length; m++)
             {
-              sz_last_time = 0, sz_final_status = "2";
               let storyze_assignee = story_zephyr[l]['Executions'][m]['executedBy'];
               //setDevelopersInformation(storyze_assignee);
               if(storyze_assignee == null) { storyze_assignee = "Unassigned"; }
@@ -2393,6 +2389,7 @@ async function make_URLinfo()
       let epic_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['Zephyr']['ZephyrTC'];
       for(var k = 0; k < epic_zephyr.length; k++)
       {
+        let ez_final_status = '2', ez_last_time = 0;
         if(initiative_DB['issues'][i]['EPIC']['issues'][j]['SDET_NeedDevelTC'] == true)
         {
           console.log("[EZ] i = ", i, " j = ", j, " k = ", k);
@@ -2418,18 +2415,17 @@ async function make_URLinfo()
             let epicze_assignee = epic_zephyr[k]['Executions'][l]['executedBy'];
             let status = epic_zephyr[k]['Executions'][l]['executionStatus'];
             // check the result of last test status.
-            if(l == 0)
+            if(status == "1") 
             {
-              if(status == "1")
-              {
-                current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(epic_zephyr[k]['Zephyr Key']);
-              }
-              else
-              {
-                current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(epic_zephyr[k]['Zephyr Key']);
-              }
-            }
+              let ez_cur_time = epic_zephyr[k]['Executions'][l]['executedOn'];
+              ez_cur_time = ez_cur_time.replace('/', '-');
+              ez_cur_time = ez_cur_time.replace(' ', 'T');
+              ez_cur_time = new Date(ez_cur_time);
+              if(ez_last_time == 0 || (ez_cur_time - ez_last_time > 0)) { ez_last_time = ez_cur_time, ez_final_status = '1'; }
+            } 
           }       
+          if(ez_final_status == '1') { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(epic_zephyr[k]['Zephyr Key']); }
+          else { current_urlinfo['EPIC_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(epic_zephyr[k]['Zephyr Key']); }
         }
       }
 
@@ -2456,6 +2452,7 @@ async function make_URLinfo()
         let story_zephyr = initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['Zephyr']['ZephyrTC'];
         for(var l = 0; l < story_zephyr.length; l++)
         {
+          let sz_last_time = 0, sz_final_status = "2";
           if(initiative_DB['issues'][i]['EPIC']['issues'][j]['STORY']['issues'][k]['SDET_NeedDevelTC'] == true)
           {
             let storyz_assignee = story_zephyr[l]['Assignee'];
@@ -2481,18 +2478,17 @@ async function make_URLinfo()
               console.log("[SZ-Exec] i = ", i, " j = ", j, " k = ", k, " l = ", l, " m = ", m);    
               let status = story_zephyr[l]['Executions'][m]['executionStatus'];
               // check the result of last test status.
-              if(m == 0)
+              if(status == "1") 
               {
-                if(status == "1") 
-                {
-                  current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(story_zephyr[l]['Zephyr Key']);
-                }
-                else
-                {
-                  current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(story_zephyr[l]['Zephyr Key']);
-                }
+                let sz_cur_time = story_zephyr[l]['Executions'][m]['executedOn'];
+                sz_cur_time = sz_cur_time.replace('/', '-');
+                sz_cur_time = sz_cur_time.replace(' ', 'T');
+                sz_cur_time = new Date(sz_cur_time);
+                if(sz_last_time == 0 || (sz_cur_time - sz_last_time > 0)) { sz_last_time = sz_cur_time, sz_final_status = '1'; }
               }
             }
+            if(sz_final_status == '1') { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_PASS']['keys'].push(story_zephyr[l]['Zephyr Key']); }
+            else { current_urlinfo['STORY_LINK']['TOTAL']['Zephyr_FAIL']['keys'].push(story_zephyr[l]['Zephyr Key']); }
           }
         }      
       } // story

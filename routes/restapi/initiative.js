@@ -42,22 +42,27 @@ router.get('/:id', function(req, res, next) {
       console.log("req.params.id == webOS5.0_Initial(SEETV)");
       filename = "initiative_DB_45400_Latest.json"
       break;
+    case "developers" :
+      console.log("req.params.id == developers");
+      filename = "developers.json"
+      break;
     default:
-      console.log("req.params.id == Default - webOS4.5_MR_Minor");
-      filename = "initiative_DB_46093_Latest.json"
-      console.log("[default] query = ", req.query);
-      console.log("[default] params = ", req.params);
+      res.send({"err msg" : "Can't find your request data"}); // 브라우저로 전송  
+      filename = null;
       break;
   }
 
-  fs.readFile(__dirname + "/../../public/json/" + filename, (err, data) => { // 파일 읽는 메소드
-      if (err) {
-        res.send({"err msg" : "Can't find raw data = " + filename}); // 브라우저로 전송   
-        return console.error(err); // 에러 발생시 에러 기록하고 종료
-      }
-      //res.end(data, 'utf-8'); // 브라우저로 전송   
-      res.send(data); // 브라우저로 전송   
-  });
+  if(filename !== null)
+  {
+    fs.readFile(__dirname + "/../../public/json/" + filename, (err, data) => { // 파일 읽는 메소드
+        if (err) {
+          res.send({"err msg" : "Can't find raw data = " + filename}); // 브라우저로 전송   
+          return console.error(err); // 에러 발생시 에러 기록하고 종료
+        }
+        //res.end(data, 'utf-8'); // 브라우저로 전송   
+        res.send(data); // 브라우저로 전송   
+    });
+  }
 });
 
 /* GET users listing. */
