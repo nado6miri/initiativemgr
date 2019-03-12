@@ -1022,7 +1022,7 @@ async function makeSnapshot_InitiativeDetailInfofromJira(KeyValue, index)
     current_initiative_info['Workflow'] = JSON.parse(JSON.stringify(current_workflow)); 
 
     // Status Summary { 'UpdateDate' : 'None', count : 0, 'Description' : "" }
-    current_initiative_info['StatusSummary'] = initparse.parseStatusSummary(changelog);
+    current_initiative_info['StatusSummary'] = initparse.parseStatusSummary(changelog, current_workflow['Status']);
 
     /*
     //current_workflow = initparse.parseWorkflow(initiativelist['issues'][0]['changelog'], current_workflow);

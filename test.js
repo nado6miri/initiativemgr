@@ -19,7 +19,7 @@ function periodic_DBjobs()
   */
   //initapi.makeSnapshot_InitiativeListfromJira("filterID_KeyListOnly", 46093, true);   // webOS4.5 MR minor airplay
 
-  initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-23900", true);   // test KEY
+  initapi.makeSnapshot_InitiativeListfromJira("keyID", "TVPLAT-29063", true);   // test KEY
 
 }  
 

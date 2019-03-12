@@ -1066,6 +1066,7 @@ function parseWorkflow(changelog, workflow)
         }
 
         let cur_status = workflow['Status'];
+        if(cur_status == "DRAFTING") { end = created; }
         workflow[cur_status]['Duration'] = (today - end) / (1000*60*60*24); 
         workflow[cur_status]['History'].push({ "startdate" : end, "enddate" : today, "peroid" : workflow[cur_status]['Duration'] });
 
@@ -1494,7 +1495,7 @@ function parseReleaseSprint(changelog, releaseSP)
 // [param] changelog, 
 // [return] the last of status summary contents from changelog [created date, count, contents]
 //===========================================================================
-function parseStatusSummary(changelog)
+function parseStatusSummary(changelog, status)
 {
     console.log("parseStatusSummary function")
     if(changelog != null)
@@ -1530,6 +1531,7 @@ function parseStatusSummary(changelog)
             let update_elapsed = 0;
             update_elapsed = getElapsedDays(item_created[0], today);
             count = (update_elapsed / 7); 
+            if(checkIsDelivered(status) == true) { count = 0; }
             console.log("[Status Summary] Changed Date : ", item_created, "누락회수 = ", count, " Status Summary : ", to);
             let result = { 'UpdateDate' : item_created[0], 'count' : count, 'Description' : to };
             return result;
